@@ -68,6 +68,11 @@
     margin-bottom:-1px;position:relative;top:1px}
   .tag.type{background:var(--cbt-primary);color:#fff}
   .tag.read{background:var(--cbt-warning);color:#5A3B04}
+  .stepbadge{display:inline-block;background:var(--cbt-heading);color:#fff;border-radius:6px;
+    padding:3px 9px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    margin-right:8px;vertical-align:middle}
+  .handoff{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;margin:0 0 18px}
+  .handoff h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.2rem;margin:0 0 10px;color:var(--cbt-heading)}
   pre.block{margin:0 0 16px;border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) var(--cbt-radius-sm);
     padding:14px 18px;overflow-x:auto;font-size:13.5px;line-height:1.65;border:1px solid var(--cbt-border)}
   pre.block.type{background:var(--cbt-primary-muted);border-color:rgba(0,153,77,.3)}
@@ -255,24 +260,156 @@ exists (see the open question in Section 1).</p>
 </div>
 
 <h2 class="section" id="backend"><span class="num">04</span>Deploying the backend, Render</h2>
-<p class="section-why">This is already written up in full, click-by-click detail elsewhere, linked
-here rather than duplicated so the two copies can't quietly drift apart.</p>
+<p class="section-why">The code is already on GitHub, committed and pushed to <code>backend/anas</code>
+(Section 1). Everything below is about getting Render itself to actually run it, continuously,
+somewhere everyone can reach.</p>
 
 <div class="card">
-  <p>Full guide: <code>Backend/dev-log/for-anas/deployment-guide.html</code>. Covers creating a Render
-  account, a managed Postgres database, the web service itself, every environment variable it needs,
-  and running migrations against it.</p>
-  <p><b>Quick summary</b>, if you've already read the full guide once: connect the GitHub repo to a new
-  Render Web Service, currently pointed at <code>backend/anas</code> (should move to <code>main</code>
-  once that exists, see Section 1), auto-deploy on every push, environment variables copied from
-  <code>.env.example</code> with real values.</p>
+  <h4><span class="stepbadge">Step 1</span>Create a Render account</h4>
+  <ol>
+    <li>Go to <code>render.com</code>, sign up with <b>GitHub</b>, not email/password, so Render can
+    see the repo directly.</li>
+    <li>A personal account is fine as a Dev-only stopgap, same status as the Vercel account in Section
+    5, migrate to a real team account before this matters beyond testing.</li>
+  </ol>
+</div>
+
+<div class="watch">
+  <span class="lbl">Possible wall, worth knowing before you hit it</span>
+  <p>Since Farhan owns the repo, connecting Render to it may need his say-so too. GitHub's rule:
+  whoever installs the Render app against a private repo needs admin rights on that repo, or the org
+  owner has to approve it once at the org level. If Render's repo picker in Step 3 below doesn't show
+  <code>cbt-mmm-platform</code>, that's why. Ask Farhan to add you as an <b>admin</b> collaborator
+  (not just write access) rather than guessing at a workaround.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 2</span>Create the shared database</h4>
+  <ol>
+    <li>In the Render dashboard, click <b>New +</b> &rarr; <b>PostgreSQL</b>.</li>
+    <li>Name it something like <code>mmm-dev-shared</code>.</li>
+    <li>Region: pick whichever is closest to the team, doesn't need to match Azure's eventual region.</li>
+    <li>Plan: the free tier is fine to start, but see the note below.</li>
+    <li>Click <b>Create Database</b>, wait for its status to say <b>Available</b>.</li>
+    <li>Open its <b>Info</b> tab. You'll need four values in Step 3: <b>Hostname</b>, <b>Port</b>,
+    <b>Database</b>, and the admin <b>Username</b> / <b>Password</b> Render generated. Keep this tab
+    open.</li>
+  </ol>
+</div>
+
+<div class="watch">
+  <span class="lbl">Free Postgres on Render doesn't last forever</span>
+  <p>Render's free-tier databases have a limited lifespan before they're deleted, confirm the exact
+  window on Render's current pricing page at signup, it's changed before and don't rely on this page to
+  have the latest number. Plan to upgrade to a paid tier, or move to Azure Postgres, before that clock
+  runs out, not after real team data is sitting in it.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 3</span>Create the web service</h4>
+  <ol>
+    <li>Click <b>New +</b> &rarr; <b>Web Service</b>.</li>
+    <li>Pick <code>cbt-mmm-platform</code> from the repo list. If it isn't there, see the wall above.</li>
+    <li><b>Branch:</b> <code>backend/anas</code> for now (see Section 1's open question about
+    <code>main</code>, re-point this once it exists).</li>
+    <li>Name: <code>mmm-backend-dev</code> or similar.</li>
+    <li>Runtime: <b>Node</b>.</li>
+    <li>Build command: <code>npm install && npm run build</code></li>
+    <li>Start command: <code>npm run start:prod</code></li>
+    <li>Instance type: free tier is fine to start.</li>
+    <li>Find <b>Auto-Deploy</b> in the settings (usually already on when you connect a repo this way)
+    and confirm it's set to <b>Yes</b>, on the branch from step 3 above. Verify this rather than
+    assume it, it's the entire reason to deploy this way instead of by hand.</li>
+    <li>Don't click Create yet, add the environment variables below first, they're on the same
+    screen.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4>Environment variables</h4>
+  <p>Same idea as the local <code>.env</code> file (<code>Backend/.env.example</code> shows every key
+  with a description), entered into Render's dashboard instead of a file:</p>
+  <table>
+    <tr><th>Key</th><th>Value</th></tr>
+    <tr><td><code>NODE_ENV</code></td><td><code>production</code></td></tr>
+    <tr><td><code>DB_HOST</code></td><td>the Postgres <b>Hostname</b> from Step 2</td></tr>
+    <tr><td><code>DB_PORT</code></td><td>the Postgres <b>Port</b> from Step 2 (usually <code>5432</code>)</td></tr>
+    <tr><td><code>DB_NAME</code></td><td>the Postgres <b>Database</b> name from Step 2</td></tr>
+    <tr><td><code>DB_ADMIN_USERNAME</code></td><td>the Postgres admin <b>Username</b> Render generated</td></tr>
+    <tr><td><code>DB_ADMIN_PASSWORD</code></td><td>the Postgres admin <b>Password</b> Render generated</td></tr>
+    <tr><td><code>DB_USERNAME</code></td><td><code>mmm_app</code></td></tr>
+    <tr><td><code>DB_PASSWORD</code></td><td>a new strong password you invent here, write it down, needed again in Step 4</td></tr>
+    <tr><td><code>DB_SSL</code></td><td><code>true</code>, Render's Postgres requires it, same as Azure will</td></tr>
+    <tr><td><code>DB_SYNCHRONIZE</code></td><td><code>false</code></td></tr>
+    <tr><td><code>DB_LOGGING</code></td><td><code>false</code>, the verbose SQL logging is for local only</td></tr>
+    <tr><td><code>AZURE_AD_TENANT_ID</code></td><td><code>d5619769-1863-41fe-86e3-95000d84f2a6</code></td></tr>
+    <tr><td><code>AZURE_AD_AUDIENCE</code></td><td><code>api://fa733969-d53d-46ed-81fc-119c740a5cc9</code></td></tr>
+    <tr><td><code>AUTH_DEV_BYPASS</code></td><td><code>true</code> for the first connection test (Section
+    6), flip to <code>false</code> once real login is wired up on the frontend</td></tr>
+  </table>
+  <p>Don't set <code>PORT</code> yourself, Render assigns its own and injects it automatically, the app
+  already reads whatever's in the environment.</p>
+  <p>Click <b>Create Web Service</b>. The first deploy takes a few minutes and will very likely
+  <b>fail on boot</b>, that's expected, the database is still empty, Step 4 fixes it.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 4</span>Run migrations against the new database</h4>
+  <p>The web service can't start yet because the tables, and the restricted <code>mmm_app</code> role,
+  don't exist on Render's database. This runs from your own machine, once, using a temporary copy of
+  <code>.env</code> pointed at Render's database instead of the local Docker one.</p>
+  <ol>
+    <li>Make a copy of the real <code>.env</code> file, name the copy <code>.env.render-setup</code>.</li>
+    <li>In that copy, change <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>,
+    <code>DB_ADMIN_USERNAME</code>, <code>DB_ADMIN_PASSWORD</code> to the Render Postgres values from
+    Step 2, and set <code>DB_USERNAME</code>/<code>DB_PASSWORD</code> to <code>mmm_app</code> and the
+    password invented in Step 3. Set <code>DB_SSL=true</code>.</li>
+  </ol>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>cd D:\Anas\MMM\Backend
+Copy-Item .env .env.backup
+Copy-Item .env.render-setup .env
+npm run migration:run</code></pre>
+  <p>Watch the output: each migration should be listed as run, ending with
+  <code>CreateAppRole1785900000002</code>, the one that actually creates <code>mmm_app</code> on
+  Render's database.</p>
+  <span class="tag type">Type this right after, don't skip it</span>
+  <pre class="block type"><code>Copy-Item .env.backup .env -Force</code></pre>
+  <p>That restores the real local <code>.env</code>, pointed at the local Docker Postgres again.
+  Confirm the local server still starts normally after this before moving on.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 5</span>Verify it</h4>
+  <ol>
+    <li>Back in Render, open the web service, check the <b>Logs</b> tab. It should say something like
+    <code>MMM backend listening on http://localhost:&lt;port&gt;</code> with no crash after it.</li>
+    <li>Copy the public URL Render shows at the top of the service page (looks like
+    <code>https://mmm-backend-dev.onrender.com</code>).</li>
+    <li>In a browser, or Postman, request <code>&lt;that URL&gt;/api/v1/health</code>. Expect
+    <code>{"status":"ok","database":"connected",...}</code>.</li>
+    <li>With <code>AUTH_DEV_BYPASS=true</code> set in Step 3, request
+    <code>&lt;that URL&gt;/api/v1/auth/me</code> too, expect <code>devBypass: true</code> back.</li>
+  </ol>
+  <div class="callout">
+    <span class="lbl">Don't mark anything Passing yet</span>
+    <p>This isn't a new row in <code>Backend/dev-log/for-anas/test-cases.html</code> on its own, it's
+    the same routes, reachable from a new address. It only really counts once Section 6 below is done
+    and the deployed frontend is calling this deployed backend for real.</p>
+  </div>
+</div>
+
+<div class="handoff">
+  <h3>Once Step 5 is confirmed, tell the team</h3>
+  <p>Share the Render URL in whatever channel the team uses. Nobody else needs Farhan's or Anas's
+  permission to start pointing their own work at it, that's the entire point of it being shared.</p>
 </div>
 
 <h2 class="section" id="frontend"><span class="num">05</span>Deploying the frontend, Vercel</h2>
 <p class="section-why">New, full detail, since this hasn't been written up step by step before.</p>
 
 <div class="card">
-  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 1</span>Create a Vercel account</h4>
+  <h4><span class="stepbadge">Step 1</span>Create a Vercel account</h4>
   <ol>
     <li>Go to <code>vercel.com</code>, click <b>Sign Up</b>.</li>
     <li>Choose <b>Continue with GitHub</b>, not email/password, so Vercel can see your repos directly.</li>
@@ -282,7 +419,7 @@ here rather than duplicated so the two copies can't quietly drift apart.</p>
 </div>
 
 <div class="card">
-  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 2</span>Import the project</h4>
+  <h4><span class="stepbadge">Step 2</span>Import the project</h4>
   <ol>
     <li>From the Vercel dashboard, click <b>Add New...</b> &rarr; <b>Project</b>.</li>
     <li>Find <code>cbt-mmm-platform</code> in the repo list and click <b>Import</b>. If it's not
@@ -298,7 +435,7 @@ here rather than duplicated so the two copies can't quietly drift apart.</p>
 </div>
 
 <div class="card">
-  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 3</span>Get your URL, and what it does right now</h4>
+  <h4><span class="stepbadge">Step 3</span>Get your URL, and what it does right now</h4>
   <ol>
     <li>Once deployed, Vercel shows a URL like <code>https://cbt-mmm-platform.vercel.app</code>. Click
     it, confirm the app actually loads.</li>
