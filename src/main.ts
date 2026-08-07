@@ -18,9 +18,14 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  // The Angular SPA runs on its own origin (Static Web Apps / Blob + Front
-  // Door). Tighten this to the real deployed origin once it exists —
-  // wide open is fine for local Dev only.
+  // Matches what the Angular frontend already calls (environment.ts's
+  // apiBaseUrl ends in /api/v1) — found while writing the cross-team
+  // deployment protocol, 2026-08-06, before it ever became a live bug.
+  app.setGlobalPrefix('api/v1');
+
+  // The Angular SPA runs on its own origin (Vercel today, Static Web Apps
+  // or Blob + Front Door once on Azure). Tighten this to the real deployed
+  // origin once it exists — wide open is fine for local Dev only.
   app.enableCors();
 
   if (config.get<boolean>('AUTH_DEV_BYPASS')) {

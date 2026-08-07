@@ -69,11 +69,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/health",
+							"raw": "{{baseUrl}}/api/v1/health",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"health"
 							]
 						},
@@ -95,11 +97,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/auth/me",
+							"raw": "{{baseUrl}}/api/v1/auth/me",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"me"
 							]
@@ -114,11 +118,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/auth/me",
+							"raw": "{{baseUrl}}/api/v1/auth/me",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"me"
 							]
@@ -146,11 +152,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/projects",
+							"raw": "{{baseUrl}}/api/v1/projects",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"projects"
 							]
 						},
@@ -173,11 +181,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/projects",
+							"raw": "{{baseUrl}}/api/v1/projects",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"projects"
 							]
 						},
@@ -191,11 +201,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/projects/:id",
+							"raw": "{{baseUrl}}/api/v1/projects/:id",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"projects",
 								":id"
 							],
@@ -221,11 +233,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/projects/:id",
+							"raw": "{{baseUrl}}/api/v1/projects/:id",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"projects",
 								":id"
 							],
@@ -255,11 +269,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/projects/:id",
+							"raw": "{{baseUrl}}/api/v1/projects/:id",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
+								"api",
+								"v1",
 								"projects",
 								":id"
 							],

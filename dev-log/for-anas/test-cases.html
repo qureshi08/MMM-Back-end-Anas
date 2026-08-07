@@ -183,7 +183,7 @@ npm run start:dev</code></pre>
     <p><b>Preconditions:</b> the server running (see
     <a href="#starting-the-server">Starting the server</a> above), Docker Postgres up.</p>
     <ol>
-      <li>Request <code>GET {{baseUrl}}/health</code> (no auth header needed, this route is
+      <li>Request <code>GET {{baseUrl}}/api/v1/health</code> (no auth header needed, this route is
       <code>@Public()</code>).</li>
     </ol>
     <div class="expect">
@@ -202,7 +202,7 @@ npm run start:dev</code></pre>
     <p><b>Preconditions:</b> <code>AUTH_DEV_BYPASS=true</code> in <code>.env</code>, the server
     running (see <a href="#starting-the-server">Starting the server</a> above).</p>
     <ol>
-      <li>Request <code>GET {{baseUrl}}/auth/me</code>, no Authorization header needed.</li>
+      <li>Request <code>GET {{baseUrl}}/api/v1/auth/me</code>, no Authorization header needed.</li>
     </ol>
     <div class="expect">
       <span class="lbl">Expected result</span>
@@ -338,7 +338,7 @@ npm run start:dev</code></pre>
       <code>DELETE /projects/:id, soft delete</code>.</li>
       <li>Click <b>POST /projects, create</b> once. It opens as a tab in the main area, to the
       right of the sidebar.</li>
-      <li>Just under the URL bar (<code>{{baseUrl}}/projects</code>) is a row of tabs: Params,
+      <li>Just under the URL bar (<code>{{baseUrl}}/api/v1/projects</code>) is a row of tabs: Params,
       Authorization, Headers, <b>Body</b>, Scripts, Settings. Click <b>Body</b>.</li>
       <li>You should see <b>raw</b> already selected and, further right on that same row, a
       dropdown that says <b>JSON</b>. Below that, a text box already containing:
@@ -392,8 +392,8 @@ npm run start:dev</code></pre>
     <ol>
       <li>Click <b>GET /projects/:id, view one</b> to open it.</li>
       <li>Look at the URL bar at the top of this request. It reads
-      <code>{{baseUrl}}/projects/:id</code>, the <code>:id</code> part is a placeholder, not a real
-      value yet.</li>
+      <code>{{baseUrl}}/api/v1/projects/:id</code>, the <code>:id</code> part is a placeholder, not
+      a real value yet.</li>
       <li>Just under the URL bar, click the <b>Params</b> tab (it's the second tab, right after
       the request name).</li>
       <li>Scroll down slightly if needed until you see a section titled <b>Path Variables</b>, with

@@ -31,7 +31,7 @@ npm run start:dev              # http://localhost:3000, restarts on save
 Confirm it's alive:
 
 ```powershell
-Invoke-RestMethod http://localhost:3000/health
+Invoke-RestMethod http://localhost:3000/api/v1/health
 ```
 
 `{"status":"ok","database":"connected", ...}` means the app is up and it can
@@ -110,7 +110,7 @@ genuinely undecided (how personal accounts should group, if at all).
 
 ```
 src/
-  main.ts                 bootstrap: global pipes, filters, CORS
+  main.ts                 bootstrap: global pipes, filters, CORS, /api/v1 prefix
   app.module.ts            wires config, database, and every feature module
 
   config/                  env validation + the one function that builds
