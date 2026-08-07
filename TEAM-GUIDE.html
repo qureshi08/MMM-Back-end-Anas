@@ -186,6 +186,65 @@ ahead if these are already familiar.</p>
   he owns the repo, see Section 8.</p>
 </div>
 
+<h3 class="sub">For Farhan: repo owner actions</h3>
+<p class="section-why">Three specific actions only the repo owner can take. Each is a separate GitHub
+mechanism, covered individually below.</p>
+
+<div class="card">
+  <h4>1. Add teammates as collaborators</h4>
+  <ol>
+    <li>On GitHub, open <code>cbt-mmm-platform</code>, click <b>Settings</b> (top tabs).</li>
+    <li>In the left sidebar, click <b>Collaborators and teams</b>.</li>
+    <li>Click <b>Add people</b>, search by GitHub username or the email tied to their GitHub account,
+    select them.</li>
+    <li>Choose a role: <b>Admin</b> for anyone who needs to manage repository settings or branches,
+    <b>Write</b> is sufficient for regular push and pull request work.</li>
+    <li>Click <b>Add</b>. GitHub sends the person an invitation, which they need to accept before
+    access takes effect.</li>
+  </ol>
+</div>
+
+<div class="watch">
+  <span class="lbl">Admin collaborator access alone will not connect Render or Vercel</span>
+  <p>This repository is under a personal GitHub account, not an organization. Third-party GitHub Apps
+  such as Render and Vercel can only be granted access to a personal account's repositories by that
+  account's owner. Adding someone as an <b>Admin</b> collaborator controls what they can do inside the
+  repository itself; it does not let them install or authorize a GitHub App on Farhan's account. If
+  this turns out not to match what Render's or Vercel's interface actually shows, report the exact
+  message rather than assuming either way.</p>
+</div>
+
+<div class="card">
+  <h4>2. Connect Render and Vercel to the repository</h4>
+  <p>The reliable path, given the constraint above: Farhan performs the initial connection himself,
+  then adds teammates inside each platform's own dashboard rather than through GitHub.</p>
+  <ol>
+    <li>Sign into <code>render.com</code> using <b>Continue with GitHub</b>, with the GitHub account
+    that owns this repository.</li>
+    <li>Follow Section 4's steps to import <code>cbt-mmm-platform</code> and grant Render's GitHub App
+    access to it.</li>
+    <li>Once the Render service exists, invite Anas as a team member from within Render's own
+    dashboard (<b>Team</b> settings), so he can manage the deployment without needing further
+    GitHub-level approval.</li>
+    <li>Repeat the same pattern for Vercel: sign in with GitHub, complete Section 5's import steps,
+    then invite Amna as a team member inside Vercel's dashboard.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4>3. Create <code>main</code> and set it as the default branch</h4>
+  <p>Hold this action until the monorepo restructuring above is agreed. Creating <code>main</code>
+  from either project's current flat layout only recreates the same merge conflict on the next push.</p>
+  <ol>
+    <li>Once ready, create the branch: on GitHub, use the branch dropdown (top left of the
+    <b>Code</b> tab) and type <code>main</code>, or run <code>git checkout -b main</code> locally and
+    push it.</li>
+    <li>Go to <b>Settings</b> &rarr; <b>General</b>.</li>
+    <li>Under <b>Default branch</b>, click the switch icon, select <code>main</code>, click
+    <b>Update</b>, and confirm.</li>
+  </ol>
+</div>
+
 <h2 class="section" id="daily"><span class="num">02</span>Your daily workflow</h2>
 <p class="section-why">What to actually type, every time you sit down to work on your own branch.</p>
 
@@ -276,10 +335,10 @@ somewhere everyone can reach.</p>
 
 <div class="watch">
   <span class="lbl">Known blocker, review before proceeding</span>
-  <p>Since Farhan owns the repo, connecting Render to it may also require his approval. GitHub
-  requires admin rights on a private repo to install the Render app against it, or org-level approval
-  from the owner. If Render's repo picker in Step 3 below doesn't show <code>cbt-mmm-platform</code>,
-  this is the reason. Ask Farhan to add you as an <b>admin</b> collaborator, not just write access.</p>
+  <p>The repository is under Farhan's personal GitHub account, so only he can grant Render's GitHub
+  App access to it, being added as a collaborator does not enable this. If <code>cbt-mmm-platform</code>
+  doesn't appear in Render's repo picker in Step 3 below, Farhan needs to complete the connection
+  himself, see Section 1's "For Farhan: repo owner actions" for the exact steps.</p>
 </div>
 
 <div class="card">
@@ -407,6 +466,14 @@ npm run migration:run</code></pre>
 <h2 class="section" id="frontend"><span class="num">05</span>Deploying the frontend, Vercel</h2>
 <p class="section-why">New, full detail, since this hasn't been written up step by step before.</p>
 
+<div class="watch">
+  <span class="lbl">Who should perform this connection</span>
+  <p>Same constraint as Render: the repository is under Farhan's personal GitHub account, so only he
+  can grant Vercel's GitHub App access to it. Farhan should complete Steps 1 and 2 below himself, then
+  invite Amna as a team member inside Vercel's own dashboard, see Section 1's "For Farhan: repo owner
+  actions."</p>
+</div>
+
 <div class="card">
   <h4><span class="stepbadge">Step 1</span>Create a Vercel account</h4>
   <ol>
@@ -422,7 +489,8 @@ npm run migration:run</code></pre>
   <ol>
     <li>From the Vercel dashboard, click <b>Add New...</b> &rarr; <b>Project</b>.</li>
     <li>Find <code>cbt-mmm-platform</code> in the repo list and click <b>Import</b>. If it's not
-    listed, click <b>Adjust GitHub App Permissions</b> and grant Vercel access to that specific repo.</li>
+    listed, click <b>Adjust GitHub App Permissions</b> and grant Vercel access to that specific repo,
+    this only works if signed in as the account that owns the repository.</li>
     <li>Vercel will ask which branch to deploy. Pick <code>frontend</code> for now (see Section 1's
     open question about <code>main</code>).</li>
     <li>Framework Preset: Vercel should auto-detect <b>Angular</b>. Confirm it did, rather than assume,
@@ -540,6 +608,9 @@ the team verifies a feature actually works end to end, not just that it appears 
   <div class="owner-card">
     <h4>Farhan</h4>
     <ul>
+      <li>Add teammates as collaborators (Section 1)</li>
+      <li>Connect Render and Vercel to the repository, then invite Anas and Amna as team members
+      inside each platform (Section 1, Sections 4 and 5)</li>
       <li>Decide the monorepo restructuring with the team</li>
       <li>Create <code>main</code> once agreed, set it as the repo's default branch</li>
     </ul>
