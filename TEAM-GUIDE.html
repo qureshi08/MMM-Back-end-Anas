@@ -191,7 +191,9 @@ ahead if these are already familiar.</p>
 mechanism, covered individually below.</p>
 
 <div class="card">
-  <h4>1. Add teammates as collaborators</h4>
+  <h4>1. Add teammates as collaborators <span style="font-weight:400;color:var(--cbt-muted);font-size:.85em">(done, confirmed August 7)</span></h4>
+  <p>Farhan has already invited the team; this is how everyone is able to access and push to the
+  repository today. Kept below for reference, and for anyone added later.</p>
   <ol>
     <li>On GitHub, open <code>cbt-mmm-platform</code>, click <b>Settings</b> (top tabs).</li>
     <li>In the left sidebar, click <b>Collaborators and teams</b>.</li>
@@ -323,6 +325,17 @@ exists (see the open question in Section 1).</p>
 (Section 1). Everything below is about getting Render itself to actually run it, continuously,
 somewhere everyone can reach.</p>
 
+<div class="callout">
+  <span class="lbl">Status, 2026-08-07</span>
+  <p>The first real deployment happened against a personal repository
+  (<code>qureshi08/MMM-Back-end-Anas</code>), pushed to as a second remote from the same local
+  clone, as an interim step while repo access on <code>cbt-mmm-platform</code> was still being
+  resolved with Farhan. It is live and fully verified: <code>/api/v1/health</code> returns
+  <code>200</code>, and <code>/api/v1/auth/me</code> correctly enforces real login. The steps below
+  are written against the shared repo and are what to follow once that access question is settled;
+  they are the same steps that were actually run, just against a different remote.</p>
+</div>
+
 <div class="card">
   <h4><span class="stepbadge">Step 1</span>Create a Render account</h4>
   <ol>
@@ -372,7 +385,11 @@ somewhere everyone can reach.</p>
     <code>main</code>, re-point this once it exists).</li>
     <li>Name: <code>mmm-backend-dev</code> or similar.</li>
     <li>Runtime: <b>Node</b>.</li>
-    <li>Build command: <code>npm install && npm run build</code></li>
+    <li>Build command: <code>npm install --include=dev && npm run build</code>. Confirmed
+    2026-08-07: a plain <code>npm install</code> here fails with <code>nest: not found</code>,
+    because setting <code>NODE_ENV=production</code> (below) makes <code>npm install</code> skip
+    <code>devDependencies</code>, and <code>@nestjs/cli</code>, which provides the build tool, lives
+    there. <code>--include=dev</code> installs it anyway for this build step.</li>
     <li>Start command: <code>npm run start:prod</code></li>
     <li>Instance type: free tier is fine to start.</li>
     <li>Find <b>Auto-Deploy</b> in the settings (usually already on when you connect a repo this way)
@@ -402,11 +419,20 @@ somewhere everyone can reach.</p>
     <tr><td><code>DB_LOGGING</code></td><td><code>false</code>, the verbose SQL logging is for local only</td></tr>
     <tr><td><code>AZURE_AD_TENANT_ID</code></td><td><code>d5619769-1863-41fe-86e3-95000d84f2a6</code></td></tr>
     <tr><td><code>AZURE_AD_AUDIENCE</code></td><td><code>api://fa733969-d53d-46ed-81fc-119c740a5cc9</code></td></tr>
-    <tr><td><code>AUTH_DEV_BYPASS</code></td><td><code>true</code> for the first connection test (Section
-    6), flip to <code>false</code> once real login is wired up on the frontend</td></tr>
+    <tr><td><code>AUTH_DEV_BYPASS</code></td><td><code>false</code>, see the note below</td></tr>
   </table>
   <p>Don't set <code>PORT</code> yourself, Render assigns its own and injects it automatically, the app
   already reads whatever's in the environment.</p>
+  <div class="watch">
+    <span class="lbl">AUTH_DEV_BYPASS cannot be true here, confirmed 2026-08-07</span>
+    <p>The app deliberately refuses to start with <code>AUTH_DEV_BYPASS=true</code> while
+    <code>NODE_ENV=production</code>, logging <code>This would let every request into the API
+    unauthenticated. Refusing to start.</code> This is intentional, not a bug, a deployed service
+    accepting every request as authenticated with no real login is exactly what it's preventing.
+    Since real Entra login is already fully working (Section 3, and <code>TC-04</code> in the test
+    suite), use it here instead of trying to bypass the check: keep <code>AUTH_DEV_BYPASS=false</code>
+    and test with a real token, same flow as TC-04, just pointed at this service's URL.</p>
+  </div>
   <p>Click <b>Create Web Service</b>. The first deploy takes a few minutes and will very likely
   <b>fail on boot</b>, that's expected, the database is still empty, Step 4 fixes it.</p>
 </div>
@@ -446,8 +472,11 @@ npm run migration:run</code></pre>
     <code>https://mmm-backend-dev.onrender.com</code>).</li>
     <li>In a browser, or Postman, request <code>&lt;that URL&gt;/api/v1/health</code>. Expect
     <code>{"status":"ok","database":"connected",...}</code>.</li>
-    <li>With <code>AUTH_DEV_BYPASS=true</code> set in Step 3, request
-    <code>&lt;that URL&gt;/api/v1/auth/me</code> too, expect <code>devBypass: true</code> back.</li>
+    <li>Request <code>&lt;that URL&gt;/api/v1/auth/me</code> with no token, expect <code>401</code>,
+    proof real login is actually being enforced, not skipped.</li>
+    <li>In Postman, use the same <b>Get New Access Token</b> flow as <code>TC-04</code>, pointed at
+    this service's URL instead of <code>localhost:3000</code>. Expect <code>200</code> with real
+    name and email back.</li>
   </ol>
   <div class="callout">
     <span class="lbl">Don't mark anything Passing yet</span>
@@ -608,7 +637,7 @@ the team verifies a feature actually works end to end, not just that it appears 
   <div class="owner-card">
     <h4>Farhan</h4>
     <ul>
-      <li>Add teammates as collaborators (Section 1)</li>
+      <li><s>Add teammates as collaborators</s>, done August 7</li>
       <li>Connect Render and Vercel to the repository, then invite Anas and Amna as team members
       inside each platform (Section 1, Sections 4 and 5)</li>
       <li>Decide the monorepo restructuring with the team</li>
