@@ -125,9 +125,9 @@
 <header>
   <div class="kicker">MMM Platform &middot; Everyone</div>
   <h1>How this <span class="italic-accent">whole thing</span> fits together</h1>
-  <p class="sub">One page covering the real, current answer to: how do we push code, how do we deploy it,
-  how do we connect the frontend to the backend, and how do we test it once it's connected. Written for
-  the whole team, Farhan, Amna, Hammad, and Anas, not just one person's personal notes.</p>
+  <p class="sub">The current, authoritative reference for pushing code, deploying it, connecting the
+  frontend to the backend, and testing the result once connected. Written for the whole team, Farhan,
+  Amna, Hammad, and Anas, not one person's personal notes.</p>
   <p class="updated">Last updated <b>August 7, 2026</b>. Covers the real repo at
   <code>github.com/mirfarhanahmad/cbt-mmm-platform</code>, Render for the backend, Vercel for the
   frontend. See <code>PLATFORM.md</code> in the same folder for the shorter, more technical version of
@@ -149,8 +149,8 @@
 </nav>
 
 <h2 class="section" id="basics"><span class="num">01</span>Git and GitHub, the real basics</h2>
-<p class="section-why">This section exists so nobody has to ask "wait, what's a branch again" in the
-middle of real work. Skip it if you're already comfortable, it'll still be here.</p>
+<p class="section-why">Quick reference definitions for the terms used throughout this guide. Skip
+ahead if these are already familiar.</p>
 
 <div class="define">
   <div class="term"><b>Repository (repo)</b><span>The whole project's folder, with its full history, living on GitHub. Ours is <code>cbt-mmm-platform</code>.</span></div>
@@ -168,7 +168,7 @@ middle of real work. Skip it if you're already comfortable, it'll still be here.
   <table>
     <tr><th>Branch</th><th>Owner</th><th>Status</th></tr>
     <tr><td><code>backend/anas</code></td><td>Anas</td><td>Exists, pushed to, real commits</td></tr>
-    <tr><td><code>frontend</code></td><td>Amna</td><td>Exists (not yet renamed to <code>frontend/amna</code>, a small housekeeping item, not urgent)</td></tr>
+    <tr><td><code>frontend</code></td><td>Amna</td><td>Exists (not yet renamed to <code>frontend/amna</code>; a minor housekeeping item)</td></tr>
     <tr><td><code>modeling/hammad</code></td><td>Hammad</td><td>Not created yet, create it when Python work starts</td></tr>
     <tr><td><code>infra/farhan</code></td><td>Farhan</td><td>Not created yet, create it when infra work starts</td></tr>
   </table>
@@ -250,8 +250,8 @@ exists (see the open question in Section 1).</p>
     <b>Compare & pull request</b> if you see it.</li>
     <li>If you don't see the banner, click <b>Pull requests</b> (top tabs) &rarr; <b>New pull request</b>
     &rarr; set <b>base</b> to <code>main</code> and <b>compare</b> to your branch.</li>
-    <li>Write a short description: what changed, and why, not just what. The commit messages already
-    say what, the PR description is where "why" belongs.</li>
+    <li>Write a short description covering what changed and why. Commit messages already record what
+    changed; the PR description should explain the reasoning.</li>
     <li>Click <b>Create pull request</b>.</li>
     <li>Ask one other teammate to look at it. Small team, keep this light, a real second pair of eyes,
     not a formal multi-approval process.</li>
@@ -275,12 +275,11 @@ somewhere everyone can reach.</p>
 </div>
 
 <div class="watch">
-  <span class="lbl">Possible wall, worth knowing before you hit it</span>
-  <p>Since Farhan owns the repo, connecting Render to it may need his say-so too. GitHub's rule:
-  whoever installs the Render app against a private repo needs admin rights on that repo, or the org
-  owner has to approve it once at the org level. If Render's repo picker in Step 3 below doesn't show
-  <code>cbt-mmm-platform</code>, that's why. Ask Farhan to add you as an <b>admin</b> collaborator
-  (not just write access) rather than guessing at a workaround.</p>
+  <span class="lbl">Known blocker, review before proceeding</span>
+  <p>Since Farhan owns the repo, connecting Render to it may also require his approval. GitHub
+  requires admin rights on a private repo to install the Render app against it, or org-level approval
+  from the owner. If Render's repo picker in Step 3 below doesn't show <code>cbt-mmm-platform</code>,
+  this is the reason. Ask Farhan to add you as an <b>admin</b> collaborator, not just write access.</p>
 </div>
 
 <div class="card">
@@ -298,11 +297,11 @@ somewhere everyone can reach.</p>
 </div>
 
 <div class="watch">
-  <span class="lbl">Free Postgres on Render doesn't last forever</span>
-  <p>Render's free-tier databases have a limited lifespan before they're deleted, confirm the exact
-  window on Render's current pricing page at signup, it's changed before and don't rely on this page to
-  have the latest number. Plan to upgrade to a paid tier, or move to Azure Postgres, before that clock
-  runs out, not after real team data is sitting in it.</p>
+  <span class="lbl">Render's free-tier Postgres has a limited lifespan</span>
+  <p>Free-tier databases on Render are deleted after a fixed period. Confirm the exact window on
+  Render's current pricing page at signup, since this policy has changed before and this document may
+  not reflect the latest figure. Plan to upgrade to a paid tier, or migrate to Azure Postgres, before
+  that expiration date, not after real team data depends on it.</p>
 </div>
 
 <div class="card">
@@ -502,14 +501,15 @@ backend instead of its built-in mock data.</p>
 </div>
 
 <h2 class="section" id="test"><span class="num">07</span>Testing the connected app</h2>
-<p class="section-why">Once frontend and backend are actually talking to each other, how the whole team
-verifies a feature really works, not just "looks right."</p>
+<p class="section-why">Once frontend and backend are actually talking to each other, this defines how
+the team verifies a feature actually works end to end, not just that it appears to work.</p>
 
 <div class="card">
   <h4>Test against the shared environments, not your own laptop</h4>
-  <p>Point your testing at the shared Vercel URL and the shared Render backend, not some mix of "my
-  local frontend talking to your local backend," that needs matching network access and correct setup
-  on both sides at the same moment, exactly what the shared environments exist to avoid.</p>
+  <p>Point testing at the shared Vercel URL and the shared Render backend, not a mix of one person's
+  local frontend and another person's local backend. That combination requires matching network access
+  and correct configuration on both sides at the same time, which is exactly what the shared
+  environments are designed to avoid.</p>
 </div>
 
 <div class="card">
@@ -517,8 +517,8 @@ verifies a feature really works, not just "looks right."</p>
   <p><code>Backend/dev-log/for-anas/test-cases.html</code> is the backend's real, reusable test suite,
   ten cases, each with exact steps and an expected result, a case only counts as <b>Passing</b> once a
   real person has actually run it and it worked. The same shape works for the frontend: a similar file
-  Amna keeps updated for her own features (creating a project through the real UI and seeing it appear
-  in Postgres, for example, not just "the page rendered").</p>
+  Amna keeps updated for her own features, for example confirming that creating a project through the
+  real UI actually produces a row in Postgres, not just that the page renders without error.</p>
 </div>
 
 <div class="card">
