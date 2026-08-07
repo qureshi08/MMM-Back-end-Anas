@@ -1,0 +1,286 @@
+{
+	"info": {
+		"name": "MMM Backend · Dev",
+		"description": "Health check and Auth smoke test for the MMM Platform backend. Import the matching environment file alongside this collection and fill in your Entra ID app registration values there. Nothing needs editing in the collection itself.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "grant_type",
+				"value": "authorization_code_with_pkce",
+				"type": "string"
+			},
+			{
+				"key": "authUrl",
+				"value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/authorize",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{clientId}}",
+				"type": "string"
+			},
+			{
+				"key": "scope",
+				"value": "{{scope}}",
+				"type": "string"
+			},
+			{
+				"key": "redirectUri",
+				"value": "https://oauth.pstmn.io/v1/callback",
+				"type": "string"
+			},
+			{
+				"key": "useBrowser",
+				"value": true,
+				"type": "boolean"
+			},
+			{
+				"key": "tokenName",
+				"value": "mmm-dev-token",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			},
+			{
+				"key": "client_authentication",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "GET /health, app + database reachable",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "Public, no token needed. 200 with database:\"connected\" means the app booted and Postgres (local Docker today, Azure Flexible Server later) is reachable."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "GET /auth/me, verify a real Entra token",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Protected by EntraAuthGuard. With AUTH_DEV_BYPASS=true in the API's .env, this works with no token at all and returns a fake dev user, use that first to prove the route is wired. Once you have a real Entra app registration, click Send, then \"Get New Access Token\" on the collection's Authorization tab (Authorization Code + PKCE, opens a Microsoft sign-in popup), and this returns the real verified claims instead."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /auth/me, no token (expect 401 once bypass is off)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"auth": {
+							"type": "noauth"
+						},
+						"description": "Deliberately sends no Authorization header. With AUTH_DEV_BYPASS=false this must come back 401, that's the guard doing its job, not a bug."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Projects (CMP-41)",
+			"item": [
+				{
+					"name": "POST /projects, create",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects"
+							]
+						},
+						"description": "Creates a project owned by the signed-in user, in their own tenant. name is required, description is optional. Copy the id from the response, the other requests in this folder need it.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Q4 Brand Campaign\",\n  \"description\": \"First real project\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects, list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/projects",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects"
+							]
+						},
+						"description": "Lists every project in the signed-in user's tenant. Row-Level Security restricts this to that tenant alone, there's no explicit filter in the code that could get it wrong."
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/:id, view one",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/projects/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+								}
+							]
+						},
+						"description": "Replace the id path variable (click the request, Params tab, Path Variables section) with a real id from the create request. A malformed id returns 400. A well-formed but nonexistent id returns 404."
+					},
+					"response": []
+				},
+				{
+					"name": "PATCH /projects/:id, partial update",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/projects/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+								}
+							]
+						},
+						"description": "Sends only name on purpose, this is TC-08: a real bug meant a partial update like this used to silently erase description too. It's fixed, this is what proves it stays fixed, description should come back exactly as it was set on create. Only the project's owner can do this, anyone else gets 403.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Q4 Brand Campaign (renamed)\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE /projects/:id, soft delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/projects/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"projects",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+								}
+							]
+						},
+						"description": "204 on success. The row isn't actually removed from Postgres, it's marked deleted (see deleted_at in pgAdmin), and stops showing up in list/view from here on. Only the project's owner can do this, anyone else gets 403."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000"
+		}
+	]
+}

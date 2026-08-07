@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend Progress Log · MMM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+    --cbt-shadow-soft:0 1px 4px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 40px;margin-bottom:8px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:64ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+
+  section{margin:0 0 40px;padding:8px 0}
+  .wrap>section.tint{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);
+    padding:38px 36px 32px;margin:0 -12px 40px}
+  @media(max-width:640px){.wrap>section.tint{padding:28px 20px 22px;margin:0 0 34px}}
+
+  h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-primary);margin:0 0 10px;font-weight:600}
+  h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(1.5rem,2.3vw,2rem);
+    line-height:1.2;margin:0 0 18px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  p{margin:0 0 14px;max-width:72ch}
+  strong{font-weight:700;color:var(--cbt-heading)}
+  a{color:var(--cbt-primary)}
+
+  .answer{border-left:4px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-lg) var(--cbt-radius-lg) 0;padding:28px 30px;margin:0}
+  .answer .lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--cbt-primary-dark);display:block;margin-bottom:10px}
+  .answer .quote{font-size:1.15rem;line-height:1.6;color:var(--cbt-heading);margin:0;max-width:70ch}
+  .answer .quote b{color:var(--cbt-primary-dark)}
+
+  table{width:100%;border-collapse:collapse;margin:6px 0}
+  th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-muted);padding:0 12px 10px;border-bottom:1px solid var(--cbt-border)}
+  td{padding:14px 12px;border-bottom:1px solid var(--cbt-border);vertical-align:top;font-size:14.5px}
+  tr:last-child td{border-bottom:none}
+  td.item{font-weight:600;color:var(--cbt-heading);white-space:nowrap}
+  td.why{color:var(--cbt-body)}
+
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .badge.done{background:var(--cbt-primary-muted);color:var(--cbt-primary-dark);border:1px solid rgba(0,153,77,.25)}
+  .badge.wait{background:var(--cbt-warning-muted);color:var(--cbt-warning-dark);border:1px solid rgba(245,158,11,.3)}
+
+  pre{background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-sm);
+    padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.6;margin:14px 0}
+  pre code{background:none;border:none;padding:0;font-size:1em;color:var(--cbt-heading)}
+  p code{background:var(--cbt-white);border:1px solid var(--cbt-border);padding:1px 6px;
+    border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+
+  .legend{display:flex;gap:22px;flex-wrap:wrap;margin:18px 0 0;font-size:12.5px;color:var(--cbt-muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+
+  .timeline{position:relative;padding-left:26px;border-left:2px solid var(--cbt-border);margin-top:4px}
+  .entry{position:relative;padding-bottom:34px}
+  .entry:last-child{padding-bottom:0}
+  .entry::before{content:"";position:absolute;left:-32px;top:4px;width:11px;height:11px;border-radius:50%;
+    background:var(--cbt-primary);border:2px solid var(--cbt-white);box-shadow:0 0 0 2px var(--cbt-primary)}
+  .entry summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .entry summary::-webkit-details-marker{display:none}
+  .entry summary::before{content:"\25B8";display:inline-block;color:var(--cbt-muted);font-size:13px;
+    transition:transform .15s ease;margin-left:-16px}
+  .entry[open] summary::before{transform:rotate(90deg)}
+  .entry .date{font-family:var(--cbt-font-mono);font-size:12px;color:var(--cbt-primary-dark);font-weight:600}
+  .entry summary h4{display:inline;font-family:var(--cbt-font-heading);font-weight:600;font-size:1.15rem;
+    margin:0;color:var(--cbt-heading)}
+  .entry .body{margin-top:10px}
+  .entry ul{margin:0 0 8px;padding-left:20px}
+  .entry li{margin:5px 0;max-width:70ch}
+  .entry code{background:var(--cbt-white);border:1px solid var(--cbt-border);padding:1px 6px;border-radius:4px;font-size:.85em}
+
+  .openlist{margin:0;padding-left:20px}
+  .openlist li{margin:10px 0;max-width:70ch}
+  .openlist b{color:var(--cbt-heading)}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:8px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>Backend progress log</span>
+</div>
+
+<header>
+  <div class="kicker">MMM &middot; Backend &middot; Dev log</div>
+  <h1>What's actually <span class="italic-accent">done</span></h1>
+  <p class="sub">A plain-language record of what's been built in the backend, what's verified, and
+  what's still waiting on something. Read this instead of asking. It's kept current.</p>
+  <p class="updated">Last updated <b>August 6, 2026</b>. Real Entra login is fully done, confirmed
+  independently by both Claude and Anas, same real result both times. Projects CRUD (CMP-41) is
+  now also fully done, Anas ran every one of <code>TC-06</code> through <code>TC-10</code>
+  himself.</p>
+</header>
+
+<section class="tint">
+  <h2>The question that started this page</h2>
+  <div class="answer">
+    <span class="lbl">If someone asks: is the Auth module done?</span>
+    <p class="quote">Say: <b>the Auth module is fully done, dev-bypass and real Microsoft sign-in
+    both.</b> Confirmed twice, independently, on August 6: once by Claude, once by Anas himself in
+    Postman, identical result both times, his real name, email, and a proper tenant and user record
+    created for his real login. Every row in the table below that can be checked has been.</p>
+  </div>
+</section>
+
+<section>
+  <h2>Status, module by module</h2>
+  <h3>Where every piece stands right now</h3>
+  <table>
+    <tr><th>Piece</th><th>Status</th><th>Why</th></tr>
+    <tr>
+      <td class="item">Local database</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Postgres runs in Docker. Claude checked it via <code>psql</code>, and Anas
+      separately connected pgAdmin himself and confirmed it, matching results from two different
+      tools.</td>
+    </tr>
+    <tr>
+      <td class="item">Tenants &amp; users tables</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Anas opened pgAdmin himself, ran a real <code>INSERT</code>, watched the
+      database fill in the <code>id</code>, <code>status</code>, and timestamps on its own, then
+      queried it back and deleted it. Not just looked at, actually used.</td>
+    </tr>
+    <tr>
+      <td class="item">Auth &middot; dev mode</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Verified twice today: once from the terminal, once by Anas himself in Postman.
+      Both got the identical result.</td>
+    </tr>
+    <tr>
+      <td class="item">Auth &middot; real Microsoft login</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed twice, independently, August 6: Claude via <code>curl</code> using
+      Anas's real token, then Anas himself in Postman, both got his real name and email back,
+      <code>devBypass: false</code>. Took real debugging to get here: a Postman config pointed at a
+      blank auth setup, a leftover placeholder tenant ID never actually replaced, a
+      client-authentication mismatch, and a real Entra quirk in the token's own audience field, all
+      found and fixed, see <code>dev-log/raw/2026-08-06.md</code> for the full chain.</td>
+    </tr>
+    <tr>
+      <td class="item">Multi-tenant support &amp; isolation</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Built and verified by Claude: a real login auto-creates a tenant and user,
+      and Postgres itself refuses to return another tenant's rows, proven with real queries. Anas
+      also checked it himself in pgAdmin, August 5, see <code>TC-05</code> in
+      <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Projects &middot; create, view, edit, delete (CMP-41)</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Built and verified by Claude, then run for real by Anas himself,
+      <code>TC-06</code> through <code>TC-10</code>, all <b>Passing</b> in
+      <code>test-cases.html</code>: create, list, view, partial update (with the fixed bug
+      confirmed not to recur), soft delete, and the owner-only rule blocking a second real user
+      from editing or deleting someone else's project. See <code>dev-log/raw/2026-08-06.md</code>
+      for the full detail, including a mid-testing database wipe and recovery.</td>
+    </tr>
+    <tr>
+      <td class="item">Postman collection</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Imported and run by Anas himself, both requests, both succeeded.</td>
+    </tr>
+    <tr>
+      <td class="item">Running on Azure</td>
+      <td><span class="badge wait">Not started</span></td>
+      <td class="why">A different blocker from the row above: this needs an actual Azure
+      subscription (paid hosting), not just the Entra tenant. Nobody owns that decision yet.</td>
+    </tr>
+    <tr>
+      <td class="item">Shared team repo</td>
+      <td><span class="badge wait">In progress</span></td>
+      <td class="why">Farhan created the repo and is adding Anas to it. Once that's confirmed, the
+      code (never actually committed until now) gets pushed there and Render is set up as a shared
+      Dev environment Amna can reach, see <code>for-anas/deployment-guide.html</code> for the exact
+      steps.</td>
+    </tr>
+  </table>
+  <div class="legend">
+    <span><span class="badge done">Done</span> built, and you personally checked it worked, not just Claude</span>
+    <span><span class="badge wait">Waiting</span> not finished, blocked, or not yet checked by you, for the stated reason</span>
+  </div>
+  <p style="margin-top:16px;font-size:13px;color:var(--cbt-muted);max-width:68ch">
+  Corrected on August 4, after two rows on this page said "Done" when only Claude had checked them,
+  not Anas. From now on, <b>Done means Anas ran the check himself</b>, not just that Claude did.</p>
+</section>
+
+<section>
+  <h2>Hands-on checks</h2>
+  <h3>Moved to their own file</h3>
+  <p>The pgAdmin database round trip, the multi-tenant row check, and the real Microsoft login
+  test used to live here, growing one section at a time with every new feature. They're now a
+  proper, reusable test suite instead: <a href="./test-cases.html"><b>test-cases.html</b></a>. Same
+  steps, same expected results, but organized to be re-run any time something might have broken
+  them, not just walked through once and left behind.</p>
+</section>
+
+<section class="tint">
+  <h2>How we got here</h2>
+  <h3>Day by day</h3>
+  <div class="timeline">
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 3, 2026</span><h4>Backend scaffolded from nothing</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Chose <b>TypeORM</b> over Prisma or Drizzle. The schema needs one open database
+        connection per request to enforce which company can see which rows, and TypeORM is built
+        for that; the other two aren't.</li>
+        <li>Built the project structure: database connection, the <code>tenants</code> and
+        <code>users</code> tables, the migration that creates them, and the Auth module (token
+        checking, a dev-only bypass so work can continue before a real login exists).</li>
+        <li>Built <code>/health</code> and <code>/auth/me</code>, the first two working endpoints.</li>
+        <li>Everything checked before Docker even existed on this machine: the code compiles, the
+        tests pass, and the app correctly refused to start without a real database instead of
+        silently pretending one was there.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 4, 2026</span><h4>Docker installed, everything wired together and proven live</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Installed Docker Desktop, hit a real prerequisite (Windows Subsystem for Linux wasn't
+        installed), fixed it, restarted.</li>
+        <li>Started the real database, ran the migration against it, started the server.</li>
+        <li>Checked both endpoints from the terminal: both returned success, and the database
+        contents were confirmed to match the design exactly.</li>
+        <li>Anas then ran the same two checks himself in Postman, independently, and got the same
+        results. That's the strongest kind of proof this works: two different people, two different
+        tools, same answer.</li>
+        <li>Renamed the project from "CRAS MMM" to "MMM" everywhere: the database, the Docker
+        container, the Postman collection, every file that mentioned the old name. Rebuilt the
+        database under the new name and re-ran every check above to confirm nothing broke.</li>
+        <li>Wrote a working protocol (see <code>Backend/PROTOCOL.md</code>) that defines exactly how
+        every future piece of work gets built, checked, and handed off, so the process is the same
+        every time and never depends on memory.</li>
+        <li>Anas caught this page saying "Done" on two rows that only Claude had checked, never him.
+        Fixed immediately: those rows now say "not checked by you," the legend explains what "Done"
+        actually means, and a full hands-on walkthrough was added below so he can run the check
+        himself. The rule is now permanent, written into <code>PROTOCOL.md</code>.</li>
+        <li>Anas said a log entry isn't teaching. Built a real lesson,
+        <code>Trainings/NestJS/knowledge-base/lessons/04-how-it-all-connects.html</code>: the exact
+        <code>GET /auth/me</code> request he ran in Postman, traced through six stages with his own
+        real values, why a Microsoft badge instead of a homegrown login, what a token actually is,
+        why the guard runs globally. Also pointed him at <b>pgAdmin 4</b>, a proper GUI for the
+        database instead of typing raw SQL in a terminal.</li>
+        <li>The hands-on section still taught raw terminal <code>psql</code> after pgAdmin had
+        already been recommended, contradicting this page's own timeline. Anas caught it. Rewrote
+        the whole section for pgAdmin and confirmed no leftover terminal steps remained.</li>
+        <li><b>Anas connected pgAdmin to the local database himself</b>, ran a real
+        <code>INSERT</code>, watched the database fill in an id, status, and timestamp he never
+        typed, queried it back, and deleted it. Both rows that were honestly marked "not checked
+        by you" are now honestly <b>Done</b>.</li>
+        <li>Anas confirmed the company already has Microsoft work accounts at
+        <code>convergentbt.com</code>, which means an Entra ID tenant already exists. That's a
+        different thing from an Azure subscription. Registering the API's app in Entra ID only
+        needs the right admin role in that tenant, not a paid subscription, so it may be
+        unblockable sooner than expected. Corrected this page and lesson 04, which had both
+        conflated the two, and updated the Azure folder's <code>project-context.md</code>.</li>
+        <li><b>Anas asked Farhan to register the real app in Entra ID</b>, since Farhan has the
+        admin role in the tenant, not Anas. Farhan created it and shared the Client ID and Tenant
+        ID back. Worked through a permissions question with Farhan (cleared up a mix-up with an
+        unrelated app of his called Nexus), confirmed why <code>access_as_user</code> is needed
+        for our own API regardless. Currently stuck on a real portal issue, the custom scope isn't
+        showing up yet when adding it as a permission, being debugged on Farhan's side (most
+        likely a Disabled-state or refresh issue, not a design problem).</li>
+        <li><b>Parked real Entra login</b> until Farhan's portal snag clears, everything on our
+        side is done and waiting. Moved on to <code>CMP-42</code> (multi-tenant support, RLS,
+        first-login provisioning), the next item in the planned sequence.</li>
+        <li><b>Anas found the real cause of the scope not saving</b>, on a throwaway test app built
+        specifically to figure it out safely: two required fields (Admin consent display name and
+        description) were left blank, silently blocking the save. Fixed it there, confirmed the
+        scope then showed up correctly, and is relaying the exact fix to Farhan for the real app.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 5, 2026</span><h4>CMP-42 built: real tenant isolation, not just a plan for it</h4></summary>
+      <div class="body">
+      <ul>
+        <li>A real login now creates a tenant and a user automatically, the first time it happens,
+        matching the open-signup decision from August 4.</li>
+        <li>Postgres itself, not just application code, now refuses to return another tenant's
+        rows. Proved it with real queries before trusting it, and a good thing too:</li>
+        <li><b>Found a real gap along the way.</b> The database user the app had been using since
+        day one turned out to be Postgres's own bootstrap superuser, which bypasses this kind of
+        protection no matter what's configured, and Postgres refuses to ever change that. Fixed by
+        giving the app a second, separate, deliberately weaker login of its own, migrations still
+        use the original one. Re-tested with real queries afterward to confirm it actually
+        works now, not just that it looks right on paper.</li>
+        <li>Verified the whole thing end to end: the same login called twice creates nothing twice,
+        the actual database rows match what came back over the API, and the existing test suite
+        still passes.</li>
+        <li>Built <a href="../../../../Trainings/NestJS/knowledge-base/lessons/05-real-tenant-isolation.html">lesson 05</a>
+        for all of the above, and updated lesson 04, which still said the real login path
+        "isn't active yet." It is now.</li>
+        <li><b>Anas realized he didn't need to wait on Farhan at all</b>: the scope allows
+        individual sign-in consent, no admin role required, just an admin role to pre-approve it
+        for everyone at once. Registered his own dev/testing app, found and fixed two more real
+        Entra snags along the way (a redirect URI conflict, an unverified-publisher block from the
+        app's account-type setting), and wired <code>.env</code> to it himself.
+        <code>AUTH_DEV_BYPASS</code> is off. <code>/auth/me</code> now correctly returns
+        <code>401</code> with no token. One Postman click away from his own first real sign-in.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 6, 2026</span><h4>Real Microsoft login actually works</h4></summary>
+      <div class="body">
+      <ul>
+        <li>First real attempt surfaced a real chain of problems, one after another, not one bug:
+        a Postman request pointed at a blank auth config instead of the working collection-level
+        one, a leftover placeholder tenant ID that had never actually been overwritten, closing
+        the sign-in window too early (Claude's own bad advice, corrected), a client-authentication
+        setting mismatched for a no-secret app, and finally a real Entra quirk, the token's own
+        audience field didn't come back in the format we'd assumed.</li>
+        <li>Found and fixed every one with real evidence, not guesses, reading the actual browser
+        address bar, the actual Postman console errors, and the actual token's own claims each
+        time, rather than assuming a fix without checking what actually happened.</li>
+        <li><b>Fixed the audience check in the code itself</b>, not just the config: Entra doesn't
+        consistently issue the full API address as the token's audience, sometimes just the bare
+        ID. The guard now accepts either form. Updated the two unit tests that check this.</li>
+        <li>Verified with Anas's real token, called <code>/auth/me</code> myself: his real name,
+        email, and object id came back correctly, <code>devBypass: false</code>, and a proper
+        tenant and user got created for his real login.</li>
+        <li>Added a short, honest addendum to lesson 04 about the audience quirk, not a whole new
+        lesson, this doesn't introduce a new concept, it's a real-world footnote on one already
+        taught there.</li>
+        <li><b>Anas then clicked Send himself in Postman</b> and got the identical result, real
+        name, real email, <code>devBypass: false</code>. Two independent confirmations, same
+        answer. <code>TC-04</code> is <b>Passing</b>, and the Auth module is genuinely done, both
+        modes, not just claimed.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 6, 2026</span><h4>Projects CRUD built (CMP-41), plus a real bug found before Anas ever saw it</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Built the full <code>projects</code> table and all five routes: create, list, view,
+        edit, delete. Only the owner can edit or delete their own project, verified with a real
+        second user, not assumed from reading the code.</li>
+        <li><b>Real bug found and fixed before any handoff:</b> a partial update sending only one
+        field (say, just a new name) was silently wiping every other field, including
+        <code>description</code>, down to <code>null</code>. Traced to how the validation library
+        builds the update object, not a typo, confirmed with a small throwaway script before
+        touching the fix. Re-verified after: a name-only update now leaves everything else exactly
+        as it was.</li>
+        <li>Verified everything against real Postgres before writing a single line of this entry:
+        create, list, view, partial update, full update, soft delete (the row stays in the
+        database with a deletion timestamp, it doesn't disappear), a made-up id correctly rejected,
+        a well-formed but nonexistent id correctly <code>404</code>s, and the owner-only rule
+        blocking a second real user from editing or deleting someone else's project.</li>
+        <li>Anas then ran every one of <code>TC-06</code> through <code>TC-10</code> himself,
+        create, list, view, the partial-update fix confirmed for real (not just by Claude),
+        soft delete, and the owner-only rule blocking a second real user, all in Postman and
+        pgAdmin, all <b>Passing</b>.</li>
+        <li><b>Mid-testing, the local database got fully wiped</b>, tenants, users, and projects
+        all empty. Most likely cause: pgAdmin's Query Tool runs the whole accumulated script when
+        Execute is clicked with nothing highlighted, not just the last line typed, so an earlier
+        <code>DELETE</code> in that same buffer re-ran along with everything else. Not data
+        corruption, a clean cascade (every table has <code>ON DELETE CASCADE</code>), and fully
+        recoverable: one authenticated request (<code>GET /auth/me</code>) auto-provisioned a
+        fresh tenant and user, same first-login logic <code>CMP-42</code> already relies on, and
+        testing continued from there with no further issues. Worth remembering for any future
+        pgAdmin session: highlight the one query you mean to run, don't rely on the buffer only
+        containing what you currently see.</li>
+      </ul>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+<section>
+  <h2>What's actually blocking progress</h2>
+  <h3>Not a to-do list. A short list of real blockers</h3>
+  <ol class="openlist">
+    <li><b>Company Azure subscription.</b> A separate thing from the tenant above: this is the paid
+    hosting account, and has to be created under a company identity, never a personal Microsoft
+    account. Until it exists, nothing can actually run on Azure. Only blocks "Running on Azure" now,
+    not real Microsoft login.</li>
+    <li><b>Shared GitHub repo.</b> The team hasn't created one. Once they do, this code is ready to
+    push as-is.</li>
+  </ol>
+</section>
+
+<footer>
+  <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <strong>MMM Backend &middot; Dev log</strong><br>
+  Generated from <code>dev-log/raw/</code>. Detail behind any line here is in that folder.
+</footer>
+
+</div>
+</body>
+</html>

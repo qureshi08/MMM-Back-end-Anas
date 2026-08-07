@@ -1,0 +1,32 @@
+# Local Postgres for Dev only. Matches Azure Postgres Flexible Server's major
+# version so behavior doesn't surprise anyone at deploy time. Everyone on the
+# team runs the same `docker compose up -d` and gets an identical DB, with no
+# per-machine "works on my Postgres" drift.
+#
+# POSTGRES_USER becomes the container's bootstrap superuser — Postgres will
+# not let this role ever be demoted (found the hard way, CMP-42, 2026-08-04:
+# Row-Level Security silently does nothing for it, no matter what a policy
+# says). That's DB_ADMIN_USERNAME here, migrations only. The app itself
+# connects as the separate, restricted DB_USERNAME role a migration creates,
+# see 1785900000002-CreateAppRole.ts.
+services:
+  postgres:
+    image: postgres:16
+    container_name: mmm-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_ADMIN_USERNAME:-mmm_dev}
+      POSTGRES_PASSWORD: ${DB_ADMIN_PASSWORD:-change-me-locally}
+      POSTGRES_DB: ${DB_NAME:-mmm_dev}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - mmm-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mmm-postgres-data:

@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Backend Test Cases · MMM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-error:#EF4444; --cbt-error-muted:#FDEDED; --cbt-error-dark:#B91C1C;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+    --cbt-shadow-soft:0 1px 4px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 40px;margin-bottom:8px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:66ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+  a{color:var(--cbt-primary)}
+  code{background:var(--cbt-surface);border:1px solid var(--cbt-border);padding:1px 6px;
+    border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  pre code{background:none;border:none;padding:0}
+
+  .summary{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 44px}
+  .stat{flex:1;min-width:140px;background:var(--cbt-surface);border-radius:var(--cbt-radius-md);
+    padding:18px 20px}
+  .stat .n{font-family:var(--cbt-font-heading);font-size:2rem;font-weight:700;color:var(--cbt-heading)}
+  .stat .l{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--cbt-muted);font-weight:600}
+  .stat.pass .n{color:var(--cbt-primary-dark)}
+  .stat.wait .n{color:var(--cbt-warning-dark)}
+
+  .tc{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);margin:0 0 24px;overflow:hidden}
+  .tc summary{cursor:pointer;list-style:none;padding:20px 24px;display:flex;align-items:center;
+    gap:14px;flex-wrap:wrap;background:var(--cbt-white)}
+  .tc summary::-webkit-details-marker{display:none}
+  .tc summary::before{content:"\25B8";color:var(--cbt-muted);font-size:14px;transition:transform .15s ease}
+  .tc[open] summary::before{transform:rotate(90deg)}
+  .tc summary .id{font-family:var(--cbt-font-mono);font-size:12px;color:var(--cbt-muted);font-weight:600}
+  .tc summary h3{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.15rem;margin:0;
+    color:var(--cbt-heading);flex:1}
+  .tc .body{padding:0 24px 24px;border-top:1px solid var(--cbt-border);padding-top:20px}
+  .tc .body p{margin:0 0 14px;max-width:72ch}
+  .tc .body ol,.tc .body ul{padding-left:22px;margin:0 0 14px;max-width:72ch}
+  .tc .body li{margin:6px 0}
+  .tc .meta{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--cbt-muted);margin:0 0 16px}
+  .tc .meta b{color:var(--cbt-heading)}
+  .tc pre{background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-sm);
+    padding:12px 16px;overflow-x:auto;font-size:13px;line-height:1.6;margin:10px 0}
+  .expect{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:14px 18px;margin:14px 0 0}
+  .expect .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-primary-dark);display:block;margin-bottom:6px}
+  .expect p{margin:0}
+
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;white-space:nowrap}
+  .badge.pass{background:var(--cbt-primary-muted);color:var(--cbt-primary-dark);border:1px solid rgba(0,153,77,.25)}
+  .badge.wait{background:var(--cbt-warning-muted);color:var(--cbt-warning-dark);border:1px solid rgba(245,158,11,.3)}
+  .badge.fail{background:var(--cbt-error-muted);color:var(--cbt-error-dark);border:1px solid rgba(239,68,68,.3)}
+
+  h2.section{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-primary);
+    margin:40px 0 16px;font-weight:600}
+  h2.section:first-of-type{margin-top:0}
+
+  .protocol{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:28px 32px;margin:0 0 44px}
+  .protocol h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.3rem;margin:0 0 14px;
+    color:var(--cbt-heading)}
+  .protocol ol{padding-left:22px;margin:0}
+  .protocol li{margin:8px 0;max-width:72ch}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:8px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>Backend test cases</span>
+</div>
+
+<header>
+  <div class="kicker">MMM &middot; Backend &middot; Test suite</div>
+  <h1>Test <span class="italic-accent">cases</span></h1>
+  <p class="sub">Every real, hands-on check that exists for this backend, kept in one place instead
+  of buried inside a status page. Re-run these after anything that could plausibly break them, not
+  just the one time they were written.</p>
+  <p class="updated">Last updated <b>August 6, 2026</b>. Pulled out of
+  <code>for-anas/progress-log.html</code>, which was accumulating one-off walkthroughs instead of a
+  real, reusable suite.</p>
+</header>
+
+<div class="summary">
+  <div class="stat pass"><div class="n">10</div><div class="l">Passing</div></div>
+  <div class="stat"><div class="n">10</div><div class="l">Total cases</div></div>
+</div>
+
+<div class="protocol">
+  <h3>How this file works</h3>
+  <ol>
+    <li>Every real, testable piece of the backend gets a case here, the same day it's built, same
+    rule as the dev log itself.</li>
+    <li>A case only gets marked <b>Passing</b> once <b>Anas</b> has personally run it and it worked,
+    matching the same rule as the rest of the dev log, Claude checking it isn't enough.</li>
+    <li>Re-run the whole list after anything that plausibly touches it: a dependency upgrade, a
+    schema change, moving to a new machine, before showing this to anyone outside the team. There's
+    no automated end-to-end suite yet, this file is what stands in for one.</li>
+    <li>A case that starts failing gets flagged <b>Failing</b> immediately, not quietly fixed and
+    reworded. The dev log's own honesty rule applies here too.</li>
+  </ol>
+</div>
+
+<div class="protocol" id="starting-the-server">
+  <h3>Starting the server, whenever a case says "server running"</h3>
+  <p style="margin:0 0 12px;max-width:72ch">Open PowerShell fresh (or a new tab if you already have
+  one open elsewhere) and run exactly this, as one block, in order:</p>
+  <pre style="background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-sm);padding:12px 16px;overflow-x:auto;font-size:13px;line-height:1.6;margin:10px 0"><code>cd D:\Anas\MMM\Backend
+pwd
+npm run start:dev</code></pre>
+  <p style="margin:12px 0 0;max-width:72ch">The <code>pwd</code> line matters, it should print
+  <code>D:\Anas\MMM\Backend</code> before <code>npm run start:dev</code> ever runs. Running it from
+  <code>D:\Anas\MMM</code> instead (one folder up, easy to be sitting in without noticing) fails
+  with <code>ENOENT ... package.json</code>, npm can't find a project there because there isn't
+  one, the actual backend is one folder deeper. Leave this terminal window open and running, don't
+  close it, that's your live server for every case below.</p>
+</div>
+
+<h2 class="section">Database</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-01</span><h3>Database round trip, in pgAdmin</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026</span><span><b>Tool:</b> pgAdmin 4</span></div>
+    <p><b>Preconditions:</b> Docker Postgres running (<code>docker compose up -d</code>), pgAdmin
+    connected to the <code>MMM Local</code> server.</p>
+    <ol>
+      <li><b>tenants</b> table &rarr; View/Edit Data &rarr; All Rows. Confirm it's queryable (may be
+      empty or may have real rows from other test cases, either is fine here).</li>
+      <li>Query Tool, with <code>mmm_dev</code> selected:
+      <pre><code>INSERT INTO tenants (name) VALUES ('Anas Test Tenant') RETURNING *;</code></pre></li>
+      <li>Execute (&#9654; or F5).</li>
+      <li>Run <code>SELECT * FROM tenants;</code> again, confirm the row is there.</li>
+      <li>Clean up: <pre><code>DELETE FROM tenants WHERE name = 'Anas Test Tenant';</code></pre></li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The <code>INSERT</code> returns the finished row immediately, including an <code>id</code>,
+      <code>status</code> of <code>active</code>, and timestamps you never typed, the database
+      fills those in on its own. The follow-up <code>SELECT</code> shows exactly that row.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section">Auth</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-02</span><h3>Health check reaches the database</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026 (Postman)</span><span><b>Tool:</b> Postman or a browser</span></div>
+    <p><b>Preconditions:</b> the server running (see
+    <a href="#starting-the-server">Starting the server</a> above), Docker Postgres up.</p>
+    <ol>
+      <li>Request <code>GET {{baseUrl}}/health</code> (no auth header needed, this route is
+      <code>@Public()</code>).</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>200 OK</code>, body <code>{"status":"ok","database":"connected",...}</code>. If
+      <code>database</code> ever says anything else, the app is up but can't actually reach
+      Postgres, worth investigating immediately, not ignoring.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-03</span><h3>Dev-bypass login</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> <code>AUTH_DEV_BYPASS=true</code> in <code>.env</code>, the server
+    running (see <a href="#starting-the-server">Starting the server</a> above).</p>
+    <ol>
+      <li>Request <code>GET {{baseUrl}}/auth/me</code>, no Authorization header needed.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>200 OK</code>, <code>devBypass: true</code>, <code>oid: "dev-bypass-oid"</code>. This
+      confirms the guard, routing, and the rest of the request pipeline all work, independent of
+      whether real Entra login is even set up yet.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-04</span><h3>Real Microsoft login</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, Send)</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> <code>AUTH_DEV_BYPASS=false</code>, <code>.env</code> pointed at a real
+    Entra app registration, Postman environment's <code>tenantId</code>/<code>clientId</code>/
+    <code>scope</code> filled in to match (both the Initial Value and Current Value columns,
+    Postman has both), the collection's own Authorization tab configured with Client Authentication
+    set to <b>Send client credentials in body</b>, not Basic Auth header.</p>
+    <p style="font-size:13px;color:var(--cbt-primary-dark);background:var(--cbt-primary-muted);padding:10px 14px;border-radius:8px;margin:0 0 14px">
+    Confirmed twice, independently, August 6: Claude via <code>curl</code> using Anas's real token,
+    then Anas himself in Postman, both got the identical result, his real name and email, not a
+    fake one. That's what actually closes this out.</p>
+    <ol>
+      <li>Left sidebar &rarr; <b>Auth</b> &rarr; <b>GET /auth/me, verify a real Entra token</b>.
+      Click it once to open it.</li>
+      <li>Click the <b>Authorization</b> tab (the row of tabs under the URL bar: Docs, Params,
+      <b>Authorization</b>, Headers, Body, Scripts, Settings). Not Headers, the header only
+      appears automatically once a token exists, it won't be there yet.</li>
+      <li>Look at the <b>Type</b> field near the top of that tab.
+        <ul>
+          <li>If it says <b>OAuth 2.0</b>, continue to the next step.</li>
+          <li>If it says <b>Inherit auth from parent</b>, that's fine too, but if you don't see a
+          <b>Get New Access Token</b> button anywhere on this screen, click the collection name
+          <b>"MMM Backend &middot; Dev"</b> at the very top of the left sidebar instead, and do the
+          rest of these steps on <em>its</em> Authorization tab, not this request's.</li>
+        </ul>
+      </li>
+      <li>Scroll down past the configuration fields (Grant Type, Auth URL, Access Token URL,
+      Client ID, Scope, ...), these are already filled in from the environment, leave every one of
+      them alone. Keep scrolling until you find a button labeled <b>Get New Access Token</b>. Click
+      it.</li>
+      <li>A new window opens showing a real Microsoft sign-in page. Sign in with your own
+      Convergent Business Technologies account, the same one registered in Entra ID. If it asks
+      you to approve permissions, click <b>Accept</b>.</li>
+      <li>That window closes on its own and Postman shows a token confirmation screen with a green
+      <b>Use Token</b> button. Click it. (If nothing appeared and the window just closed, the sign-in
+      didn't complete, go back to step 4 and try again.)</li>
+      <li>You're back on the request now. The Authorization tab should show a token listed under
+      "Current Token" or similar, proof one is actually attached.</li>
+      <li><b>Double-check before sending:</b> click the <b>Headers</b> tab. You should now see one
+      more header than before, <code>Authorization: Bearer eyJ...</code>. If it's not there, the
+      token didn't attach, go back to step 4 and redo it, don't click Send yet.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>200 OK</code>, your real <code>oid</code>, <code>email</code>, and <code>name</code>,
+      <code>devBypass: false</code>. Not <code>dev-bypass-oid</code>.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">If you get 401 "Missing or malformed Authorization header"</span>
+      <p>This means no token was ever attached, the same thing that happened the first time this
+      was tried. It's not a code problem, it means step 4 to 6 above didn't actually complete.
+      Redo them slowly, and check the Headers tab (step 8) before clicking Send, not after.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section">Multi-tenant isolation</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-05</span><h3>First login auto-creates a tenant and user</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 5, 2026</span><span><b>Tool:</b> pgAdmin 4</span></div>
+    <p><b>Preconditions:</b> a login has already happened (dev-bypass or real) since the database
+    was last reset.</p>
+    <ol>
+      <li><b>tenants</b> table &rarr; View/Edit Data &rarr; All Rows. Confirm a row exists with a
+      real <code>external_key</code> (<code>org:...</code> or <code>personal:...</code>), not
+      seeded by hand.</li>
+      <li><b>users</b> table &rarr; All Rows. Confirm a row exists whose <code>tenant_id</code>
+      matches the tenant row's <code>id</code>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Both rows exist without anyone having typed an <code>INSERT</code> for them, the login
+      itself created them. Re-running the same login again should not create a second pair, same
+      tenant and user come back every time.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section">Projects (CMP-41)</h2>
+
+<div class="watch" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted);border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:0 0 24px">
+  <span class="lbl" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cbt-warning-dark);display:block;margin-bottom:6px">Do this first, once, before TC-06</span>
+  <p style="margin:0">The requests below don't exist in your Postman yet. Editing
+  <code>postman/MMM-Backend.postman_collection.json</code> on disk never changes what's already
+  loaded in your Postman app, only importing it does. Steps:</p>
+  <ol style="margin:10px 0 0;padding-left:22px">
+    <li>In Postman, top left, click <b>Import</b>.</li>
+    <li>Click the <b>File</b> tab in the dialog that opens, then <b>choose files</b>, and browse
+    to <code>D:\Anas\MMM\Backend\postman\MMM-Backend.postman_collection.json</code>. Select it,
+    click <b>Import</b>.</li>
+    <li>Postman recognizes it as an update to the collection you already have and offers a
+    <b>Replace</b> option, confirmed working this way August 6, 2026. Click <b>Replace</b>.</li>
+    <li>Open the collection and confirm it now has three folders: <b>Health</b>, <b>Auth</b>, and
+    <b>Projects (CMP-41)</b>.</li>
+    <li>If you want to re-run <b>TC-04</b> at some point, you'll need to click <b>Get New Access
+    Token</b> again on the collection's Authorization tab, replacing the collection doesn't carry
+    the old cached token over. Not needed for TC-06 through TC-10 if
+    <code>AUTH_DEV_BYPASS=true</code>.</li>
+  </ol>
+</div>
+
+<details class="tc">
+  <summary><span class="id">TC-06</span><h3>Create a project</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, then confirmed in pgAdmin)</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> the server running (see
+    <a href="#starting-the-server">Starting the server</a> above), Docker Postgres up, either
+    <code>AUTH_DEV_BYPASS=true</code> or a real token attached (see TC-03/TC-04 if you need a
+    refresher on either), doesn't matter which for this one.</p>
+    <ol>
+      <li>Open Postman. In the left sidebar, find the <b>MMM Backend</b> collection (you imported
+      it back in TC-02, it's a folder icon with the collection name next to it).</li>
+      <li>Click the small arrow or the collection name to expand it. You'll see folders inside:
+      <b>Health</b>, <b>Auth</b>, and a new one added today, <b>Projects (CMP-41)</b>.</li>
+      <li>Click <b>Projects (CMP-41)</b> to expand it. You'll see five requests listed:
+      <code>POST /projects, create</code>, <code>GET /projects, list</code>,
+      <code>GET /projects/:id, view one</code>, <code>PATCH /projects/:id, partial update</code>,
+      <code>DELETE /projects/:id, soft delete</code>.</li>
+      <li>Click <b>POST /projects, create</b> once. It opens as a tab in the main area, to the
+      right of the sidebar.</li>
+      <li>Just under the URL bar (<code>{{baseUrl}}/projects</code>) is a row of tabs: Params,
+      Authorization, Headers, <b>Body</b>, Scripts, Settings. Click <b>Body</b>.</li>
+      <li>You should see <b>raw</b> already selected and, further right on that same row, a
+      dropdown that says <b>JSON</b>. Below that, a text box already containing:
+      <pre><code>{
+  "name": "Q4 Brand Campaign",
+  "description": "First real project"
+}</code></pre>
+      This was saved into the collection already, you don't need to type anything, just confirm
+      it's there and matches what's shown here.</li>
+      <li>Find the blue <b>Send</b> button, top right of the request tab, next to the URL bar.
+      Click it.</li>
+      <li>The response appears in the panel underneath. Near the top of that panel, next to the
+      word "Status", you'll see a number in green.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>201</code> (or <code>200</code>, both are fine here). The response body
+      below it is JSON containing a real <code>id</code> (a long string of letters, numbers, and
+      dashes), your <code>tenantId</code> and <code>ownerId</code> filled in automatically,
+      <code>"status": "active"</code>, and the <code>name</code>/<code>description</code> you sent
+      back exactly.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Copy the id before moving on</span>
+      <p>In the response body, double-click directly on the <code>id</code> value (the long string
+      after <code>"id":</code>) to select just that value, then <b>Ctrl+C</b> to copy it. Paste it
+      somewhere you can see it, Notepad is fine, you'll need to paste it into four more requests
+      below.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-07</span><h3>List and view a project</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> TC-06 done, you have a real project <code>id</code> copied
+    somewhere.</p>
+    <p><b>Part 1, the list</b></p>
+    <ol>
+      <li>In the <b>Projects (CMP-41)</b> folder (still expanded from TC-06), click
+      <b>GET /projects, list</b> to open it.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Part 1</span>
+      <p>Status <code>200</code>. The response body is a JSON array, <code>[ {...}, {...} ]</code>,
+      containing at least the project you created in TC-06, findable by its <code>name</code>.</p>
+    </div>
+    <p><b>Part 2, view one</b></p>
+    <ol>
+      <li>Click <b>GET /projects/:id, view one</b> to open it.</li>
+      <li>Look at the URL bar at the top of this request. It reads
+      <code>{{baseUrl}}/projects/:id</code>, the <code>:id</code> part is a placeholder, not a real
+      value yet.</li>
+      <li>Just under the URL bar, click the <b>Params</b> tab (it's the second tab, right after
+      the request name).</li>
+      <li>Scroll down slightly if needed until you see a section titled <b>Path Variables</b>, with
+      a small table underneath it: two columns, <b>Key</b> and <b>Value</b>. There should be one
+      row, <code>id</code>, with a value that currently says
+      <code>REPLACE-WITH-A-REAL-PROJECT-ID</code>.</li>
+      <li>Click directly into that <b>Value</b> cell. Select all the placeholder text inside it
+      (Ctrl+A while your cursor is in that cell, or click and drag across it) and delete it.</li>
+      <li>Paste the real project id you copied in TC-06 (<b>Ctrl+V</b>).</li>
+      <li>Look back up at the URL bar, it should now show your real id in place of
+      <code>:id</code>, confirming the substitution actually took.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Part 2</span>
+      <p>Status <code>200</code>, and the response body is that exact same project, same
+      <code>id</code>, <code>name</code>, and <code>description</code> as TC-06's response.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: two more checks, same request</span>
+      <p>Repeat steps 4 to 8 above twice more, on the same <b>GET /projects/:id, view one</b>
+      request: once with the <b>Value</b> cell set to <code>not-a-real-id</code>, expect status
+      <code>400</code> (the id itself is malformed, not just missing). Once with it set to
+      <code>00000000-0000-0000-0000-000000000000</code>, expect status <code>404</code>
+      (well-formed, but no project actually has this id). When you're done with both, put your
+      real project id from TC-06 back into that <b>Value</b> cell, TC-08 needs it there.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-08</span><h3>Partial update doesn't wipe other fields</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> TC-06 done, and TC-07 left the real project id sitting in
+    <b>GET /projects/:id, view one</b>'s Path Variables (you'll reuse that same id here).</p>
+    <p style="font-size:13px;color:var(--cbt-primary-dark);background:var(--cbt-primary-muted);padding:10px 14px;border-radius:8px;margin:0 0 14px">
+    This case exists because of a real bug found and fixed while building this: sending only
+    <code>name</code> in an update was silently erasing <code>description</code>. Fixed, this case
+    is what proves it stays fixed.</p>
+    <ol>
+      <li>In the <b>Projects (CMP-41)</b> folder, click <b>PATCH /projects/:id, partial update</b>
+      to open it.</li>
+      <li>Click the <b>Params</b> tab, same as TC-07, and find the <b>Path Variables</b> table.
+      Click into the <b>Value</b> cell for <code>id</code>, clear it (Ctrl+A, then type or paste),
+      and paste in your real project id from TC-06.</li>
+      <li>Click the <b>Body</b> tab. You should see:
+      <pre><code>{
+  "name": "Q4 Brand Campaign (renamed)"
+}</code></pre>
+      Confirm it says only <code>name</code>, nothing about <code>description</code> anywhere in
+      that box. Don't add anything to it, an empty <code>description</code> field left out
+      entirely is the whole point of this test.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>. In the response body, <code>name</code> now says
+      <code>"Q4 Brand Campaign (renamed)"</code>, and <code>description</code> still says
+      <code>"First real project"</code>, exactly what you sent in TC-06, even though this request
+      never mentioned <code>description</code> at all.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-error);background:var(--cbt-error-muted)">
+      <span class="lbl" style="color:var(--cbt-error-dark)">If description comes back null</span>
+      <p>That's the original bug back. Stop, don't assume it's fine, and tell me exactly that:
+      "description came back null on TC-08." Don't try to work around it yourself.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-09</span><h3>Delete is soft, not gone</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, then pgAdmin)</span><span><b>Tool:</b> Postman, then pgAdmin</span></div>
+    <p><b>Preconditions:</b> TC-06 done, and you still have that project's real id.</p>
+    <p><b>Step 1, delete it</b></p>
+    <ol>
+      <li>In the <b>Projects (CMP-41)</b> folder, click <b>DELETE /projects/:id, soft delete</b> to
+      open it.</li>
+      <li>Click the <b>Params</b> tab, find the <b>Path Variables</b> table, click into the
+      <b>Value</b> cell for <code>id</code>, clear it, and paste your real project id from TC-06.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Step 1</span>
+      <p>Status <code>204</code>, and the response body area is empty, that's normal for a
+      <code>204</code>, there's nothing to show.</p>
+    </div>
+    <p><b>Step 2, confirm it's gone from the API</b></p>
+    <ol>
+      <li>Click <b>GET /projects/:id, view one</b>. Its <code>id</code> Path Variable should still
+      have the same real id in it from TC-07/TC-08, leave it as is.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Step 2</span>
+      <p>Status <code>404</code>. As far as the API is concerned, the project is gone.</p>
+    </div>
+    <p><b>Step 3, confirm it's gone from the list</b></p>
+    <ol>
+      <li>Click <b>GET /projects, list</b>. Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Step 3</span>
+      <p>The array in the response no longer contains a project with the name you set in TC-08
+      ("Q4 Brand Campaign (renamed)").</p>
+    </div>
+    <p><b>Step 4, confirm it's still really in Postgres</b></p>
+    <ol>
+      <li>Open pgAdmin. In the left tree, expand <b>Servers &rarr; MMM Local &rarr; Databases &rarr;
+      mmm_dev &rarr; Schemas &rarr; public &rarr; Tables</b>, same path you've used in earlier
+      cases.</li>
+      <li>Right-click <b>mmm_dev</b> (the database, near the top of that tree) and choose
+      <b>Query Tool</b>.</li>
+      <li>Paste this in, replacing <code>&lt;the id&gt;</code> with your real project id, quotes
+      and all:
+      <pre><code>SELECT name, deleted_at FROM projects WHERE id = '&lt;the id&gt;';</code></pre></li>
+      <li>Run it (the &#9654; play button, or F5).</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Step 4</span>
+      <p>One row comes back. <code>name</code> still says "Q4 Brand Campaign (renamed)", and
+      <code>deleted_at</code> has a real timestamp in it, not blank. The row is still physically
+      there, just marked deleted, that's what "soft delete" means, kept for audit purposes instead
+      of actually erased.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-10</span><h3>Only the owner can edit or delete a project</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (pgAdmin, then Postman)</span><span><b>Tool:</b> pgAdmin, then Postman</span></div>
+    <p><b>Why this one needs pgAdmin first:</b> testing "someone else can't touch my project"
+    properly needs a second real user, and Amna isn't onboarded yet. This creates a throwaway
+    second user by hand instead of waiting on that.</p>
+    <p><b>Step 1, create a fresh project</b></p>
+    <p>The project from TC-06 is gone (you soft-deleted it in TC-09), so make a new one for this
+    test rather than trying to reuse that one.</p>
+    <ol>
+      <li>In the <b>Projects (CMP-41)</b> folder, click <b>POST /projects, create</b> (the same
+      request from TC-06).</li>
+      <li>Click <b>Send</b> as is, no need to change the body.</li>
+      <li>In the response, double-click the <code>id</code> value to select it, <b>Ctrl+C</b> to
+      copy it. This is a different id from TC-06's, keep it separate, paste it somewhere you can
+      see it.</li>
+    </ol>
+    <p><b>Step 2, find your tenant id in pgAdmin</b></p>
+    <ol>
+      <li>Open pgAdmin, right-click <b>mmm_dev</b> in the left tree, <b>Query Tool</b> (same as
+      TC-09's Step 4).</li>
+      <li>Paste this in, with your Step 1 project id in place of <code>&lt;the project id&gt;</code>:
+      <pre><code>SELECT id, tenant_id FROM projects WHERE id = '&lt;the project id&gt;';</code></pre></li>
+      <li>Run it (&#9654; or F5). One row comes back. Copy the <code>tenant_id</code> value the
+      same way, double-click to select, Ctrl+C, paste it somewhere visible, you need it in the
+      next step.</li>
+    </ol>
+    <p><b>Step 3, create a throwaway second user</b></p>
+    <ol>
+      <li>Still in the Query Tool, clear the box (Ctrl+A, Delete) and paste this in, with your
+      Step 2 <code>tenant_id</code> in place of <code>&lt;the tenant_id from above&gt;</code>:
+      <pre><code>INSERT INTO users (tenant_id, email, first_name, last_name, global_role)
+VALUES ('&lt;the tenant_id from above&gt;', 'throwaway-test-user@test.local', 'Throwaway', 'User', 'marketing_analyst')
+RETURNING id;</code></pre></li>
+      <li>Run it. One row comes back with a new <code>id</code>, this is the throwaway user's id.
+      Copy it the same way, you need it immediately in the next step.</li>
+    </ol>
+    <p><b>Step 4, reassign the project to that throwaway user</b></p>
+    <ol>
+      <li>Clear the Query Tool box again, paste this in, with the throwaway user's id from Step 3
+      in place of <code>&lt;the new user's id&gt;</code>, and your Step 1 project id in place of
+      <code>&lt;the project id&gt;</code>:
+      <pre><code>UPDATE projects SET owner_id = '&lt;the new user's id&gt;' WHERE id = '&lt;the project id&gt;';</code></pre></li>
+      <li>Run it. It should say <code>UPDATE 1</code> underneath, one row changed.</li>
+    </ol>
+    <p><b>Step 5, try to edit and delete it as yourself, not the throwaway user</b></p>
+    <p>You're not signing in as the throwaway user, that's just a database row, it can't sign in
+    to anything. You're still you, and the project no longer belongs to you, that's the point.</p>
+    <ol>
+      <li>Back in Postman, <b>Projects (CMP-41)</b> folder, click <b>PATCH /projects/:id, partial
+      update</b>.</li>
+      <li><b>Params</b> tab, <b>Path Variables</b> table, set the <code>id</code> value to your
+      Step 1 project id (the one you just reassigned).</li>
+      <li>Click <b>Send</b>.</li>
+      <li>Now click <b>DELETE /projects/:id, soft delete</b>. Set its <code>id</code> Path Variable
+      to the same project id.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, Step 5</span>
+      <p>Both requests come back with status <code>403</code>, body
+      <code>{"statusCode":403,"message":"Only the project owner can do this."}</code>. Then open
+      <b>GET /projects/:id, view one</b>, same id, and Send: it should still show your original
+      <code>name</code> from Step 1, untouched, and <code>deletedAt</code> still <code>null</code>,
+      proof the blocked requests didn't quietly succeed anyway.</p>
+    </div>
+    <p><b>Step 6, clean up the throwaway user</b></p>
+    <ol>
+      <li>Back in pgAdmin's Query Tool, clear it and run:
+      <pre><code>DELETE FROM users WHERE email = 'throwaway-test-user@test.local';</code></pre></li>
+    </ol>
+  </div>
+</details>
+
+<footer>
+  <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <strong>MMM Backend &middot; Test cases</strong><br>
+  See <a href="./progress-log.html">the progress log</a> for overall status, and
+  <code>dev-log/raw/</code> for the technical detail behind any case here.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared Dev Deployment Guide · MMM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-error:#EF4444; --cbt-error-muted:#FDEDED; --cbt-error-dark:#B91C1C;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+    --cbt-shadow-soft:0 1px 4px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 40px;margin-bottom:8px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:66ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+  a{color:var(--cbt-primary)}
+  code{background:var(--cbt-surface);border:1px solid var(--cbt-border);padding:1px 6px;
+    border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  pre code{background:none;border:none;padding:0}
+
+  h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.5rem;
+    margin:48px 0 6px;color:var(--cbt-heading)}
+  h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.7em;
+    font-weight:600;margin-right:10px}
+  h2.section:first-of-type{margin-top:0}
+  .section-why{color:var(--cbt-muted);margin:0 0 20px;max-width:70ch}
+
+  .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 18px}
+  .card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
+  .card p{margin:0 0 12px;max-width:72ch}
+  .card ol,.card ul{padding-left:22px;margin:0 0 12px;max-width:72ch}
+  .card li{margin:6px 0}
+
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;padding:5px 11px;border-radius:6px 6px 0 0;
+    margin-bottom:-1px;position:relative;top:1px}
+  .tag.type{background:var(--cbt-primary);color:#fff}
+  .tag.read{background:var(--cbt-warning);color:#5A3B04}
+  pre.block{margin:0 0 16px;border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) var(--cbt-radius-sm);
+    padding:14px 18px;overflow-x:auto;font-size:13.5px;line-height:1.65;border:1px solid var(--cbt-border)}
+  pre.block.type{background:var(--cbt-primary-muted);border-color:rgba(0,153,77,.3)}
+  pre.block.read{background:var(--cbt-warning-muted);border-color:rgba(245,158,11,.35)}
+
+  .callout{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .callout p{margin:0}
+  .callout .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-primary-dark);display:block;margin-bottom:6px}
+
+  .watch{border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .watch p{margin:0}
+  .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+
+  table{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:14px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--cbt-muted);
+    font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--cbt-border)}
+  td{padding:10px 12px;border-bottom:1px solid var(--cbt-border);vertical-align:top}
+  td code{white-space:nowrap}
+
+  .stepnum{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;
+    border-radius:50%;background:var(--cbt-heading);color:#fff;font-family:var(--cbt-font-mono);
+    font-size:12px;font-weight:600;margin-right:10px;flex-shrink:0}
+
+  .handoff{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:28px 32px;margin:16px 0 44px}
+  .handoff h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.3rem;margin:0 0 14px;color:var(--cbt-heading)}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:8px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>Shared Dev deployment</span>
+</div>
+
+<header>
+  <div class="kicker">MMM &middot; Backend &middot; Deployment</div>
+  <h1>Getting this backend somewhere <span class="italic-accent">Amna</span> can reach</h1>
+  <p class="sub">Right now this backend only exists on your machine. This guide gets it onto GitHub,
+  then onto Render as a real, always-on service with its own database, so Amna can build and test the
+  frontend against it without you both needing to be online at the same time. Nothing about the app
+  gets simplified or switched off to make this work. Real login stays on.</p>
+  <p class="updated">Last updated <b>August 6, 2026</b>. This is temporary infrastructure for
+  Dev only, replaced once real Azure App Service is set up, see
+  <code>project-context.md</code> in the Azure folder.</p>
+</header>
+
+<div class="watch">
+  <span class="lbl">Found while writing this guide</span>
+  <p><code>Backend\</code> has never actually been committed to git. It's initialized, but every file
+  in it is untracked and there are zero commits. Everything built this whole project, including the
+  real Entra login work, currently exists only on your machine with no history at all. Step 1 fixes
+  this. It's the reason this guide starts with a real commit, not just a push.</p>
+</div>
+
+<h2 class="section"><span class="num">01</span>Get the code into Farhan's repo</h2>
+<p class="section-why">Farhan already created the GitHub repo and is adding you to it. Your job is to
+turn your local, uncommitted folder into real commits, then push them there.</p>
+
+<div class="card">
+  <h4><span class="stepnum">1</span>Get the repo URL from Farhan</h4>
+  <p>Ask him for the repo's HTTPS URL. It looks like
+  <code>https://github.com/&lt;org-or-username&gt;/&lt;repo-name&gt;.git</code>. Confirm you can see
+  the repo at that URL in your browser first, and that you've accepted the GitHub invite he sends,
+  before doing anything below.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepnum">2</span>Open PowerShell in the right folder</h4>
+  <p>Every command below assumes you're inside <code>D:\Anas\MMM\Backend</code>. Check the folder
+  before typing anything else.</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>cd D:\Anas\MMM\Backend
+pwd</code></pre>
+  <p>The second line should print <code>D:\Anas\MMM\Backend</code>. If it doesn't, <code>cd</code>
+  to the right place before continuing.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepnum">3</span>Commit everything you have, for real this time</h4>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git add .
+git status</code></pre>
+  <p>Read the output of <code>git status</code> before continuing. It should list every real source
+  file as staged (green), and should <b>not</b> list <code>.env</code>, <code>node_modules</code>, or
+  <code>dist</code>, those are excluded by <code>.gitignore</code> already. If you see
+  <code>.env</code> in that list, stop and tell me before committing, that file has real passwords in
+  it.</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git commit -m "Initial commit: NestJS backend, auth, multi-tenant RLS"</code></pre>
+</div>
+
+<div class="card">
+  <h4><span class="stepnum">4</span>Point this repo at Farhan's GitHub repo and push</h4>
+  <p>Replace the URL below with the real one Farhan gave you.</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git remote add origin https://github.com/REPLACE/WITH-REAL-URL.git
+git branch -M main
+git push -u origin main</code></pre>
+  <p>If Farhan's repo already has its own first commit (for example, a starter README), the push
+  above will be rejected with a message like <code>fetch first</code> or
+  <code>rejected (non-fast-forward)</code>. If that happens, stop and tell me the exact message
+  instead of guessing at a fix. The safe fix depends on what's actually in that first commit,
+  and the wrong one can quietly discard work.</p>
+</div>
+
+<div class="watch">
+  <span class="lbl">Possible wall, worth knowing about before you hit it</span>
+  <p>Since Farhan owns the repo, connecting Render to it in Step 4 below may need his say-so too.
+  GitHub's rule: whoever installs the Render app against a private repo needs admin rights on that
+  repo, or the org owner needs to approve it once at the org level. If Render's repo picker in Step
+  4 doesn't show this repo, that's why, same shape as the tenant-admin-consent wall from the Entra
+  work. Ask Farhan to add you as an <b>admin</b> collaborator (not just write access) if it happens,
+  rather than guessing at a workaround.</p>
+</div>
+
+<h2 class="section"><span class="num">02</span>Create your Render account</h2>
+<p class="section-why">You're using your own personal Render account for now, which is fine as a
+Dev-only stopgap, the same "this is temporary, revisit later" status as your personal Entra
+test app.</p>
+
+<div class="card">
+  <ol>
+    <li>Go to <code>render.com</code> and sign up. Sign up with GitHub (not email/password) so it can
+    see your repos directly. This is the same account that'll need access to Farhan's repo from
+    Step 1.</li>
+    <li>Use your work email (<code>@convergentbt.com</code>) if it asks, even though it's a personal
+    account, so it's easy to hand over to a real team account later without losing history.</li>
+  </ol>
+</div>
+
+<h2 class="section"><span class="num">03</span>Create the shared database</h2>
+<p class="section-why">Your current Postgres only exists in Docker on your laptop. Render needs its
+own, separate one, reachable from anywhere.</p>
+
+<div class="card">
+  <ol>
+    <li>In the Render dashboard, click <b>New +</b> &rarr; <b>PostgreSQL</b>.</li>
+    <li>Name it something like <code>mmm-dev-shared</code>.</li>
+    <li>Region: pick whichever is closest to you and Amna both, it doesn't need to match Azure's
+    future region.</li>
+    <li>Plan: the free tier is fine to start.</li>
+    <li>Click <b>Create Database</b>, then wait for its status to say <b>Available</b>.</li>
+    <li>Once it's up, open its <b>Info</b> tab. You'll need four values off this page in the next
+    step: <b>Hostname</b>, <b>Port</b>, <b>Database</b>, and the admin <b>Username</b> /
+    <b>Password</b> Render generated for you. Keep this tab open.</li>
+  </ol>
+</div>
+
+<h2 class="section"><span class="num">04</span>Create the web service</h2>
+<p class="section-why">This is the actual NestJS app, running continuously, redeploying itself every
+time you push to <code>main</code>.</p>
+
+<div class="card">
+  <ol>
+    <li>Click <b>New +</b> &rarr; <b>Web Service</b>.</li>
+    <li>Pick the repo from Step 1 in the list. If it isn't there, see the "possible wall" callout
+    above.</li>
+    <li>Name: <code>mmm-backend-dev</code> or similar.</li>
+    <li>Runtime: <b>Node</b>.</li>
+    <li>Build command: <code>npm install && npm run build</code></li>
+    <li>Start command: <code>npm run start:prod</code></li>
+    <li>Instance type: free tier is fine to start.</li>
+    <li>Find <b>Auto-Deploy</b> in the settings (usually already on by default when you connect a
+    repo this way) and confirm it's set to <b>Yes</b>, branch <code>main</code>. This is the whole
+    "push and it updates itself" part, verify it rather than assume it, since it's the reason
+    this step is being done at all.</li>
+    <li>Don't click Create yet. Add the environment variables in the next step first, they're
+    on the same screen.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4>Environment variables</h4>
+  <p>Same idea as your local <code>.env</code>, entered into Render's dashboard instead of a file.
+  Add each of these under the web service's <b>Environment</b> section:</p>
+  <table>
+    <tr><th>Key</th><th>Value</th></tr>
+    <tr><td><code>NODE_ENV</code></td><td><code>production</code></td></tr>
+    <tr><td><code>DB_HOST</code></td><td>the Postgres <b>Hostname</b> from Step 3</td></tr>
+    <tr><td><code>DB_PORT</code></td><td>the Postgres <b>Port</b> from Step 3 (usually <code>5432</code>)</td></tr>
+    <tr><td><code>DB_NAME</code></td><td>the Postgres <b>Database</b> name from Step 3</td></tr>
+    <tr><td><code>DB_ADMIN_USERNAME</code></td><td>the Postgres admin <b>Username</b> Render generated</td></tr>
+    <tr><td><code>DB_ADMIN_PASSWORD</code></td><td>the Postgres admin <b>Password</b> Render generated</td></tr>
+    <tr><td><code>DB_USERNAME</code></td><td><code>mmm_app</code></td></tr>
+    <tr><td><code>DB_PASSWORD</code></td><td>make up a new strong password, write it down, you'll need it again in Step 5</td></tr>
+    <tr><td><code>DB_SSL</code></td><td><code>true</code>, Render's Postgres requires it, same as Azure will</td></tr>
+    <tr><td><code>DB_SYNCHRONIZE</code></td><td><code>false</code></td></tr>
+    <tr><td><code>DB_LOGGING</code></td><td><code>false</code>, leave the verbose SQL logging off here, it's for local only</td></tr>
+    <tr><td><code>AZURE_AD_TENANT_ID</code></td><td>same value as your local <code>.env</code></td></tr>
+    <tr><td><code>AZURE_AD_AUDIENCE</code></td><td>same value as your local <code>.env</code></td></tr>
+    <tr><td><code>AUTH_DEV_BYPASS</code></td><td><code>false</code>, stays off, real login only, this is the whole point</td></tr>
+  </table>
+  <p>Don't set <code>PORT</code> yourself. Render assigns its own and injects it automatically; the
+  app already reads whatever's in the environment.</p>
+  <p>Click <b>Create Web Service</b> once all of these are in. The first deploy takes a few minutes
+  and will very likely <b>fail on boot</b>. That's expected, keep reading, it's because the
+  database is still empty.</p>
+</div>
+
+<h2 class="section"><span class="num">05</span>Run migrations against the new database</h2>
+<p class="section-why">The web service can't start yet because the tables and the restricted
+<code>mmm_app</code> role don't exist on Render's database. Migrations create both, same as they did
+locally, just pointed somewhere else this one time.</p>
+
+<div class="card">
+  <span class="tag read">Read only, don't type this into a file</span>
+  <p>This runs from your own machine, once, using a temporary copy of your <code>.env</code> pointed
+  at Render's database instead of your local Docker one.</p>
+  <ol>
+    <li>Make a copy of your real <code>.env</code> file and name the copy <code>.env.render-setup</code>.</li>
+    <li>In that copy, change <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_NAME</code>,
+    <code>DB_ADMIN_USERNAME</code>, <code>DB_ADMIN_PASSWORD</code> to the Render Postgres values from
+    Step 3, and set <code>DB_USERNAME</code>/<code>DB_PASSWORD</code> to <code>mmm_app</code> and the
+    password you invented in Step 4. Set <code>DB_SSL=true</code>.</li>
+  </ol>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>Copy-Item .env .env.backup
+Copy-Item .env.render-setup .env
+npm run migration:run</code></pre>
+  <p>Watch the output: you should see each migration listed as run, ending with
+  <code>CreateAppRole1785900000002</code>. That last one is the one that actually creates
+  <code>mmm_app</code> on Render's database.</p>
+  <span class="tag type">Type this, right after, don't skip this part</span>
+  <pre class="block type"><code>Copy-Item .env.backup .env -Force</code></pre>
+  <p>That last command puts your real local <code>.env</code> back, pointed at your own Docker
+  Postgres again. Confirm your local server still starts normally after this before moving on.</p>
+</div>
+
+<h2 class="section"><span class="num">06</span>Verify it, the same way TC-04 was verified</h2>
+<div class="card">
+  <ol>
+    <li>Back in Render, open the web service and check the <b>Logs</b> tab. It should now say
+    something like <code>MMM backend listening on http://localhost:&lt;port&gt;</code> with no
+    crash after it.</li>
+    <li>Copy the public URL Render shows at the top of the service page
+    (looks like <code>https://mmm-backend-dev.onrender.com</code>).</li>
+    <li>In Postman, duplicate your existing TC-04 request, point it at
+    <code>&lt;that URL&gt;/auth/me</code> instead of <code>localhost:3000</code>, keep your same real
+    token. A <code>200</code> with your real name and email back means this whole chapter worked.</li>
+  </ol>
+  <div class="callout">
+    <span class="lbl">Don't mark anything Passing yet</span>
+    <p>This deployment isn't a new row in <code>test-cases.html</code> on its own, it's the
+    same auth flow, just reachable from a new address. Once you've actually run the check above and
+    it works, tell me and I'll add a short note to the dev log and this guide confirming it, same rule
+    as everything else: I don't mark it done, you running it does.</p>
+  </div>
+</div>
+
+<h2 class="section"><span class="num">07</span>What to hand Amna</h2>
+<div class="handoff">
+  <h3>Once Step 6 is confirmed</h3>
+  <p>Send her these four things. She doesn't need Farhan, doesn't need admin rights, and doesn't need
+  you online at the same time. She signs in with her own <code>@convergentbt.com</code>
+  account, same as you did.</p>
+  <table>
+    <tr><th>What</th><th>Value</th></tr>
+    <tr><td>API base URL</td><td>the Render URL from Step 6</td></tr>
+    <tr><td>Tenant ID</td><td>same as your <code>AZURE_AD_TENANT_ID</code></td></tr>
+    <tr><td>Client ID</td><td>the same app's Client ID from your <code>.env</code></td></tr>
+    <tr><td>How to get a token</td><td>the same collection-level "Get New Access Token" flow as your TC-04, she can copy your Postman collection and just swap the environment's base URL</td></tr>
+  </table>
+  <p>First time she signs in, she'll see Microsoft's consent screen for herself, once, same as you
+  did, that's individual user consent, not something that needs Farhan. Her first successful
+  call auto-provisions her a real tenant and user record too, same provisioning logic
+  <code>CMP-42</code> already proved works.</p>
+</div>
+
+<div class="watch">
+  <span class="lbl">One real gap, worth deciding before Amna starts building against this</span>
+  <p>For her actual frontend code (not Postman) to get a token, it needs its own sign-in flow wired up
+  in whatever framework she's using, that's separate frontend work, not something this guide
+  covers. Worth a short conversation with her about which library handles that on her side (MSAL for
+  most JS frontends) before she's blocked on it.</p>
+</div>
+
+<footer>
+  <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  Convergent Business Technologies &middot; MMM Backend &middot; internal, not for distribution outside the team.
+</footer>
+
+</div>
+</body>
+</html>
