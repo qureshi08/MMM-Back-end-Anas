@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Team Guide · MMM Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-error:#EF4444; --cbt-error-muted:#FDEDED; --cbt-error-dark:#B91C1C;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono);background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  pre code{background:none;border:none;padding:0}
+  a{color:var(--cbt-primary)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 36px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:70ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+
+  nav.toc{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:0 0 40px}
+  nav.toc h2{font-family:var(--cbt-font-heading);font-size:1.05rem;margin:0 0 12px;color:var(--cbt-heading)}
+  nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+  nav.toc li{margin:5px 0;break-inside:avoid}
+  nav.toc a{color:var(--cbt-body);text-decoration:none;font-size:14px}
+  nav.toc a:hover{color:var(--cbt-primary)}
+
+  h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.7rem;
+    margin:56px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
+  h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.62em;
+    font-weight:600;margin-right:10px;vertical-align:middle}
+  h2.section:first-of-type{margin-top:0}
+  .section-why{color:var(--cbt-muted);margin:0 0 22px;max-width:72ch}
+
+  h3.sub{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.2rem;margin:32px 0 10px;color:var(--cbt-heading)}
+
+  .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 18px}
+  .card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
+  .card p{margin:0 0 12px;max-width:72ch}
+  .card ol,.card ul{padding-left:22px;margin:0 0 12px;max-width:72ch}
+  .card li{margin:6px 0}
+
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;
+    letter-spacing:.07em;text-transform:uppercase;padding:5px 11px;border-radius:6px 6px 0 0;
+    margin-bottom:-1px;position:relative;top:1px}
+  .tag.type{background:var(--cbt-primary);color:#fff}
+  .tag.read{background:var(--cbt-warning);color:#5A3B04}
+  pre.block{margin:0 0 16px;border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) var(--cbt-radius-sm);
+    padding:14px 18px;overflow-x:auto;font-size:13.5px;line-height:1.65;border:1px solid var(--cbt-border)}
+  pre.block.type{background:var(--cbt-primary-muted);border-color:rgba(0,153,77,.3)}
+  pre.block.read{background:var(--cbt-warning-muted);border-color:rgba(245,158,11,.35)}
+
+  .callout{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .callout p{margin:0}
+  .callout .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-primary-dark);display:block;margin-bottom:6px}
+
+  .watch{border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .watch p{margin:0}
+  .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+
+  .define{display:flex;flex-wrap:wrap;gap:12px;margin:0 0 20px}
+  .define .term{flex:1;min-width:200px;background:var(--cbt-blue-muted);border-radius:var(--cbt-radius-md);
+    padding:14px 16px}
+  .define .term b{display:block;color:var(--cbt-blue-dark);font-family:var(--cbt-font-mono);font-size:12.5px;margin-bottom:4px}
+  .define .term span{font-size:13.5px;color:var(--cbt-body)}
+
+  table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--cbt-muted);
+    font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--cbt-border)}
+  td{padding:10px 12px;border-bottom:1px solid var(--cbt-border);vertical-align:top}
+  td code{white-space:nowrap}
+
+  .owner-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:0 0 20px}
+  .owner-card{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:20px 22px}
+  .owner-card h4{font-family:var(--cbt-font-heading);font-weight:700;margin:0 0 10px;color:var(--cbt-heading)}
+  .owner-card ul{margin:0;padding-left:18px;font-size:13.5px}
+  .owner-card li{margin:6px 0}
+  @media (max-width:720px){.owner-grid{grid-template-columns:1fr}nav.toc ol{columns:1}}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:40px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>MMM Platform &middot; Team guide</span>
+</div>
+
+<header>
+  <div class="kicker">MMM Platform &middot; Everyone</div>
+  <h1>How this <span class="italic-accent">whole thing</span> fits together</h1>
+  <p class="sub">One page covering the real, current answer to: how do we push code, how do we deploy it,
+  how do we connect the frontend to the backend, and how do we test it once it's connected. Written for
+  the whole team, Farhan, Amna, Hammad, and Anas, not just one person's personal notes.</p>
+  <p class="updated">Last updated <b>August 7, 2026</b>. Covers the real repo at
+  <code>github.com/mirfarhanahmad/cbt-mmm-platform</code>, Render for the backend, Vercel for the
+  frontend. See <code>PLATFORM.md</code> in the same folder for the shorter, more technical version of
+  this same information.</p>
+</header>
+
+<nav class="toc">
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#basics">Git and GitHub, the real basics</a></li>
+    <li><a href="#daily">Your daily workflow</a></li>
+    <li><a href="#pr">Opening a Pull Request</a></li>
+    <li><a href="#backend">Deploying the backend, Render</a></li>
+    <li><a href="#frontend">Deploying the frontend, Vercel</a></li>
+    <li><a href="#connect">Connecting frontend to backend</a></li>
+    <li><a href="#test">Testing the connected app</a></li>
+    <li><a href="#owners">Who owns what, right now</a></li>
+  </ol>
+</nav>
+
+<h2 class="section" id="basics"><span class="num">01</span>Git and GitHub, the real basics</h2>
+<p class="section-why">This section exists so nobody has to ask "wait, what's a branch again" in the
+middle of real work. Skip it if you're already comfortable, it'll still be here.</p>
+
+<div class="define">
+  <div class="term"><b>Repository (repo)</b><span>The whole project's folder, with its full history, living on GitHub. Ours is <code>cbt-mmm-platform</code>.</span></div>
+  <div class="term"><b>Commit</b><span>A saved snapshot of your changes, with a message explaining what and why.</span></div>
+  <div class="term"><b>Branch</b><span>Your own copy of the project's history to work on, without touching anyone else's until you're ready to combine it.</span></div>
+  <div class="term"><b>Push</b><span>Sending your commits from your own machine up to GitHub, where everyone else can see them.</span></div>
+  <div class="term"><b>Pull Request (PR)</b><span>A request to merge your branch into another one (usually <code>main</code>), with a chance for someone else to look at it first.</span></div>
+  <div class="term"><b>Clone</b><span>Downloading a full copy of the repo, with its history, onto your own machine, done once per machine.</span></div>
+</div>
+
+<div class="card">
+  <h4>Your branch, already set up</h4>
+  <p>Every person on this project has their own branch to push to freely, no review needed for your own
+  day-to-day commits there:</p>
+  <table>
+    <tr><th>Branch</th><th>Owner</th><th>Status</th></tr>
+    <tr><td><code>backend/anas</code></td><td>Anas</td><td>Exists, pushed to, real commits</td></tr>
+    <tr><td><code>frontend</code></td><td>Amna</td><td>Exists (not yet renamed to <code>frontend/amna</code>, a small housekeeping item, not urgent)</td></tr>
+    <tr><td><code>modeling/hammad</code></td><td>Hammad</td><td>Not created yet, create it when Python work starts</td></tr>
+    <tr><td><code>infra/farhan</code></td><td>Farhan</td><td>Not created yet, create it when infra work starts</td></tr>
+  </table>
+  <p>Full naming convention and the reasoning behind it is in <code>Backend/CONTRIBUTING.md</code>'s
+  "Git workflow and collaboration" section.</p>
+</div>
+
+<div class="watch">
+  <span class="lbl">Real open question, not yet resolved</span>
+  <p>There's no <code>main</code> branch on the repo yet, and GitHub's current default branch is
+  <code>feature/angular-shell-setup</code>, which isn't meant to be permanent. On top of that, the
+  backend and frontend branches each have their project sitting at the repo root, which can't merge
+  into one shared <code>main</code> as-is, that needs to become a real monorepo (<code>backend/</code>
+  and <code>frontend/</code> as subfolders) first. This is a call for the team, especially Farhan since
+  he owns the repo, see Section 8.</p>
+</div>
+
+<h2 class="section" id="daily"><span class="num">02</span>Your daily workflow</h2>
+<p class="section-why">What to actually type, every time you sit down to work on your own branch.</p>
+
+<div class="card">
+  <h4>First time only, on a new machine: cloning the repo</h4>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>cd D:\
+git clone https://github.com/mirfarhanahmad/cbt-mmm-platform.git
+cd cbt-mmm-platform
+pwd</code></pre>
+  <p>The last line should print the folder you just cloned into. Pick whatever parent folder makes
+  sense on your machine, <code>D:\</code> is just an example, matching how Anas's local backend folder
+  is laid out today.</p>
+  <p>Then switch to your own branch:</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git checkout your-branch-name</code></pre>
+  <p>Replace <code>your-branch-name</code> with the real one from the table in Section 1, e.g.
+  <code>frontend</code> if you're Amna.</p>
+</div>
+
+<div class="card">
+  <h4>Every time: set your git identity once per machine</h4>
+  <p>If this hasn't been done on your machine yet, git will refuse your first commit and tell you so.
+  Set it once, matching your own name and GitHub-linked email:</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git config user.name "Your Name"
+git config user.email "your-email@example.com"</code></pre>
+  <p>This is scoped to just this one repo (no <code>--global</code>), on purpose, so it doesn't affect
+  anything else on your machine unless you choose to make it global later.</p>
+</div>
+
+<div class="card">
+  <h4>Making and saving changes</h4>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git status</code></pre>
+  <p>Always run this before committing. It lists every file you've changed, added, or deleted. Read it,
+  don't skip straight to committing. If you see a file you don't recognize touching, or anything named
+  <code>.env</code>, stop and figure out why before continuing, that file holds real passwords and
+  should never be committed.</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git add .
+git commit -m "feat(area): what you actually changed, present tense"</code></pre>
+  <p>The commit message format (<code>type(area): description</code>) is defined in
+  <code>Backend/CONTRIBUTING.md</code>'s Commits section, <code>type</code> is one of <code>feat</code>,
+  <code>fix</code>, <code>chore</code>, <code>docs</code>, <code>test</code>, <code>refactor</code>.</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>git push</code></pre>
+  <p>The first time you push a brand new branch, git will tell you to use
+  <code>git push -u origin your-branch-name</code> instead, just once, it'll say so plainly if that's
+  what's needed.</p>
+</div>
+
+<h2 class="section" id="pr"><span class="num">03</span>Opening a Pull Request</h2>
+<p class="section-why">How a chunk of your work actually reaches everyone else, once <code>main</code>
+exists (see the open question in Section 1).</p>
+
+<div class="card">
+  <ol>
+    <li>Push your branch (Section 2 above).</li>
+    <li>Go to <code>github.com/mirfarhanahmad/cbt-mmm-platform</code> in your browser. GitHub usually
+    shows a yellow banner offering to open a PR for the branch you just pushed, click
+    <b>Compare & pull request</b> if you see it.</li>
+    <li>If you don't see the banner, click <b>Pull requests</b> (top tabs) &rarr; <b>New pull request</b>
+    &rarr; set <b>base</b> to <code>main</code> and <b>compare</b> to your branch.</li>
+    <li>Write a short description: what changed, and why, not just what. The commit messages already
+    say what, the PR description is where "why" belongs.</li>
+    <li>Click <b>Create pull request</b>.</li>
+    <li>Ask one other teammate to look at it. Small team, keep this light, a real second pair of eyes,
+    not a formal multi-approval process.</li>
+    <li>Once they've looked, click <b>Merge pull request</b>.</li>
+  </ol>
+</div>
+
+<h2 class="section" id="backend"><span class="num">04</span>Deploying the backend, Render</h2>
+<p class="section-why">This is already written up in full, click-by-click detail elsewhere, linked
+here rather than duplicated so the two copies can't quietly drift apart.</p>
+
+<div class="card">
+  <p>Full guide: <code>Backend/dev-log/for-anas/deployment-guide.html</code>. Covers creating a Render
+  account, a managed Postgres database, the web service itself, every environment variable it needs,
+  and running migrations against it.</p>
+  <p><b>Quick summary</b>, if you've already read the full guide once: connect the GitHub repo to a new
+  Render Web Service, currently pointed at <code>backend/anas</code> (should move to <code>main</code>
+  once that exists, see Section 1), auto-deploy on every push, environment variables copied from
+  <code>.env.example</code> with real values.</p>
+</div>
+
+<h2 class="section" id="frontend"><span class="num">05</span>Deploying the frontend, Vercel</h2>
+<p class="section-why">New, full detail, since this hasn't been written up step by step before.</p>
+
+<div class="card">
+  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 1</span>Create a Vercel account</h4>
+  <ol>
+    <li>Go to <code>vercel.com</code>, click <b>Sign Up</b>.</li>
+    <li>Choose <b>Continue with GitHub</b>, not email/password, so Vercel can see your repos directly.</li>
+    <li>This can be a personal account for now, same Dev-only-stopgap status as the Render account, see
+    <code>PLATFORM.md</code>.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 2</span>Import the project</h4>
+  <ol>
+    <li>From the Vercel dashboard, click <b>Add New...</b> &rarr; <b>Project</b>.</li>
+    <li>Find <code>cbt-mmm-platform</code> in the repo list and click <b>Import</b>. If it's not
+    listed, click <b>Adjust GitHub App Permissions</b> and grant Vercel access to that specific repo.</li>
+    <li>Vercel will ask which branch to deploy. Pick <code>frontend</code> for now (see Section 1's
+    open question about <code>main</code>).</li>
+    <li>Framework Preset: Vercel should auto-detect <b>Angular</b>. Confirm it did, rather than assume,
+    the field is near the top of the import screen.</li>
+    <li>Build Command and Output Directory: leave whatever Vercel auto-filled unless you know it's
+    wrong. Angular CLI's defaults are <code>ng build</code> and <code>dist/&lt;project-name&gt;</code>.</li>
+    <li>Click <b>Deploy</b>. First deploy takes a few minutes.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4><span class="tag" style="position:static;background:var(--cbt-heading);color:#fff;border-radius:6px;padding:3px 9px;font-size:10px;margin-right:8px">Step 3</span>Get your URL, and what it does right now</h4>
+  <ol>
+    <li>Once deployed, Vercel shows a URL like <code>https://cbt-mmm-platform.vercel.app</code>. Click
+    it, confirm the app actually loads.</li>
+    <li>It'll still be running on <b>mock data</b> at this point, <code>useMockApi: true</code> is the
+    current default, see Section 6. That's expected, not a failure, connecting it to the real backend
+    is the next section.</li>
+    <li>Every future push to <code>frontend</code> redeploys automatically, and every other branch or
+    PR gets its own separate preview URL, a Vercel default, nothing to configure.</li>
+  </ol>
+</div>
+
+<h2 class="section" id="connect"><span class="num">06</span>Connecting frontend to backend</h2>
+<p class="section-why">The actual wiring: how the deployed frontend starts talking to the real deployed
+backend instead of its built-in mock data.</p>
+
+<div class="callout">
+  <span class="lbl">Already fixed, nothing to do here</span>
+  <p>The backend's API now lives under <code>/api/v1</code> (e.g. <code>/api/v1/projects</code>),
+  matching what the frontend's code already expected. Found and fixed 2026-08-06, see
+  <code>PLATFORM.md</code> for the detail. CORS is also already wide open on the backend, no action
+  needed for a first connection.</p>
+</div>
+
+<div class="card">
+  <h4>The one real gap, frontend side (Amna)</h4>
+  <p>The frontend has a mock/real switch already built in
+  (<code>src/environments/environment.ts</code>), but a production build today doesn't yet swap in a
+  different config, so it would still use <code>localhost</code> and mock data no matter where it's
+  deployed. Two files fix this:</p>
+  <ol>
+    <li>Add <code>src/environments/environment.prod.ts</code>:</li>
+  </ol>
+  <span class="tag type">Type this, into a new file</span>
+  <pre class="block type"><code>export const environment = {
+  production: true,
+  useMockApi: false,
+  apiBaseUrl: 'https://REPLACE-WITH-YOUR-REAL-RENDER-URL/api/v1',
+};</code></pre>
+  <ol start="2">
+    <li>In <code>angular.json</code>, find the <code>production</code> configuration under
+    <code>architect.build.configurations</code>, and add a <code>fileReplacements</code> entry so the
+    production build actually uses the new file:</li>
+  </ol>
+  <span class="tag type">Type this, inside the existing "production" block</span>
+  <pre class="block type"><code>"fileReplacements": [
+  {
+    "replace": "src/environments/environment.ts",
+    "with": "src/environments/environment.prod.ts"
+  }
+]</code></pre>
+  <ol start="3">
+    <li>Commit, push, Vercel redeploys automatically. Reload the Vercel URL and the app should now be
+    calling the real Render backend.</li>
+  </ol>
+</div>
+
+<div class="watch">
+  <span class="lbl">Real login is a separate, later step</span>
+  <p>For this first connection, leave the Render backend's <code>AUTH_DEV_BYPASS=true</code>, that
+  proves the wiring works with one less moving part. Real Microsoft sign-in on the frontend needs
+  <code>@azure/msal-angular</code> wired up, and a new Redirect URI added to the Entra app registration
+  for the frontend's real URL (Anas's action item, he registered the app). See <code>PLATFORM.md</code>
+  Section 3 for the full detail.</p>
+</div>
+
+<h2 class="section" id="test"><span class="num">07</span>Testing the connected app</h2>
+<p class="section-why">Once frontend and backend are actually talking to each other, how the whole team
+verifies a feature really works, not just "looks right."</p>
+
+<div class="card">
+  <h4>Test against the shared environments, not your own laptop</h4>
+  <p>Point your testing at the shared Vercel URL and the shared Render backend, not some mix of "my
+  local frontend talking to your local backend," that needs matching network access and correct setup
+  on both sides at the same moment, exactly what the shared environments exist to avoid.</p>
+</div>
+
+<div class="card">
+  <h4>The backend already has a real test suite, reuse the pattern</h4>
+  <p><code>Backend/dev-log/for-anas/test-cases.html</code> is the backend's real, reusable test suite,
+  ten cases, each with exact steps and an expected result, a case only counts as <b>Passing</b> once a
+  real person has actually run it and it worked. The same shape works for the frontend: a similar file
+  Amna keeps updated for her own features (creating a project through the real UI and seeing it appear
+  in Postgres, for example, not just "the page rendered").</p>
+</div>
+
+<div class="card">
+  <h4>A real end-to-end check, once Section 6 is done</h4>
+  <ol>
+    <li>Open the Vercel URL.</li>
+    <li>Do something that should hit the real backend, create a project through the actual UI.</li>
+    <li>In pgAdmin, Query Tool against <code>mmm_dev</code> (or the equivalent on the Render Postgres),
+    confirm the row actually exists.</li>
+    <li>That's a real, end-to-end confirmed feature, not two halves that were only ever tested
+    separately.</li>
+  </ol>
+</div>
+
+<h2 class="section" id="owners"><span class="num">08</span>Who owns what, right now</h2>
+<p class="section-why">So nothing here quietly becomes everyone's problem and nobody's task.</p>
+
+<div class="owner-grid">
+  <div class="owner-card">
+    <h4>Farhan</h4>
+    <ul>
+      <li>Decide the monorepo restructuring with the team</li>
+      <li>Create <code>main</code> once agreed, set it as the repo's default branch</li>
+    </ul>
+  </div>
+  <div class="owner-card">
+    <h4>Amna</h4>
+    <ul>
+      <li>Add <code>environment.prod.ts</code> + <code>angular.json</code> <code>fileReplacements</code>
+      (Section 6)</li>
+      <li>Deploy to Vercel (Section 5), share the real URL with Anas</li>
+      <li>Optionally rename her branch to <code>frontend/amna</code></li>
+    </ul>
+  </div>
+  <div class="owner-card">
+    <h4>Anas</h4>
+    <ul>
+      <li>Finish the actual Render deploy (guide already written, not yet executed)</li>
+      <li>Add Amna's frontend URL as a Redirect URI in the Entra app registration once she has one</li>
+    </ul>
+  </div>
+</div>
+
+<footer>
+  <img class="footer-logo" src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  MMM Platform &middot; Team Guide &middot; internal, not for distribution outside the team. See
+  <code>PLATFORM.md</code> for the shorter technical reference version of this same information.
+</footer>
+
+</div>
+</body>
+</html>
