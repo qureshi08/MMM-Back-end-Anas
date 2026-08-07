@@ -568,8 +568,9 @@ backend instead of its built-in mock data.</p>
   <pre class="block type"><code>export const environment = {
   production: true,
   useMockApi: false,
-  apiBaseUrl: 'https://REPLACE-WITH-YOUR-REAL-RENDER-URL/api/v1',
+  apiBaseUrl: 'https://mmm-back-end-anas.onrender.com/api/v1',
 };</code></pre>
+  <p>This is the real, live URL, confirmed 2026-08-07, not a placeholder.</p>
   <ol start="2">
     <li>In <code>angular.json</code>, find the <code>production</code> configuration under
     <code>architect.build.configurations</code>, and add a <code>fileReplacements</code> entry so the
@@ -588,13 +589,149 @@ backend instead of its built-in mock data.</p>
   </ol>
 </div>
 
-<div class="watch">
-  <span class="lbl">Real login is a separate, later step</span>
-  <p>For this first connection, leave the Render backend's <code>AUTH_DEV_BYPASS=true</code>, that
-  proves the wiring works with one less moving part. Real Microsoft sign-in on the frontend needs
-  <code>@azure/msal-angular</code> wired up, and a new Redirect URI added to the Entra app registration
-  for the frontend's real URL (Anas's action item, he registered the app). See <code>PLATFORM.md</code>
-  Section 3 for the full detail.</p>
+<h3 class="sub">Real Microsoft sign-in (MSAL), not a bypass</h3>
+<p class="section-why">Confirmed 2026-08-07: the current frontend's "Sign in with Microsoft" button is
+a placeholder, it waits 600ms and navigates on, no token is ever requested or sent. Every protected
+route correctly returns <code>401</code> as a result, real login was never actually built. This is the
+real implementation, code included, not a temporary bypass.</p>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 1</span>Register the frontend's real origins in Entra (Anas)</h4>
+  <p>MSAL.js needs the app registration to know exactly which origins are allowed to receive a token
+  back, and specifically as an <b>SPA</b> platform entry, not <b>Web</b>. A Web platform entry does not
+  allow the browser-based, CORS token exchange MSAL.js relies on, this is a real, common
+  misconfiguration, not a detail to skip.</p>
+  <ol>
+    <li>Entra admin center &rarr; <b>App registrations</b> &rarr; <b>MMM Backend Dev (Anas)</b>
+    (Client ID <code>fa733969-d53d-46ed-81fc-119c740a5cc9</code>).</li>
+    <li>Left sidebar &rarr; <b>Authentication</b>.</li>
+    <li>Click <b>Add a platform</b> &rarr; choose <b>Single-page application</b>, not Web.</li>
+    <li>Add these Redirect URIs, one per line:
+      <ul>
+        <li><code>http://localhost:4200</code> (Amna's local dev server)</li>
+        <li>her real Vercel production URL, once she has one</li>
+      </ul>
+    </li>
+    <li>Click <b>Configure</b>, then <b>Save</b>.</li>
+  </ol>
+  <div class="watch">
+    <span class="lbl">Vercel gives more than one URL, add the ones that matter</span>
+    <p>Every push gets its own preview URL (Section 5), those change constantly and don't need
+    individual Redirect URI entries. Add the stable production URL (the one without a random preview
+    hash), and re-add it if it ever changes. Preview-URL sign-in can wait until it's actually needed.</p>
+  </div>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 2</span>Install MSAL (Amna, in the frontend repo)</h4>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>npm install @azure/msal-angular @azure/msal-browser</code></pre>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 3</span>MSAL configuration</h4>
+  <p>New file, <code>src/app/core/auth/msal-config.ts</code>. The Client ID and Tenant ID are the
+  same real values the backend already validates tokens against.</p>
+  <span class="tag type">Type this, into a new file</span>
+  <pre class="block type"><code>import { PublicClientApplication } from '@azure/msal-browser';
+
+export const msalInstance = new PublicClientApplication({
+  auth: {
+    clientId: 'fa733969-d53d-46ed-81fc-119c740a5cc9',
+    authority: 'https://login.microsoftonline.com/d5619769-1863-41fe-86e3-95000d84f2a6',
+    // Computed at runtime, not hardcoded. This is what makes the same code
+    // correct on localhost:4200 and on the real Vercel domain, as long as
+    // both are registered in Entra (Step 1).
+    redirectUri: window.location.origin,
+  },
+  cache: {
+    cacheLocation: 'localStorage',
+    storeAuthStateInCookie: false,
+  },
+});
+
+export const API_SCOPE = 'api://fa733969-d53d-46ed-81fc-119c740a5cc9/access_as_user';</code></pre>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 4</span>Wire MSAL into the app (app.config.ts)</h4>
+  <p>Angular's standalone bootstrap uses <code>importProvidersFrom</code> to bring in MSAL's module
+  config. This registers three things at once: the MSAL instance itself, a guard for protected routes,
+  and an interceptor that automatically attaches a real bearer token to any HTTP call whose URL matches
+  the backend, so <code>project.service.ts</code>, <code>dataset.service.ts</code>, and
+  <code>experiment.service.ts</code> need no changes at all, the token attaches itself.</p>
+  <span class="tag type">Type this, add to the existing providers array</span>
+  <pre class="block type"><code>import { importProvidersFrom } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import {
+  MsalModule, MsalInterceptor, MsalGuard,
+  MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG,
+  MsalService, MsalBroadcastService,
+} from '@azure/msal-angular';
+import { InteractionType } from '@azure/msal-browser';
+import { msalInstance, API_SCOPE } from './core/auth/msal-config';
+import { environment } from '../environments/environment';
+
+// ...inside the providers array:
+importProvidersFrom(MsalModule.forRoot(msalInstance, null, null)),
+{ provide: MSAL_INSTANCE, useValue: msalInstance },
+{
+  provide: MSAL_GUARD_CONFIG,
+  useValue: { interactionType: InteractionType.Popup, authRequest: { scopes: [API_SCOPE] } },
+},
+{
+  provide: MSAL_INTERCEPTOR_CONFIG,
+  useValue: {
+    interactionType: InteractionType.Popup,
+    protectedResourceMap: new Map([[environment.apiBaseUrl + '/*', [API_SCOPE]]]),
+  },
+},
+{ provide: HTTP_INTERCEPTORS, useClass: MsalInterceptor, multi: true },
+MsalService,
+MsalBroadcastService,</code></pre>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 5</span>Replace the fake login</h4>
+  <p>In <code>login.ts</code>, remove the 600ms <code>setTimeout</code> and the direct navigation.
+  Replace the button's click handler with a real popup sign-in:</p>
+  <span class="tag type">Type this</span>
+  <pre class="block type"><code>import { inject } from '@angular/core';
+import { MsalService } from '@azure/msal-angular';
+import { API_SCOPE } from '../../core/auth/msal-config';
+
+// inside the component class:
+private readonly msal = inject(MsalService);
+
+signInWithMicrosoft(): void {
+  this.msal.loginPopup({ scopes: [API_SCOPE] }).subscribe({
+    next: () => this.router.navigate(['/overview']),
+    error: (err) => console.error('Sign-in failed:', err),
+  });
+}</code></pre>
+  <p>Real failure now surfaces as a real console error instead of quietly rendering an empty
+  dashboard, worth keeping that distinction rather than swallowing it.</p>
+</div>
+
+<div class="card">
+  <h4><span class="stepbadge">Step 6</span>Verify it, real sign-in, real data</h4>
+  <ol>
+    <li>Run locally first (<code>npm start</code>, <code>http://localhost:4200</code>), since it's
+    faster to debug than a full Vercel redeploy per attempt.</li>
+    <li>Click <b>Sign in with Microsoft</b>. This should open a genuine Microsoft popup, not navigate
+    away instantly.</li>
+    <li>Sign in with a real <code>@convergentbt.com</code> account. First time, expect a consent
+    screen (individual user consent, not something requiring Farhan).</li>
+    <li>After the popup closes, open the browser's Network tab. Calls to
+    <code>/api/v1/projects</code> etc. should now carry a real <code>Authorization: Bearer</code>
+    header, and come back <code>200</code>, not <code>401</code>.</li>
+    <li>The dashboard should show real data (empty is fine, an empty list from a real, successful
+    call looks identical to the old fake empty state, the difference is in the Network tab, not the
+    screen, check there, not just the UI).</li>
+    <li>This also auto-provisions a real tenant and user for Amna's own account, same first-login
+    logic <code>CMP-42</code> already proved works for Anas.</li>
+    <li>Once local works, repeat against the deployed Vercel URL.</li>
+  </ol>
 </div>
 
 <h2 class="section" id="test"><span class="num">07</span>Testing the connected app</h2>
