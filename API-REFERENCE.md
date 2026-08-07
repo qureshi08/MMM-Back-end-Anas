@@ -8,8 +8,12 @@ built, it says so explicitly rather than being omitted.
 
 | Environment | URL |
 |---|---|
-| Production (live now) | `https://mmm-back-end-anas.onrender.com/api/v1` |
+| Shared Dev (live now, Render) | `https://mmm-back-end-anas.onrender.com/api/v1` |
 | Local development | `http://localhost:3000/api/v1` |
+
+This is Dev infrastructure, a stopgap on Render and Vercel until real Azure infrastructure exists
+(App Service, Postgres Flexible Server), not a production deployment. See `PLATFORM.md` for the full
+architecture picture.
 
 Every route below is relative to one of these base URLs. All routes live under the `/api/v1` prefix,
 there is no unprefixed API.
@@ -24,8 +28,9 @@ cookie mechanism, authentication is exclusively a Microsoft Entra ID access toke
 - **Scope:** `api://fa733969-d53d-46ed-81fc-119c740a5cc9/access_as_user`
 - **Header:** `Authorization: Bearer <token>`
 
-A request with no token, or a malformed/expired one, returns `401`. There is no dev bypass on the
-production deployment, tokens must be real.
+A request with no token, or a malformed/expired one, returns `401`. Dev bypass mode
+(`AUTH_DEV_BYPASS`) is deliberately off on this shared Dev deployment, tokens must be real, same as
+production will eventually require.
 
 ### First-login behavior
 
