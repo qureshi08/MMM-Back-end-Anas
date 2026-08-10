@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture · MMM Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono);background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  a{color:var(--cbt-primary)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 36px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:70ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+
+  .legend{display:flex;gap:20px;flex-wrap:wrap;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);
+    padding:18px 24px;margin:0 0 32px;font-size:13.5px}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .legend .swatch{width:18px;height:18px;border-radius:5px;flex-shrink:0}
+  .legend .swatch.live{background:var(--cbt-primary-muted);border:2px solid var(--cbt-primary)}
+  .legend .swatch.notbuilt{background:var(--cbt-white);border:2px dashed var(--cbt-muted)}
+  .legend .swatch.auth{background:var(--cbt-blue-muted);border:2px solid var(--cbt-blue)}
+
+  svg{max-width:100%;height:auto;display:block}
+  .figwrap{margin:0 0 40px;overflow-x:auto;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:20px}
+
+  h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.6rem;
+    margin:52px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
+  h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.62em;
+    font-weight:600;margin-right:10px;vertical-align:middle}
+  .section-why{color:var(--cbt-muted);margin:0 0 20px;max-width:72ch}
+
+  .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 16px}
+  .card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
+  .card p{margin:0 0 10px;max-width:72ch}
+  .card p:last-child{margin-bottom:0}
+
+  .watch{border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .watch p{margin:0}
+  .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+
+  .maintain{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:40px 0 0}
+  .maintain h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.2rem;margin:0 0 12px;color:var(--cbt-heading)}
+  .maintain ol{margin:0;padding-left:20px}
+  .maintain li{margin:6px 0}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:40px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>MMM Platform &middot; Architecture</span>
+</div>
+
+<header>
+  <div class="kicker">MMM Platform &middot; Whole system</div>
+  <h1>The whole app, <span class="italic-accent">traced</span></h1>
+  <p class="sub">One picture of everything, what's real and live, what's still just a plan, and how
+  a real request actually moves through it. A living document, this page gets a small edit the same
+  day anything on it changes state, not rewritten from scratch each time.</p>
+  <p class="updated">Last updated <b>August 10, 2026</b>. Confirmed against the real, deployed
+  system, not the plan for it.</p>
+</header>
+
+<div class="legend">
+  <div class="item"><span class="swatch live"></span> Built and live, verified for real</div>
+  <div class="item"><span class="swatch auth"></span> A third party the system talks to (Microsoft)</div>
+  <div class="item"><span class="swatch notbuilt"></span> Planned, not built yet</div>
+</div>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling and Projects are built and live, Datasets and Experiments-and-Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced. Two dashed, not-yet-built paths branch off: Datasets would connect to Blob Storage, and Experiments and Jobs would connect to a Job Queue, which would connect to a Python Modeling Worker. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
+
+<text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">A REAL REQUEST, TOP TO BOTTOM</text>
+
+<rect x="40" y="46" width="300" height="50" rx="10" fill="#F7F8F7" stroke="#C7CDC9" stroke-width="1.4"/>
+<text x="190" y="76" text-anchor="middle" font-size="12" fill="#0C1A10">A real person, in a browser</text>
+
+<line x1="190" y1="96" x2="190" y2="120" stroke="#6B7280" stroke-width="1.6" marker-end="url(#arrow)"/>
+
+<rect x="40" y="128" width="560" height="98" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="60" y="152" font-size="12.5" font-weight="700" fill="#007A3D">ANGULAR SPA &middot; VERCEL &middot; LIVE</text>
+<text x="60" y="174" font-size="11.5" font-family="JetBrains Mono, monospace" fill="#0C1A10">mmm-frontend-amna.vercel.app</text>
+<text x="60" y="196" font-size="11" fill="#374151">Real Microsoft sign-in (MSAL, redirect flow),</text>
+<text x="60" y="212" font-size="11" fill="#374151">real bearer token attached to every API call</text>
+
+<line x1="600" y1="177" x2="636" y2="177" stroke="#2563EB" stroke-width="1.6" marker-end="url(#arrowblue)"/>
+<rect x="640" y="128" width="260" height="98" rx="10" fill="#EAF1FD" stroke="#2563EB" stroke-width="1.6"/>
+<text x="660" y="152" font-size="12.5" font-weight="700" fill="#1D4ED8">MICROSOFT ENTRA ID</text>
+<text x="660" y="174" font-size="11" fill="#374151">Issues the real access token</text>
+<text x="660" y="192" font-size="11" fill="#374151">on sign-in, single-page-app</text>
+<text x="660" y="210" font-size="11" fill="#374151">redirect URIs registered</text>
+
+<line x1="190" y1="226" x2="190" y2="252" stroke="#6B7280" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="205" y="243" font-size="10.5" fill="#6B7280">every request: Authorization: Bearer &lt;token&gt;</text>
+
+<rect x="40" y="258" width="860" height="232" rx="12" fill="#FFFFFF" stroke="#E2E8E4" stroke-width="1.4"/>
+<text x="60" y="284" font-size="12.5" font-weight="700" fill="#0C1A10">NESTJS BACKEND &middot; RENDER &middot; LIVE</text>
+<text x="60" y="302" font-size="11" font-family="JetBrains Mono, monospace" fill="#6B7280">mmm-back-end-anas.onrender.com/api/v1</text>
+
+<rect x="60" y="316" width="260" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="80" y="340" font-size="11.5" font-weight="700" fill="#007A3D">AUTH GUARD +</text>
+<text x="80" y="356" font-size="11.5" font-weight="700" fill="#007A3D">TENANT INTERCEPTOR</text>
+<text x="80" y="380" font-size="10.5" fill="#374151">Validates the real token,</text>
+<text x="80" y="396" font-size="10.5" fill="#374151">auto-provisions tenant/user</text>
+<text x="80" y="412" font-size="10.5" fill="#374151">on first login, sets</text>
+<text x="80" y="428" font-size="10.5" font-family="JetBrains Mono, monospace" fill="#374151">app.tenant_id</text>
+<text x="80" y="448" font-size="10.5" fill="#374151">before any query runs</text>
+
+<rect x="336" y="316" width="200" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="356" y="340" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS MODULE</text>
+<text x="356" y="364" font-size="10.5" fill="#374151">create &middot; list &middot; view</text>
+<text x="356" y="380" font-size="10.5" fill="#374151">edit &middot; soft delete</text>
+<text x="356" y="404" font-size="10.5" fill="#374151">Owner-only edit/delete,</text>
+<text x="356" y="420" font-size="10.5" fill="#374151">verified with a real</text>
+<text x="356" y="436" font-size="10.5" fill="#374151">second user</text>
+
+<rect x="552" y="316" width="176" height="150" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="572" y="340" font-size="11.5" font-weight="700" fill="#4B5563">DATASETS MODULE</text>
+<text x="572" y="364" font-size="10.5" fill="#6B7280">Not built yet</text>
+<text x="572" y="382" font-size="10.5" fill="#6B7280">CMP-38: upload,</text>
+<text x="572" y="398" font-size="10.5" fill="#6B7280">validation, Blob</text>
+<text x="572" y="414" font-size="10.5" fill="#6B7280">storage</text>
+
+<rect x="744" y="316" width="136" height="150" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="764" y="340" font-size="11" font-weight="700" fill="#4B5563">EXPERIMENTS</text>
+<text x="764" y="356" font-size="11" font-weight="700" fill="#4B5563">+ JOBS</text>
+<text x="764" y="380" font-size="10.5" fill="#6B7280">Not built yet</text>
+<text x="764" y="398" font-size="10.5" fill="#6B7280">CMP-39/43</text>
+
+<line x1="190" y1="490" x2="190" y2="516" stroke="#6B7280" stroke-width="1.6" marker-end="url(#arrow)"/>
+<text x="205" y="507" font-size="10.5" fill="#6B7280">the real query, tenant-scoped</text>
+
+<rect x="40" y="522" width="460" height="94" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="60" y="548" font-size="12.5" font-weight="700" fill="#007A3D">POSTGRES &middot; RENDER &middot; LIVE</text>
+<text x="60" y="570" font-size="11" fill="#374151">Row-Level Security enforced, even on the</text>
+<text x="60" y="586" font-size="11" fill="#374151">admin role. tenants &middot; users &middot; projects</text>
+<text x="60" y="602" font-size="11" fill="#374151">hold real data for three real people.</text>
+
+<line x1="632" y1="466" x2="632" y2="516" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
+<rect x="552" y="522" width="176" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="572" y="546" font-size="11.5" font-weight="700" fill="#4B5563">BLOB STORAGE</text>
+<text x="572" y="566" font-size="10.5" fill="#6B7280">Not built yet</text>
+<text x="572" y="582" font-size="10.5" fill="#6B7280">CMP-38</text>
+
+<line x1="812" y1="466" x2="812" y2="516" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
+<rect x="744" y="522" width="136" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="764" y="546" font-size="11.5" font-weight="700" fill="#4B5563">JOB QUEUE</text>
+<text x="764" y="566" font-size="10.5" fill="#6B7280">Not built yet</text>
+<text x="764" y="582" font-size="10.5" fill="#6B7280">CMP-79 defines it</text>
+
+<line x1="812" y1="592" x2="812" y2="626" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4"/>
+<line x1="812" y1="626" x2="700" y2="626" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
+<rect x="560" y="632" width="280" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="580" y="656" font-size="11.5" font-weight="700" fill="#4B5563">PYTHON MODELING WORKER</text>
+<text x="580" y="676" font-size="10.5" fill="#6B7280">Not built yet. The backend never fits a</text>
+<text x="580" y="692" font-size="10.5" fill="#6B7280">model itself, this is a separate process.</text>
+
+<rect x="40" y="726" width="860" height="120" rx="12" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.4"/>
+<text x="60" y="750" font-size="11" font-weight="700" fill="#8A5A06">DEV-ONLY STOPGAP, NOT THE REAL TARGET</text>
+<text x="60" y="772" font-size="11.5" fill="#374151">Everything above runs on Render and Vercel today. Real target is Azure:</text>
+<text x="60" y="792" font-size="11.5" fill="#374151">App Service for this backend, Postgres Flexible Server for the database,</text>
+<text x="60" y="812" font-size="11.5" fill="#374151">Blob Storage, and Container Apps for the worker. Nothing in the code</text>
+<text x="60" y="832" font-size="11.5" fill="#374151">branches on which one it's talking to, only configuration changes.</text>
+
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
+<marker id="arrowblue" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#2563EB"/></marker>
+<marker id="arrowgrey" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker>
+</defs>
+</svg>
+</div>
+
+<h2 class="section" id="frontend"><span class="num">01</span>The frontend</h2>
+<div class="card">
+  <h4>Angular SPA, deployed on Vercel</h4>
+  <p>The user-facing app. Signs in with a real Microsoft account through MSAL, using a redirect
+  flow (not a popup, that failed in testing due to a cross-window communication issue common on
+  modern hosts). Every API call carries the real token automatically, via an interceptor, existing
+  service code (<code>project.service.ts</code> and similar) never has to handle the token itself.</p>
+  <p>Every push to its own repository redeploys automatically. See <code>TEAM-GUIDE.html</code>
+  Section 5 for the deployment steps.</p>
+</div>
+
+<h2 class="section" id="authlayer"><span class="num">02</span>Authentication</h2>
+<div class="card">
+  <h4>Microsoft Entra ID, not a homegrown login</h4>
+  <p>A single-tenant Entra app registration, Authorization Code plus PKCE, no client secret. First
+  sign-in from any real Microsoft account auto-provisions a tenant and user on the backend, no
+  invite step. See <code>API-REFERENCE.html</code> Section 02 for the real Client ID, Tenant ID,
+  and scope.</p>
+</div>
+
+<h2 class="section" id="backend"><span class="num">03</span>The backend</h2>
+<div class="card">
+  <h4>NestJS, deployed on Render</h4>
+  <p>Owns tenancy, auth, and the platform's business data. It never fits a model itself, that's a
+  separate process by design, real modeling runs take minutes to hours and cannot happen inside an
+  HTTP request.</p>
+  <p><b>Live now:</b> the Auth Guard and Tenant Interceptor (validates every token, resolves it to
+  a real tenant and user, enforces Row-Level Security context), and the Projects module, full CRUD,
+  owner-only edit and delete.</p>
+  <p><b>Not built yet:</b> Datasets, Experiments, and Jobs. See <code>API-REFERENCE.html</code>
+  Section 10 for the exact routes that will 404 until these exist.</p>
+</div>
+
+<h2 class="section" id="db"><span class="num">04</span>The database</h2>
+<div class="card">
+  <h4>Postgres, deployed on Render</h4>
+  <p>Multi-tenant by row, not by separate database per customer. Every tenant-owned table enforces
+  Row-Level Security with <code>FORCE</code>, meaning the rule applies even to the admin database
+  role, not just application code. Directly tested, not assumed, see
+  <code>Trainings/NestJS/knowledge-base/lessons/06-locked-out-by-your-own-rule.html</code> for a
+  real case where this caught the very people who built it.</p>
+</div>
+
+<h2 class="section" id="notyet"><span class="num">05</span>Not built yet</h2>
+<div class="watch">
+  <span class="lbl">Real, on the roadmap, drawn dashed above on purpose</span>
+  <p><b>Blob Storage</b> holds the actual uploaded dataset files, Postgres never stores the raw
+  file, only metadata pointing at it. <b>Job Queue</b> and the <b>Python Modeling Worker</b> are
+  how a model run actually happens, decoupled from the request that starts it, so the backend can
+  answer immediately with a job id instead of the caller waiting minutes to hours for a response.
+  <code>CMP-79</code> defines the exact message contract between the backend and the worker before
+  either side builds against it.</p>
+</div>
+
+<div class="maintain">
+  <h3>Keeping this page real</h3>
+  <ol>
+    <li>When a module moves from planned to built, its box changes from the dashed grey style to
+    the solid green one, and its text updates from "Not built yet" to what it actually does.</li>
+    <li>When a new piece gets added (a new module, a new external service), it gets a new box in
+    the diagram and a new numbered section below it, not a note bolted onto an existing one.</li>
+    <li>Whenever this page changes, the same day's <code>dev-log/raw/YYYY-MM-DD.md</code> entry
+    should say so, same rule as every other real change on this project.</li>
+  </ol>
+</div>
+
+<footer>
+  <img class="footer-logo" src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  MMM Platform &middot; Architecture &middot; kept updated alongside the real system, not written
+  once and left behind.
+</footer>
+
+</div>
+</body>
+</html>
