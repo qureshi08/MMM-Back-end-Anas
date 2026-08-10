@@ -217,7 +217,15 @@ session. This is exactly how <code>TC-04</code> in the backend's own test suite 
   -H "Authorization: Bearer &lt;your real token&gt;"</code></pre>
 </div>
 
-<h2 class="section" id="conventions"><span class="num">04</span>CORS and response conventions</h2>
+<h2 class="section" id="conventions"><span class="num">04</span>Headers, CORS, and response conventions</h2>
+<table>
+  <tr><th>Direction</th><th>Header</th><th>When</th></tr>
+  <tr><td>Request</td><td><code>Authorization: Bearer &lt;token&gt;</code></td><td>Every route except <code>GET /health</code></td></tr>
+  <tr><td>Request</td><td><code>Content-Type: application/json</code></td><td>Any request with a body (<code>POST</code>, <code>PATCH</code>)</td></tr>
+  <tr><td>Response</td><td><code>Content-Type: application/json; charset=utf-8</code></td><td>Every response, success or error</td></tr>
+</table>
+<p>No other custom headers are set on either side. No rate-limit headers, no pagination headers,
+nothing beyond the standard ones a browser or HTTP client adds automatically.</p>
 <ul>
   <li><b>CORS</b> is wide open right now, any origin is allowed. Nothing needed on any client's
   side for this specifically.</li>
@@ -289,27 +297,75 @@ auth and is automatically scoped to the caller's own tenant, enforced by the dat
   <p>Any field not in this list is rejected with <code>400</code>, unknown fields are never
   silently ignored. <code>status</code> cannot be set on create, every new project starts
   <code>"active"</code>.</p>
-  <p><b>Response, 201:</b> the full project object, see the data model below.</p>
-  <p><b>Example</b></p>
+  <p><b>Request example</b></p>
   <pre class="block"><code>curl -X POST https://mmm-back-end-anas.onrender.com/api/v1/projects \
   -H "Authorization: Bearer &lt;your real token&gt;" \
   -H "Content-Type: application/json" \
   -d '{"name":"Q4 Brand Campaign","description":"First real project"}'</code></pre>
+  <p><b>Response, 201</b></p>
+  <pre class="block"><code>{
+  "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "createdAt": "2026-08-06T11:51:35.322Z",
+  "updatedAt": "2026-08-06T11:51:35.322Z",
+  "tenantId": "c7d1d3f5-673f-428d-9f89-3125df7d4eb2",
+  "name": "Q4 Brand Campaign",
+  "description": "First real project",
+  "ownerId": "6d3f500e-acaf-4f21-a9b5-30621a8f34bc",
+  "status": "active",
+  "deletedAt": null
+}</code></pre>
 </div>
 
 <h3 class="endpoint"><span class="method get">GET</span>/projects</h3>
 <p class="endpoint-desc">Lists every project in the signed-in user's tenant. No pagination,
-filtering, or sorting yet, this returns the full list every time. Response is an array, possibly
-empty (<code>[]</code>).</p>
+filtering, or sorting yet, this returns the full list every time.</p>
+<div class="card">
+  <p><b>Response, 200</b>, an array, possibly empty (<code>[]</code>), same object shape as
+  create, repeated per item:</p>
+  <pre class="block"><code>[
+  {
+    "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+    "createdAt": "2026-08-06T11:51:35.322Z",
+    "updatedAt": "2026-08-06T11:51:35.322Z",
+    "tenantId": "c7d1d3f5-673f-428d-9f89-3125df7d4eb2",
+    "name": "Q4 Brand Campaign",
+    "description": "First real project",
+    "ownerId": "6d3f500e-acaf-4f21-a9b5-30621a8f34bc",
+    "status": "active",
+    "deletedAt": null
+  }
+]</code></pre>
+</div>
 
 <h3 class="endpoint"><span class="method get">GET</span>/projects/:id</h3>
 <p class="endpoint-desc">Returns one project by id.</p>
-<table>
-  <tr><th>Case</th><th>Response</th></tr>
-  <tr><td>Malformed id (not a valid UUID)</td><td><code>400</code></td></tr>
-  <tr><td>Well-formed id that doesn't exist, or belongs to another tenant</td><td><code>404</code></td></tr>
-  <tr><td>Otherwise</td><td><code>200</code>, the project object</td></tr>
-</table>
+<div class="card">
+  <table>
+    <tr><th>Case</th><th>Response</th></tr>
+    <tr><td>Malformed id (not a valid UUID)</td><td><code>400</code></td></tr>
+    <tr><td>Well-formed id that doesn't exist, or belongs to another tenant</td><td><code>404</code></td></tr>
+    <tr><td>Otherwise</td><td><code>200</code>, the project object</td></tr>
+  </table>
+  <p><b>Response, 200</b></p>
+  <pre class="block"><code>{
+  "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "createdAt": "2026-08-06T11:51:35.322Z",
+  "updatedAt": "2026-08-06T11:51:35.322Z",
+  "tenantId": "c7d1d3f5-673f-428d-9f89-3125df7d4eb2",
+  "name": "Q4 Brand Campaign",
+  "description": "First real project",
+  "ownerId": "6d3f500e-acaf-4f21-a9b5-30621a8f34bc",
+  "status": "active",
+  "deletedAt": null
+}</code></pre>
+  <p><b>Response, 404</b></p>
+  <pre class="block"><code>{
+  "statusCode": 404,
+  "message": "Project 1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3 not found.",
+  "path": "/api/v1/projects/1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "timestamp": "2026-08-07T10:18:26.902Z"
+}</code></pre>
+</div>
 
 <h3 class="endpoint"><span class="method patch">PATCH</span>/projects/:id</h3>
 <p class="endpoint-desc">Partial update. Only send the fields actually changing, fields you don't
@@ -323,16 +379,46 @@ send are left completely untouched (a real bug where omitted fields used to get 
     <tr><td><code>description</code></td><td>string</td><td>up to 2000 characters</td></tr>
     <tr><td><code>status</code></td><td>string</td><td><code>"active"</code> or <code>"archived"</code></td></tr>
   </table>
+  <p><b>Request example</b>, renaming only, <code>description</code> is deliberately absent and
+  will not be touched:</p>
+  <pre class="block"><code>curl -X PATCH https://mmm-back-end-anas.onrender.com/api/v1/projects/1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3 \
+  -H "Authorization: Bearer &lt;your real token&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Q4 Brand Campaign (renamed)"}'</code></pre>
+  <p><b>Response, 200</b>, note <code>description</code> is unchanged, and <code>updatedAt</code>
+  moved:</p>
+  <pre class="block"><code>{
+  "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "createdAt": "2026-08-06T11:51:35.322Z",
+  "updatedAt": "2026-08-06T12:03:11.837Z",
+  "tenantId": "c7d1d3f5-673f-428d-9f89-3125df7d4eb2",
+  "name": "Q4 Brand Campaign (renamed)",
+  "description": "First real project",
+  "ownerId": "6d3f500e-acaf-4f21-a9b5-30621a8f34bc",
+  "status": "active",
+  "deletedAt": null
+}</code></pre>
   <p><b>Only the project's owner may update it.</b> Anyone else, even in the same tenant, gets
-  <code>403</code>, <code>"Only the project owner can do this."</code></p>
-  <p><b>Response, 200:</b> the full, updated project object.</p>
+  <code>403</code>:</p>
+  <pre class="block"><code>{
+  "statusCode": 403,
+  "message": "Only the project owner can do this.",
+  "path": "/api/v1/projects/1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "timestamp": "2026-08-10T07:59:48.602Z"
+}</code></pre>
 </div>
 
 <h3 class="endpoint"><span class="method delete">DELETE</span>/projects/:id</h3>
 <p class="endpoint-desc">Soft delete. The row is not removed from the database, <code>deletedAt</code>
 gets set. A deleted project no longer appears in <code>GET /projects</code>, and
 <code>GET /projects/:id</code> returns <code>404</code> for it afterward. Same ownership rule as
-<code>PATCH</code>, non-owners get <code>403</code>. <b>Response, 204, no body.</b></p>
+<code>PATCH</code>, non-owners get <code>403</code>.</p>
+<div class="card">
+  <pre class="block"><code>curl -X DELETE https://mmm-back-end-anas.onrender.com/api/v1/projects/1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3 \
+  -H "Authorization: Bearer &lt;your real token&gt;"</code></pre>
+  <p><b>Response, 204</b>, empty body, that's normal for a <code>204</code>, there's nothing to
+  show.</p>
+</div>
 
 <h2 class="section" id="model"><span class="num">09</span>Data model: Project</h2>
 <pre class="block"><code>{
