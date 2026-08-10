@@ -128,11 +128,13 @@
 <section class="tint">
   <h2>The question that started this page</h2>
   <div class="answer">
-    <span class="lbl">If someone asks: is the Auth module done?</span>
-    <p class="quote">Say: <b>the Auth module is fully done, dev-bypass and real Microsoft sign-in
-    both.</b> Confirmed twice, independently, on August 6: once by Claude, once by Anas himself in
-    Postman, identical result both times, his real name, email, and a proper tenant and user record
-    created for his real login. Every row in the table below that can be checked has been.</p>
+    <span class="lbl">If someone asks: is the whole thing actually connected yet?</span>
+    <p class="quote">Say: <b>yes, real Microsoft login, real backend, real database, and the real
+    frontend all confirmed talking to each other, not just each half tested in isolation.</b>
+    Confirmed August 10 across three real accounts (Farhan, Anas, Amna): real sign-in on the
+    deployed frontend, a real project created through the actual UI, and independent database
+    confirmation that it was genuinely there, not just shown on screen. Every row in the table below
+    that can be checked has been.</p>
   </div>
 </section>
 
@@ -431,6 +433,51 @@
       </div>
     </details>
 
+    <details class="entry">
+      <summary><span class="date">AUGUST 7, 2026</span><h4>Backend deployed and live, real URL, reachable from anywhere</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Pushed the backend's own history (never committed anywhere before this) to
+        <code>github.com/mirfarhanahmad/cbt-mmm-platform</code>, and separately to a personal
+        repository, <code>github.com/qureshi08/MMM-Back-end-Anas</code>, as an interim deployment
+        target while access questions on the shared repo were still open.</li>
+        <li>Deployed to Render: a real Postgres instance and a real, always-on web service, both
+        found and fixed along the way: a build failure caused by <code>NODE_ENV=production</code>
+        making <code>npm install</code> skip the dev dependency the build tool itself lives in, and
+        the app's own safety check correctly refusing to boot with dev-bypass on in production,
+        real Entra login was used instead of working around that check.</li>
+        <li>Verified live, independently, twice: <code>curl</code> against the real URL from
+        outside Render entirely, and Anas confirming the same result directly in his own browser.
+        <code>/api/v1/health</code> returns real data, <code>/api/v1/auth/me</code> correctly
+        enforces real login.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 10, 2026</span><h4>The frontend actually talks to the backend, confirmed real, not just claimed</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Real Microsoft sign-in wired into Amna's frontend (MSAL), replacing what had been a
+        fake 600ms placeholder login. Real bugs found and fixed along the way: two Entra redirect
+        URI mismatches (one for local testing, one for the real deployed Vercel URL), a popup-based
+        sign-in flow that silently failed due to a cross-window communication issue, fixed by
+        switching to redirect flow instead, a stale API URL from an earlier build, and a dashboard
+        header that showed a fixed name regardless of who actually signed in.</li>
+        <li><b>A real false alarm, caused by how this was being verified, not a bug in the actual
+        work:</b> direct database checks kept showing zero rows in <code>users</code> and
+        <code>projects</code>, even after real sign-ins and real project creation. Root cause: both
+        tables enforce Row-Level Security even against the admin database role, and every check was
+        missing the one line the real application code always sets first. Once queried correctly,
+        the real data was there the whole time, three real people (Farhan, Anas, Amna), each
+        auto-provisioned into one shared tenant, and real projects owned by the right people. See
+        <code>dev-log/raw/2026-08-10.md</code> for the full chain, and a new lesson,
+        <code>Trainings/NestJS/knowledge-base/lessons/06-locked-out-by-your-own-rule.html</code>,
+        written the same day so this specific trap doesn't catch anyone again.</li>
+      </ul>
+      </div>
+    </details>
+
   </div>
 </section>
 
@@ -442,8 +489,13 @@
     hosting account, and has to be created under a company identity, never a personal Microsoft
     account. Until it exists, nothing can actually run on Azure. Only blocks "Running on Azure" now,
     not real Microsoft login.</li>
-    <li><b>Shared GitHub repo.</b> The team hasn't created one. Once they do, this code is ready to
-    push as-is.</li>
+    <li><b>The shared repo's <code>main</code> branch and monorepo structure.</b> The repo itself
+    (<code>github.com/mirfarhanahmad/cbt-mmm-platform</code>) has existed since August 6, with real
+    backend code pushed to it. What's still missing: a <code>main</code> branch, and a decision on
+    how the backend and frontend projects fit into one shared tree, they currently live on two
+    separate personal repos as an interim step (see <code>PLATFORM.md</code>/<code>TEAM-GUIDE.html</code>),
+    which worked for proving the whole system connects, but isn't where this should stay long term.
+    Farhan's call.</li>
   </ol>
 </section>
 
