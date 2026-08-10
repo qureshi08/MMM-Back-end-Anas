@@ -40,21 +40,29 @@
   .updated b{color:var(--cbt-heading)}
 
   .legend{display:flex;gap:20px;flex-wrap:wrap;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);
-    padding:18px 24px;margin:0 0 32px;font-size:13.5px}
+    padding:18px 24px;margin:0 0 20px;font-size:13.5px}
   .legend .item{display:flex;align-items:center;gap:8px}
   .legend .swatch{width:18px;height:18px;border-radius:5px;flex-shrink:0}
   .legend .swatch.live{background:var(--cbt-primary-muted);border:2px solid var(--cbt-primary)}
   .legend .swatch.notbuilt{background:var(--cbt-white);border:2px dashed var(--cbt-muted)}
   .legend .swatch.auth{background:var(--cbt-blue-muted);border:2px solid var(--cbt-blue)}
 
+  .toc{display:flex;flex-wrap:wrap;gap:8px 10px;margin:0 0 32px;padding:0}
+  .toc a{font-size:12.5px;font-weight:600;color:var(--cbt-heading);text-decoration:none;
+    background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:999px;padding:7px 14px}
+  .toc a:hover{border-color:var(--cbt-primary);color:var(--cbt-primary-dark)}
+  .toc a span{color:var(--cbt-primary);font-family:var(--cbt-font-mono);margin-right:6px}
+
   svg{max-width:100%;height:auto;display:block}
-  .figwrap{margin:0 0 40px;overflow-x:auto;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:20px}
+  .figwrap{margin:0 0 28px;overflow-x:auto;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:20px}
+  .figcap{font-size:12px;color:var(--cbt-muted);margin:-16px 0 32px;padding:0 4px}
 
   h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.6rem;
-    margin:52px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
+    margin:56px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
   h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.62em;
     font-weight:600;margin-right:10px;vertical-align:middle}
   .section-why{color:var(--cbt-muted);margin:0 0 20px;max-width:72ch}
+  h3.sub{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.12rem;margin:30px 0 12px;color:var(--cbt-heading)}
 
   .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 16px}
   .card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
@@ -66,6 +74,53 @@
   .watch p{margin:0}
   .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
     color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+
+  .pull{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .pull p{margin:0;color:var(--cbt-heading)}
+
+  /* file trees: enumeration, styled as reference, not forced into SVG */
+  .tree{font-family:var(--cbt-font-mono);font-size:12.5px;line-height:2;background:var(--cbt-white);
+    border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-md);padding:18px 22px;overflow-x:auto;margin:0 0 22px}
+  .tree .dir{color:var(--cbt-heading);font-weight:700}
+  .tree .file{color:var(--cbt-body)}
+  .tree .indent{color:#D3D9D5}
+  .tree .note{color:var(--cbt-muted);font-family:var(--cbt-font-body);font-size:11.5px}
+  .tree .note.live{color:var(--cbt-primary-dark)}
+  .tree .note.plan{color:var(--cbt-warning-dark)}
+
+  /* the request pipeline: a real, ordered, numbered timeline */
+  .pipeline{margin:18px 0 34px;position:relative;padding-left:48px}
+  .pipeline::before{content:"";position:absolute;left:18px;top:8px;bottom:8px;width:2px;background:var(--cbt-border)}
+  .pstep{position:relative;margin:0 0 22px}
+  .pstep .dot{position:absolute;left:-48px;top:0;width:36px;height:36px;border-radius:50%;
+    background:var(--cbt-primary-muted);border:2px solid var(--cbt-primary);color:var(--cbt-primary-dark);
+    font-family:var(--cbt-font-mono);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+  .pstep.auth .dot{background:var(--cbt-blue-muted);border-color:var(--cbt-blue);color:var(--cbt-blue-dark)}
+  .pstep.err .dot{background:var(--cbt-warning-muted);border-color:var(--cbt-warning);color:var(--cbt-warning-dark)}
+  .pstep h5{font-family:var(--cbt-font-heading);font-size:1.02rem;font-weight:700;margin:4px 0 6px;color:var(--cbt-heading)}
+  .pstep p{margin:0 0 10px;max-width:70ch;font-size:14.5px}
+  .pstep pre{margin:0;background:var(--cbt-heading);color:#D7F5E3;border-radius:var(--cbt-radius-sm);
+    padding:13px 16px;font-family:var(--cbt-font-mono);font-size:12px;line-height:1.65;overflow-x:auto;white-space:pre}
+
+  table.schema{width:100%;border-collapse:collapse;font-size:13px;margin:0 0 26px;overflow-x:auto;display:block}
+  table.schema th{text-align:left;background:var(--cbt-surface);color:var(--cbt-muted);font-weight:600;
+    font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:9px 12px;border-bottom:1px solid var(--cbt-border)}
+  table.schema td{padding:9px 12px;border-bottom:1px solid var(--cbt-border);vertical-align:top}
+  table.schema td.col{font-family:var(--cbt-font-mono);font-weight:600;color:var(--cbt-heading);white-space:nowrap}
+  table.schema td.type{font-family:var(--cbt-font-mono);color:var(--cbt-primary-dark);white-space:nowrap}
+  table.schema caption{caption-side:top;text-align:left;font-family:var(--cbt-font-heading);font-weight:700;
+    font-size:1.02rem;color:var(--cbt-heading);padding:0 0 10px}
+
+  .azure-card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:20px 24px;margin:0 0 14px;
+    display:grid;grid-template-columns:160px 1fr;gap:18px}
+  .azure-card .tag{font-family:var(--cbt-font-mono);font-size:10.5px;font-weight:700;color:var(--cbt-muted);
+    background:var(--cbt-surface);border-radius:6px;padding:7px 10px;align-self:start;text-align:center;line-height:1.4}
+  .azure-card .tag.new{color:var(--cbt-warning-dark);background:var(--cbt-warning-muted)}
+  .azure-card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.02rem;margin:0 0 6px;color:var(--cbt-heading)}
+  .azure-card p{margin:0 0 6px;font-size:14px}
+  .azure-card .from{color:var(--cbt-muted);font-size:12.5px;margin:0}
+  @media (max-width:640px){.azure-card{grid-template-columns:1fr}}
 
   .maintain{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:40px 0 0}
   .maintain h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.2rem;margin:0 0 12px;color:var(--cbt-heading)}
@@ -86,13 +141,14 @@
 </div>
 
 <header>
-  <div class="kicker">MMM Platform &middot; Whole system</div>
+  <div class="kicker">MMM Platform &middot; Whole system, in depth</div>
   <h1>The whole app, <span class="italic-accent">traced</span></h1>
-  <p class="sub">One picture of everything, what's real and live, what's still just a plan, and how
-  a real request actually moves through it. A living document, this page gets a small edit the same
-  day anything on it changes state, not rewritten from scratch each time.</p>
-  <p class="updated">Last updated <b>August 10, 2026</b>. Confirmed against the real, deployed
-  system, not the plan for it.</p>
+  <p class="sub">Every real file, every real step a request takes, every real column in the database,
+  and the exact Azure resources each piece becomes once there's a subscription to deploy it into. A
+  living document: this page gets a small edit the same day anything on it changes state, not
+  rewritten from scratch each time.</p>
+  <p class="updated">Last updated <b>August 10, 2026</b>. Confirmed against the real, deployed system
+  and the real source files, not the plan for either.</p>
 </header>
 
 <div class="legend">
@@ -100,6 +156,20 @@
   <div class="item"><span class="swatch auth"></span> A third party the system talks to (Microsoft)</div>
   <div class="item"><span class="swatch notbuilt"></span> Planned, not built yet</div>
 </div>
+
+<div class="toc">
+  <a href="#overview"><span>00</span>Overview</a>
+  <a href="#frontend"><span>01</span>Frontend</a>
+  <a href="#authlayer"><span>02</span>Every step of a request</a>
+  <a href="#backend"><span>03</span>Backend, file by file</a>
+  <a href="#db"><span>04</span>Database, column by column</a>
+  <a href="#notyet"><span>05</span>Not built yet</a>
+  <a href="#azure"><span>06</span>The Azure Marketplace target</a>
+</div>
+
+<h2 class="section" id="overview" style="margin-top:0"><span class="num">00</span>One request, top to bottom</h2>
+<p class="section-why">Start here for the shape of the whole system. Every section below goes deep on
+one box from this picture.</p>
 
 <div class="figwrap">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling and Projects are built and live, Datasets and Experiments-and-Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced. Two dashed, not-yet-built paths branch off: Datasets would connect to Blob Storage, and Experiments and Jobs would connect to a Job Queue, which would connect to a Python Modeling Worker. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
@@ -194,7 +264,7 @@
 <text x="60" y="772" font-size="11.5" fill="#374151">Everything above runs on Render and Vercel today. Real target is Azure:</text>
 <text x="60" y="792" font-size="11.5" fill="#374151">App Service for this backend, Postgres Flexible Server for the database,</text>
 <text x="60" y="812" font-size="11.5" fill="#374151">Blob Storage, and Container Apps for the worker. Nothing in the code</text>
-<text x="60" y="832" font-size="11.5" fill="#374151">branches on which one it's talking to, only configuration changes.</text>
+<text x="60" y="832" font-size="11.5" fill="#374151">branches on which one it's talking to, only configuration changes. See</text>
 
 <defs>
 <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
@@ -203,49 +273,330 @@
 </defs>
 </svg>
 </div>
+<p class="figcap">Section 06 below draws exactly this box, one to one, as it becomes real Azure resources.</p>
 
-<h2 class="section" id="frontend"><span class="num">01</span>The frontend</h2>
+<h2 class="section" id="frontend"><span class="num">01</span>The frontend, file by file</h2>
+<p class="section-why">What the Angular app is actually made of, not just "the frontend talks to the backend."</p>
+
 <div class="card">
   <h4>Angular SPA, deployed on Vercel</h4>
   <p>The user-facing app. Signs in with a real Microsoft account through MSAL, using a redirect
   flow (not a popup, that failed in testing due to a cross-window communication issue common on
   modern hosts). Every API call carries the real token automatically, via an interceptor, existing
-  service code (<code>project.service.ts</code> and similar) never has to handle the token itself.</p>
-  <p>Every push to its own repository redeploys automatically. See <code>TEAM-GUIDE.html</code>
-  Section 5 for the deployment steps.</p>
+  service code never has to handle the token itself. Every push to its own repository redeploys
+  automatically. See <code>TEAM-GUIDE.html</code> Section 5 for the deployment steps.</p>
 </div>
 
-<h2 class="section" id="authlayer"><span class="num">02</span>Authentication</h2>
-<div class="card">
-  <h4>Microsoft Entra ID, not a homegrown login</h4>
-  <p>A single-tenant Entra app registration, Authorization Code plus PKCE, no client secret. First
-  sign-in from any real Microsoft account auto-provisions a tenant and user on the backend, no
-  invite step. See <code>API-REFERENCE.html</code> Section 02 for the real Client ID, Tenant ID,
-  and scope.</p>
+<div class="tree">
+src/
+&nbsp;&nbsp;<span class="dir">app/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">core/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">auth/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">msal-config.ts</span>  <span class="note live">real Client ID + Tenant ID, exports the MSAL instance and API_SCOPE</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">services/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">project.service.ts</span>  <span class="note live">real HTTP calls to /api/v1/projects</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">dataset.service.ts</span>  <span class="note plan">backend route doesn't exist yet, calls will 404</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">experiment.service.ts</span>  <span class="note plan">backend route doesn't exist yet, calls will 404</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">notification.service.ts</span>  <span class="note plan">backend route doesn't exist yet, calls will 404</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">mock/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">mock-data.ts</span>  <span class="note plan">stand-in data, only for the modules with no real endpoint yet</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">models/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">domain.models.ts</span>  <span class="note live">TypeScript shapes matching the real API response bodies</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">header/</span>, <span class="dir">sidebar/</span>  <span class="note live">app shell, shown once signed in</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">features/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">auth/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">login.ts</span>  <span class="note live">real loginRedirect(), no bypass, no placeholder name</span>
+&nbsp;&nbsp;<span class="dir">environments/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">environment.ts</span>  <span class="note">local dev config, points at localhost:3000</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">environment.prod.ts</span>  <span class="note live">points at the real Render backend URL</span>
+angular.json  <span class="note live">fileReplacements swaps in environment.prod.ts for the Vercel build</span>
 </div>
 
-<h2 class="section" id="backend"><span class="num">03</span>The backend</h2>
+<h3 class="sub">How a sign-in becomes a working page</h3>
+<div class="pull">
+  <p>The app never stores a password. It sends the browser to Microsoft, Microsoft sends back proof
+  of who signed in, and every API call after that just forwards that proof. Section 02 picks up
+  exactly where this leaves off, on the backend's side of that same proof.</p>
+</div>
+
+<h2 class="section" id="authlayer"><span class="num">02</span>Every step of a request, in order</h2>
+<p class="section-why">Not "the backend checks auth then queries the database." The real order NestJS
+actually runs these in, with the real code at each step, because the order is exactly why two
+different tenants' data can never mix even if a query forgot to filter by tenant.</p>
+
+<div class="pipeline">
+
+<div class="pstep">
+  <div class="dot">1</div>
+  <h5>The request arrives</h5>
+  <p>The Angular app calls the backend with the real access token attached. <code>main.ts</code>
+  strips the <code>/api/v1</code> prefix while routing, and CORS is already open
+  (<code>app.enableCors()</code>) so the Vercel origin is allowed through.</p>
+  <pre>GET /api/v1/projects
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGc...</pre>
+</div>
+
+<div class="pstep">
+  <div class="dot">2</div>
+  <h5>The route is matched, then Guards run</h5>
+  <p>Nest resolves this to <code>ProjectsController.findAll()</code>. Before that method can run, every
+  Guard on the route must return true. This route has one: <code>EntraAuthGuard</code>. A
+  <code>@Public()</code> route (like <code>/health</code>) skips this Guard entirely.</p>
+</div>
+
+<div class="pstep auth">
+  <div class="dot">3</div>
+  <h5>The token is checked against Microsoft, not this app's own database</h5>
+  <p><code>EntraJwtVerifier.verify()</code> fetches (and caches) Microsoft's real public signing keys,
+  then checks the signature, the expiry, and who the token was issued for. It accepts either form of
+  the audience Entra might send, because the same app registration issued the bare Client ID for this
+  one, found the hard way on 2026-08-06.</p>
+  <pre>createRemoteJWKSet(
+  "https://login.microsoftonline.com/&lt;tenant-id&gt;/discovery/v2.0/keys"
+)
+
+jwtVerify(token, jwks, {
+  audience: [bareClientId, "api://" + bareClientId],
+  issuer:   pinnedIssuer   // or any real Microsoft v2 issuer, if multi-tenant
+})</pre>
+</div>
+
+<div class="pstep err">
+  <div class="dot">!</div>
+  <h5>If the token fails any of those checks</h5>
+  <p>The Guard throws, the request stops right here. Nothing below this line ever runs: no database
+  connection is opened, nothing is provisioned. The caller gets <code>401 Unauthorized</code>.</p>
+</div>
+
+<div class="pstep">
+  <div class="dot">4</div>
+  <h5>A database transaction opens for this request, and only this request</h5>
+  <p><code>TenantContextInterceptor</code> runs next. One <code>QueryRunner</code>, one transaction,
+  scoped to this single HTTP request, not shared with any other request even on the same pooled
+  connection.</p>
+  <pre>const queryRunner = dataSource.createQueryRunner()
+await queryRunner.connect()
+await queryRunner.startTransaction()</pre>
+</div>
+
+<div class="pstep">
+  <div class="dot">5</div>
+  <h5>The tenant and user are found, or created if this is a first sign-in</h5>
+  <p><code>TenantResolutionService.resolveOrProvision()</code> turns "a Microsoft account signed in"
+  into "a row in this app's own tenants and users tables." A company Entra tenant maps to one platform
+  tenant shared by everyone in it; a personal Microsoft account gets its own tenant, because every
+  personal account shares Microsoft's one fixed pseudo-tenant id and can't be grouped by it.</p>
+  <pre>externalKey = isPersonalAccount ? `personal:${oid}` : `org:${tid}`
+tenant = find or create Tenant where externalKey matches
+
+SELECT set_config('app.tenant_id', tenant.id, true)   // ← the line everything below depends on
+
+user = find or create User where tenantId + email matches
+       (first user in a brand new tenant becomes ADMINISTRATOR)</pre>
+</div>
+
+<div class="pstep">
+  <div class="dot">6</div>
+  <h5>Every query from here on is automatically scoped to that tenant</h5>
+  <p>The resolved <code>tenantId</code> and this same <code>queryRunner</code> are attached to
+  <code>AsyncLocalStorage</code>, not passed as a parameter through every function call in between.
+  Any service can call <code>getTenantContext()</code> and get the right one back, for this request
+  only.</p>
+  <pre>await runWithTenantContext({ tenantId, queryRunner }, () =&gt; next.handle())</pre>
+</div>
+
+<div class="pstep">
+  <div class="dot">7</div>
+  <h5>The request body is validated</h5>
+  <p>Pipes run after Guards and after the Interceptor's setup phase, right before the controller
+  method body executes. The global <code>ValidationPipe</code> checks the body against the route's
+  DTO, e.g. <code>CreateProjectDto</code>.</p>
+  <pre>new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true })
+// unknown fields are stripped, a missing required field throws 400 Bad Request</pre>
+</div>
+
+<div class="pstep">
+  <div class="dot">8</div>
+  <h5>The controller and service run, and the database enforces the rest</h5>
+  <p><code>ProjectsController</code> calls <code>ProjectsService</code>, which queries through the
+  same <code>QueryRunner</code> from step 4. Postgres's own <code>tenant_isolation</code> policy
+  filters every row using the <code>app.tenant_id</code> set in step 5, even if application code had a
+  bug and forgot to filter by tenant itself.</p>
+</div>
+
+<div class="pstep">
+  <div class="dot">9</div>
+  <h5>Success: the transaction commits</h5>
+  <p><code>queryRunner.commitTransaction()</code>, then <code>release()</code>. The response is sent
+  to the browser.</p>
+</div>
+
+<div class="pstep err">
+  <div class="dot">!</div>
+  <h5>Failure at any point from step 4 onward: nothing is half-saved</h5>
+  <p>A thrown error is caught by the global <code>AllExceptionsFilter</code>, which formats the JSON
+  error body and status code, and by the Interceptor's own catch block, which calls
+  <code>rollbackTransaction()</code> before releasing the connection. A first sign-in that fails
+  halfway through provisioning never leaves an orphaned tenant with no user in it.</p>
+</div>
+
+</div>
+
+<h2 class="section" id="backend"><span class="num">03</span>The backend, file by file</h2>
+<p class="section-why">Every real source file in the NestJS app, grouped the way the code is actually
+organized. If a module isn't listed here, it doesn't exist yet.</p>
+
 <div class="card">
   <h4>NestJS, deployed on Render</h4>
   <p>Owns tenancy, auth, and the platform's business data. It never fits a model itself, that's a
   separate process by design, real modeling runs take minutes to hours and cannot happen inside an
   HTTP request.</p>
-  <p><b>Live now:</b> the Auth Guard and Tenant Interceptor (validates every token, resolves it to
-  a real tenant and user, enforces Row-Level Security context), and the Projects module, full CRUD,
-  owner-only edit and delete.</p>
-  <p><b>Not built yet:</b> Datasets, Experiments, and Jobs. See <code>API-REFERENCE.html</code>
-  Section 10 for the exact routes that will 404 until these exist.</p>
 </div>
 
-<h2 class="section" id="db"><span class="num">04</span>The database</h2>
+<div class="tree">
+src/
+&nbsp;&nbsp;<span class="file">main.ts</span>  <span class="note live">bootstraps Nest, sets the /api/v1 prefix, enables CORS, wires global pipe + filter</span>
+&nbsp;&nbsp;<span class="file">app.module.ts</span>  <span class="note live">the root module, imports every module below</span>
+&nbsp;&nbsp;<span class="dir">config/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">env.validation.ts</span>  <span class="note live">every env var, typed and checked; refuses to boot if one is missing or wrong</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">database.config.ts</span>  <span class="note live">builds the TypeORM connection options from those env vars</span>
+&nbsp;&nbsp;<span class="dir">database/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">data-source.ts</span>  <span class="note live">the migration CLI's own connection, uses the admin DB role</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">migrations/</span>  <span class="note live">5 real migrations, run in order, see Section 04</span>
+&nbsp;&nbsp;<span class="dir">common/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">entities/</span><span class="file">base.entity.ts</span>  <span class="note live">shared id / created_at / updated_at columns</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">filters/</span><span class="file">http-exception.filter.ts</span>  <span class="note live">the global AllExceptionsFilter, formats every error response</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">tenant/</span><span class="file">tenant-context.ts</span>  <span class="note live">the AsyncLocalStorage carrier, see Section 02 step 6</span>
+&nbsp;&nbsp;<span class="dir">types/</span><span class="file">express.d.ts</span>  <span class="note live">adds the real user shape onto Express's Request type</span>
+&nbsp;&nbsp;<span class="dir">modules/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">health/</span>  <span class="note live">@Public() route, used by Render's own health check</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">auth/</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">entra-jwt.verifier.ts</span>  <span class="note live">Section 02 step 3, real jose verification</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">entra-jwt-verifier.provider.ts</span>  <span class="note live">wires the verifier as an injectable Nest provider</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">guards/</span><span class="file">entra-auth.guard.ts</span>  <span class="note live">Section 02 step 2-3</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">tenant-resolution.service.ts</span>  <span class="note live">Section 02 step 5</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">tenant-context.interceptor.ts</span>  <span class="note live">Section 02 steps 4-6, 9</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">decorators/</span><span class="file">public.decorator.ts</span>, <span class="file">current-user.decorator.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">interfaces/</span><span class="file">authenticated-user.interface.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">auth.controller.ts</span>, <span class="file">auth.module.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">tenants/</span><span class="file">tenants.module.ts</span>, <span class="file">tenants.service.ts</span>, <span class="dir">entities/</span><span class="file">tenant.entity.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">users/</span><span class="file">users.module.ts</span>, <span class="file">users.service.ts</span>, <span class="dir">entities/</span><span class="file">user.entity.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">projects/</span>  <span class="note live">CMP-41, full CRUD, the one business module that's actually built</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">projects.controller.ts</span>, <span class="file">projects.service.ts</span>, <span class="file">projects.module.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">entities/</span><span class="file">project.entity.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="dir">dto/</span><span class="file">create-project.dto.ts</span>, <span class="file">update-project.dto.ts</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">datasets/</span>  <span class="note plan">doesn't exist yet, CMP-38</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="file">experiments/</span>, <span class="file">jobs/</span>  <span class="note plan">don't exist yet, CMP-39 / CMP-43 / CMP-79</span>
+</div>
+
+<h2 class="section" id="db"><span class="num">04</span>The database, column by column</h2>
+<p class="section-why">Every real table, every real column, exactly as the migrations created them.
+Not "the schema", the actual <code>CREATE TABLE</code>.</p>
+
 <div class="card">
   <h4>Postgres, deployed on Render</h4>
   <p>Multi-tenant by row, not by separate database per customer. Every tenant-owned table enforces
   Row-Level Security with <code>FORCE</code>, meaning the rule applies even to the admin database
   role, not just application code. Directly tested, not assumed, see
-  <code>Trainings/NestJS/knowledge-base/lessons/06-locked-out-by-your-own-rule.html</code> for a
-  real case where this caught the very people who built it.</p>
+  <code>Trainings/NestJS/knowledge-base/lessons/06-locked-out-by-your-own-rule.html</code> for a real
+  case where this caught the very people who built it.</p>
 </div>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 320" role="img" aria-label="Three tables. Tenants is the top-level table. Users belongs to a tenant, one tenant has many users. Projects also belongs to a tenant, and separately each project has one owner, which is a user, so one user can own many projects.">
+
+<rect x="335" y="24" width="270" height="70" rx="10" fill="#F7F8F7" stroke="#C7CDC9" stroke-width="1.4"/>
+<text x="470" y="52" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0C1A10">TENANTS</text>
+<text x="470" y="72" text-anchor="middle" font-size="10.5" fill="#6B7280">one row per customer organization</text>
+
+<line x1="400" y1="94" x2="220" y2="170" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrowg2)"/>
+<text x="270" y="140" font-size="10" fill="#6B7280">tenant_id FK,</text>
+<text x="270" y="153" font-size="10" fill="#6B7280">1 tenant &rarr; many users</text>
+
+<line x1="540" y1="94" x2="720" y2="170" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrowg2)"/>
+<text x="600" y="140" font-size="10" fill="#6B7280">tenant_id FK,</text>
+<text x="600" y="153" font-size="10" fill="#6B7280">1 tenant &rarr; many projects</text>
+
+<rect x="40" y="176" width="280" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="180" y="206" text-anchor="middle" font-size="12.5" font-weight="700" fill="#007A3D">USERS</text>
+<text x="180" y="228" text-anchor="middle" font-size="10.5" fill="#374151">one row per real signed-in person</text>
+<text x="180" y="246" text-anchor="middle" font-size="10.5" fill="#374151">unique per (tenant_id, email)</text>
+
+<line x1="320" y1="221" x2="620" y2="221" stroke="#6B7280" stroke-width="1.5" marker-end="url(#arrowg2)"/>
+<text x="470" y="212" text-anchor="middle" font-size="10" fill="#6B7280">owner_id FK, 1 user &rarr; many projects</text>
+
+<rect x="620" y="176" width="280" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="760" y="206" text-anchor="middle" font-size="12.5" font-weight="700" fill="#007A3D">PROJECTS</text>
+<text x="760" y="228" text-anchor="middle" font-size="10.5" fill="#374151">the one business table that's built</text>
+<text x="760" y="246" text-anchor="middle" font-size="10.5" fill="#374151">CMP-41, full CRUD</text>
+
+<defs>
+<marker id="arrowg2" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
+</defs>
+</svg>
+</div>
+<p class="figcap">Every arrow is a real foreign key, ON DELETE CASCADE. Delete a tenant and every
+user and project under it goes with it.</p>
+
+<table class="schema">
+<caption>tenants</caption>
+<tr><th>column</th><th>type</th><th>note</th></tr>
+<tr><td class="col">id</td><td class="type">uuid</td><td>primary key, default gen_random_uuid()</td></tr>
+<tr><td class="col">name</td><td class="type">text</td><td>not null</td></tr>
+<tr><td class="col">status</td><td class="type">text</td><td>not null, default 'active', check in (active, suspended, deprovisioned)</td></tr>
+<tr><td class="col">external_key</td><td class="type">text</td><td>not null, unique. org:&lt;entra-tenant-id&gt; or personal:&lt;oid&gt;</td></tr>
+<tr><td class="col">created_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+<tr><td class="col">updated_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+</table>
+
+<table class="schema">
+<caption>users</caption>
+<tr><th>column</th><th>type</th><th>note</th></tr>
+<tr><td class="col">id</td><td class="type">uuid</td><td>primary key, default gen_random_uuid()</td></tr>
+<tr><td class="col">tenant_id</td><td class="type">uuid</td><td>not null, FK &rarr; tenants(id), ON DELETE CASCADE</td></tr>
+<tr><td class="col">email</td><td class="type">text</td><td>not null, unique per (tenant_id, email), not globally unique</td></tr>
+<tr><td class="col">first_name</td><td class="type">text</td><td>not null</td></tr>
+<tr><td class="col">last_name</td><td class="type">text</td><td>not null</td></tr>
+<tr><td class="col">global_role</td><td class="type">text</td><td>not null, check in (marketing_analyst, marketing_manager, data_scientist, administrator)</td></tr>
+<tr><td class="col">created_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+<tr><td class="col">updated_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+<tr><td class="col">deleted_at</td><td class="type">timestamptz</td><td>nullable, soft delete</td></tr>
+</table>
+
+<table class="schema">
+<caption>projects</caption>
+<tr><th>column</th><th>type</th><th>note</th></tr>
+<tr><td class="col">id</td><td class="type">uuid</td><td>primary key, default gen_random_uuid()</td></tr>
+<tr><td class="col">tenant_id</td><td class="type">uuid</td><td>not null, FK &rarr; tenants(id), ON DELETE CASCADE, indexed</td></tr>
+<tr><td class="col">name</td><td class="type">text</td><td>not null</td></tr>
+<tr><td class="col">description</td><td class="type">text</td><td>nullable</td></tr>
+<tr><td class="col">owner_id</td><td class="type">uuid</td><td>not null, FK &rarr; users(id), ON DELETE CASCADE, indexed</td></tr>
+<tr><td class="col">status</td><td class="type">text</td><td>not null, default 'active', check in (active, archived)</td></tr>
+<tr><td class="col">created_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+<tr><td class="col">updated_at</td><td class="type">timestamptz</td><td>not null, default now()</td></tr>
+<tr><td class="col">deleted_at</td><td class="type">timestamptz</td><td>nullable, soft delete</td></tr>
+</table>
+
+<h3 class="sub">The exact rule that makes tenants unable to see each other's rows</h3>
+<div class="tree" style="line-height:1.7">
+ALTER TABLE "projects" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "projects" FORCE ROW LEVEL SECURITY;   <span class="note">← without FORCE, the app's own DB owner role would be exempt</span>
+
+CREATE POLICY "tenant_isolation" ON "projects"
+  USING ("tenant_id" = current_setting('app.tenant_id', true)::uuid);
+</div>
+<div class="watch">
+  <span class="lbl">Same policy, same wording, on both users and projects</span>
+  <p>current_setting(..., true) with missing_ok = true means a session that never called
+  set_config matches zero rows, not an error. Fail closed, not open, on purpose.</p>
+</div>
+
+<h3 class="sub">Two database roles, on purpose</h3>
+<table class="schema">
+<tr><th>role</th><th>used by</th><th>why</th></tr>
+<tr><td class="col">DB_ADMIN_USERNAME</td><td>the migration CLI only</td><td>Postgres superusers are exempt from Row-Level Security unconditionally, and the bootstrap role can never be demoted off superuser, found the hard way, 2026-08-04</td></tr>
+<tr><td class="col">DB_USERNAME</td><td>the running app, every request</td><td>a genuinely restricted role, created by migration <code>CreateAppRole1785900000002</code>, granted SELECT/INSERT/UPDATE/DELETE, nothing more</td></tr>
+</table>
 
 <h2 class="section" id="notyet"><span class="num">05</span>Not built yet</h2>
 <div class="watch">
@@ -258,13 +609,191 @@
   either side builds against it.</p>
 </div>
 
+<h2 class="section" id="azure"><span class="num">06</span>The Azure Marketplace target</h2>
+<p class="section-why">No Azure subscription exists yet, waiting on Farhan for a company-identity
+account, and there's no trial being pursued for shared infrastructure in the meantime. But every
+decision above was already made with this section in mind: nothing in the running code branches on
+which cloud it's talking to, only configuration does. This is the exact, named target it becomes.</p>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 650" role="img" aria-label="An Azure resource group, not yet provisioned, containing eight resources drawn dashed: Static Web Apps replacing Vercel, App Service replacing Render for the backend, Postgres Flexible Server replacing Render's database, Key Vault for secrets, Blob Storage for dataset files, Service Bus for the job queue, Application Insights for observability, and Container Apps for the Python modeling worker. Outside the resource group, two external boxes: Microsoft Entra ID, already live today and reconfigured to accept any customer organization, and the Marketplace Fulfillment API, a webhook with no equivalent in the current Dev setup, receiving subscribe, change plan, cancel and renew events.">
+
+<text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">TODAY'S RENDER + VERCEL BOX, BECOMING THIS</text>
+
+<rect x="20" y="50" width="900" height="435" rx="14" fill="#FFFFFF" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="8 5"/>
+<text x="40" y="76" font-size="11.5" font-weight="700" fill="#8A5A06">AZURE RESOURCE GROUP &middot; TARGET, NOT YET PROVISIONED</text>
+
+<rect x="40" y="90" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="58" y="112" font-size="11.5" font-weight="700" fill="#4B5563">STATIC WEB APPS</text>
+<text x="58" y="132" font-size="10.5" fill="#6B7280">Frontend, replaces Vercel</text>
+<text x="58" y="150" font-size="10.5" fill="#6B7280">Same Angular build output,</text>
+<text x="58" y="168" font-size="10.5" fill="#6B7280">no application code change</text>
+
+<rect x="335" y="90" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="353" y="112" font-size="11.5" font-weight="700" fill="#4B5563">APP SERVICE</text>
+<text x="353" y="132" font-size="10.5" fill="#6B7280">Backend, replaces Render</text>
+<text x="353" y="150" font-size="10.5" fill="#6B7280">Linux, Node 20, Managed</text>
+<text x="353" y="168" font-size="10.5" fill="#6B7280">Identity for Key Vault access</text>
+<text x="353" y="186" font-size="10.5" fill="#6B7280">Same NestJS code, unchanged</text>
+
+<rect x="630" y="90" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="648" y="112" font-size="11.5" font-weight="700" fill="#4B5563">POSTGRES FLEXIBLE SERVER</text>
+<text x="648" y="132" font-size="10.5" fill="#6B7280">Database, replaces Render Postgres</text>
+<text x="648" y="150" font-size="10.5" fill="#6B7280">Same schema, same RLS SQL,</text>
+<text x="648" y="168" font-size="10.5" fill="#6B7280">zero application code change</text>
+
+<rect x="40" y="220" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="58" y="242" font-size="11.5" font-weight="700" fill="#4B5563">KEY VAULT</text>
+<text x="58" y="262" font-size="10.5" fill="#6B7280">Secrets storage</text>
+<text x="58" y="280" font-size="10.5" fill="#6B7280">DB password, no more plaintext</text>
+<text x="58" y="298" font-size="10.5" fill="#6B7280">in a hosting provider's env vars</text>
+
+<rect x="335" y="220" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="353" y="242" font-size="11.5" font-weight="700" fill="#4B5563">BLOB STORAGE</text>
+<text x="353" y="262" font-size="10.5" fill="#6B7280">Dataset files &middot; CMP-38</text>
+<text x="353" y="280" font-size="10.5" fill="#6B7280">Postgres stores only the</text>
+<text x="353" y="298" font-size="10.5" fill="#6B7280">pointer, never the raw file</text>
+
+<rect x="630" y="220" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="648" y="242" font-size="11.5" font-weight="700" fill="#4B5563">SERVICE BUS</text>
+<text x="648" y="262" font-size="10.5" fill="#6B7280">Job queue &middot; CMP-79</text>
+<text x="648" y="280" font-size="10.5" fill="#6B7280">Backend enqueues a model run,</text>
+<text x="648" y="298" font-size="10.5" fill="#6B7280">the worker dequeues it</text>
+
+<rect x="40" y="350" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="58" y="372" font-size="11.5" font-weight="700" fill="#4B5563">APPLICATION INSIGHTS</text>
+<text x="58" y="392" font-size="10.5" fill="#6B7280">Observability</text>
+<text x="58" y="410" font-size="10.5" fill="#6B7280">Request tracing, error rates,</text>
+<text x="58" y="428" font-size="10.5" fill="#6B7280">attached to App Service and</text>
+<text x="58" y="446" font-size="10.5" fill="#6B7280">Container Apps both</text>
+
+<rect x="335" y="350" width="270" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="353" y="372" font-size="11.5" font-weight="700" fill="#4B5563">CONTAINER APPS</text>
+<text x="353" y="392" font-size="10.5" fill="#6B7280">Python Modeling Worker</text>
+<text x="353" y="410" font-size="10.5" fill="#6B7280">Scales to zero when idle,</text>
+<text x="353" y="428" font-size="10.5" fill="#6B7280">starts a container per job</text>
+
+<line x1="470" y1="200" x2="470" y2="500" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4"/>
+<line x1="470" y1="500" x2="255" y2="500" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey3)"/>
+<line x1="470" y1="500" x2="700" y2="500" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey3)"/>
+
+<rect x="40" y="510" width="430" height="110" rx="10" fill="#EAF1FD" stroke="#2563EB" stroke-width="1.6"/>
+<text x="58" y="534" font-size="11.5" font-weight="700" fill="#1D4ED8">MICROSOFT ENTRA ID</text>
+<text x="58" y="556" font-size="10.5" fill="#374151">Same real service, already live today</text>
+<text x="58" y="574" font-size="10.5" fill="#374151">Reconfigured multi-tenant so any</text>
+<text x="58" y="592" font-size="10.5" fill="#374151">customer organization can sign in,</text>
+<text x="58" y="610" font-size="10.5" fill="#374151">not just this one Entra tenant</text>
+
+<rect x="500" y="510" width="400" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="518" y="534" font-size="11.5" font-weight="700" fill="#4B5563">MARKETPLACE FULFILLMENT API</text>
+<text x="518" y="556" font-size="10.5" fill="#6B7280">The one piece with no Dev-stage</text>
+<text x="518" y="574" font-size="10.5" fill="#6B7280">equivalent. A webhook Microsoft calls</text>
+<text x="518" y="592" font-size="10.5" fill="#6B7280">on subscribe, plan change, cancel,</text>
+<text x="518" y="610" font-size="10.5" fill="#6B7280">renew &middot; CMP-55 / CMP-77</text>
+
+<defs>
+<marker id="arrowgrey3" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker>
+</defs>
+</svg>
+</div>
+<p class="figcap">Every dashed box here is the same "not built yet" meaning as everywhere else on this
+page, it just means "not provisioned" instead of "not coded". The code these resources would run is
+already written and live on Render/Vercel today.</p>
+
+<h3 class="sub">What each one is, in real depth</h3>
+
+<div class="azure-card">
+  <div class="tag">from Vercel</div>
+  <div><h4>Azure Static Web Apps</h4><p>Hosts the built Angular output and serves it globally.
+  Same build, same <code>environment.prod.ts</code> swap already wired via
+  <code>fileReplacements</code>, moving hosts is a deploy target change, not a code change.</p>
+  <p class="from">Free tier covers a single small app comfortably to start.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag">from Render</div>
+  <div><h4>Azure App Service (Linux, Node 20)</h4><p>Hosts the NestJS backend exactly as it runs on
+  Render today. Given a <b>Managed Identity</b> instead of raw connection strings, so it can read
+  secrets from Key Vault at startup without a password ever sitting in an App Service setting.</p>
+  <p class="from">The same build command fix found on Render (installing devDependencies for the
+  Nest build) applies here too, it's a Node/npm behavior, not a Render-specific one.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag">from Render Postgres</div>
+  <div><h4>Azure Database for PostgreSQL: Flexible Server</h4><p>The exact same schema, the
+  exact same <code>FORCE ROW LEVEL SECURITY</code> policies, the exact same two-role split
+  (DB_ADMIN_USERNAME for migrations, DB_USERNAME for the app). None of Section 04's SQL changes,
+  only the connection host and credentials do.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">new for target</div>
+  <div><h4>Azure Key Vault</h4><p>Where <code>DB_PASSWORD</code>, and any future client secret,
+  actually lives, instead of sitting in a hosting provider's plaintext environment variable screen.
+  App Service reads it at startup through its Managed Identity, no credential is ever typed into a
+  dashboard by a person.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">new, CMP-38</div>
+  <div><h4>Azure Blob Storage</h4><p>Holds the actual uploaded dataset files once Datasets exists.
+  Postgres was designed from the start to store only a pointer to the file, never the file itself,
+  so this slots in without a schema change.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">new, CMP-79</div>
+  <div><h4>Azure Service Bus</h4><p>The job queue between the backend and the Python worker. The
+  backend enqueues a message and answers the caller immediately with a job id; the worker dequeues it
+  whenever it's free. <code>CMP-79</code> is the ticket that defines the exact message shape both
+  sides build against, before either side writes code for it.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">new for target</div>
+  <div><h4>Application Insights</h4><p>Request tracing and error rates for App Service and Container
+  Apps both, in one place. Render's own dashboard covers this today at much smaller scale; this is
+  the real replacement once there's more than three real users to watch.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">new, worker</div>
+  <div><h4>Azure Container Apps</h4><p>Runs the Python modeling worker. Chosen over a full Kubernetes
+  cluster (AKS) because a model run is a bounded job, not a long-lived service, Container Apps scales
+  a job's containers to zero when nothing is running and starts one per job on demand.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag">already live</div>
+  <div><h4>Microsoft Entra ID, reconfigured</h4><p>The exact same real service already signing Farhan,
+  Anas, and Amna in today. For Marketplace distribution it gets reconfigured multi-tenant, so any
+  customer's own Entra tenant, or personal Microsoft account, can sign in, not just the one Entra
+  tenant this app registration currently trusts.</p></div>
+</div>
+
+<div class="azure-card">
+  <div class="tag new">Marketplace-only</div>
+  <div><h4>SaaS Fulfillment API webhook</h4><p>The one resource on this whole page with no Dev-stage
+  equivalent at all. A real HTTP endpoint the Azure Marketplace calls when a customer subscribes,
+  changes plan, cancels, or renews, so the platform's own record of who's paying for what stays in
+  sync automatically instead of a person updating it by hand. Nothing to build until there's a real
+  Marketplace SaaS offer to receive events from. Tracked as <code>CMP-55</code> and
+  <code>CMP-77</code>.</p></div>
+</div>
+
 <div class="maintain">
   <h3>Keeping this page real</h3>
   <ol>
     <li>When a module moves from planned to built, its box changes from the dashed grey style to
-    the solid green one, and its text updates from "Not built yet" to what it actually does.</li>
-    <li>When a new piece gets added (a new module, a new external service), it gets a new box in
-    the diagram and a new numbered section below it, not a note bolted onto an existing one.</li>
+    the solid green one, and its text updates from "Not built yet" to what it actually does, in
+    both Section 00's overview and its own deep section.</li>
+    <li>When a new piece gets added (a new module, a new external service, a new database column),
+    it gets a new box or a new table row where the equivalent already lives, not a note bolted onto
+    an unrelated section.</li>
+    <li>When an Azure resource in Section 06 actually gets provisioned, its box moves from dashed
+    grey to solid green, exactly like every other "not built yet" box on this page, and its azure-card
+    below gets the real resource name and region.</li>
     <li>Whenever this page changes, the same day's <code>dev-log/raw/YYYY-MM-DD.md</code> entry
     should say so, same rule as every other real change on this project.</li>
   </ol>
