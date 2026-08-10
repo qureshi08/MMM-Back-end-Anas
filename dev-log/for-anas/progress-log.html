@@ -118,10 +118,11 @@
   <h1>What's actually <span class="italic-accent">done</span></h1>
   <p class="sub">A plain-language record of what's been built in the backend, what's verified, and
   what's still waiting on something. Read this instead of asking. It's kept current.</p>
-  <p class="updated">Last updated <b>August 7, 2026</b>. Real Entra login is fully done, confirmed
-  independently by both Claude and Anas, same real result both times. Projects CRUD (CMP-41) is
-  fully done, Anas ran every one of <code>TC-06</code> through <code>TC-10</code> himself. The
-  backend is now deployed and live, reachable from anywhere, not just localhost.</p>
+  <p class="updated">Last updated <b>August 10, 2026</b>. Real Entra login is fully done on both
+  backend and frontend, confirmed independently across three real accounts. Projects CRUD
+  (<code>CMP-41</code>) is fully done end to end, real UI, real backend, real database, all
+  confirmed. The backend is deployed and live, and the frontend now genuinely talks to it, not mock
+  data.</p>
 </header>
 
 <section class="tint">
@@ -217,6 +218,19 @@
       access to the shared repo is still being resolved with Farhan, see
       <code>PLATFORM.md</code>/<code>TEAM-GUIDE.html</code> and <code>dev-log/raw/2026-08-07.md</code>
       for the full detail, including two real deploy bugs found and fixed along the way.</td>
+    </tr>
+    <tr>
+      <td class="item">Frontend connected to backend, real login end to end</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed August 10, real Microsoft sign-in on Amna's deployed frontend
+      (<code>mmm-frontend-amna.vercel.app</code>), real project creation through the actual UI, and
+      independent database confirmation for three real accounts (Farhan, Anas, Amna), all correctly
+      auto-provisioned into one shared tenant with real projects owned by the right people. Real bugs
+      found and fixed along the way: two Entra redirect URI mismatches, an MSAL popup flow failing
+      due to a cross-window communication issue (switched to redirect flow), a stale API URL, and a
+      hardcoded name in the dashboard header. See <code>dev-log/raw/2026-08-10.md</code> for the full
+      chain, including a real false alarm caused by a gap in how this was being verified, not a bug
+      in the actual work.</td>
     </tr>
   </table>
   <div class="legend">

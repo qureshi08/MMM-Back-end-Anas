@@ -775,26 +775,34 @@ the team verifies a feature actually works end to end, not just that it appears 
     <h4>Farhan</h4>
     <ul>
       <li><s>Add teammates as collaborators</s>, done August 7</li>
-      <li>Connect Render and Vercel to the repository, then invite Anas and Amna as team members
-      inside each platform (Section 1, Sections 4 and 5)</li>
-      <li>Decide the monorepo restructuring with the team</li>
+      <li>Decide the monorepo restructuring with the team, more pressing now that both sides are
+      genuinely connected and working, on two separate personal repos, a real merge is worth doing
+      soon rather than letting that continue indefinitely</li>
       <li>Create <code>main</code> once agreed, set it as the repo's default branch</li>
     </ul>
   </div>
   <div class="owner-card">
     <h4>Amna</h4>
     <ul>
-      <li>Add <code>environment.prod.ts</code> + <code>angular.json</code> <code>fileReplacements</code>
-      (Section 6)</li>
-      <li>Deploy to Vercel (Section 5), share the real URL with Anas</li>
+      <li><s>Add <code>environment.prod.ts</code> + <code>angular.json</code>
+      <code>fileReplacements</code></s>, done</li>
+      <li><s>Deploy to Vercel, share the real URL</s>, done, live at
+      <code>mmm-frontend-amna.vercel.app</code></li>
+      <li><s>Real MSAL login, wired and verified end to end</s>, done August 10, see
+      <code>dev-log/raw/2026-08-10.md</code></li>
       <li>Optionally rename her branch to <code>frontend/amna</code></li>
     </ul>
   </div>
   <div class="owner-card">
     <h4>Anas</h4>
     <ul>
-      <li>Finish the actual Render deploy (guide already written, not yet executed)</li>
-      <li>Add Amna's frontend URL as a Redirect URI in the Entra app registration once she has one</li>
+      <li><s>Finish the actual Render deploy</s>, done, live at
+      <code>mmm-back-end-anas.onrender.com</code></li>
+      <li><s>Add Amna's frontend URL as a Redirect URI in Entra</s>, done, both
+      <code>localhost:4200</code> and the real Vercel URL are registered</li>
+      <li>Clear the four throwaway test projects currently sitting in the shared Dev database before
+      showing this environment to anyone outside the immediate testing loop</li>
+      <li>Next real backend work: <code>CMP-38</code>, dataset upload/validation and Blob storage</li>
     </ul>
   </div>
 </div>
