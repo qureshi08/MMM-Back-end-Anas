@@ -117,20 +117,21 @@
 <header>
   <div class="kicker">MMM Platform &middot; Backend &middot; Frontend &middot; Modeling</div>
   <h1>The API, <span class="italic-accent">exactly</span> as it really is</h1>
-  <p class="sub">Shared with the frontend team and the modeling team, kept updated as the backend
-  changes. Everything here reflects what's actually built and deployed, not what's planned. Where
-  something isn't built yet, it says so directly instead of being left out.</p>
-  <p class="updated">Last updated <b>August 10, 2026</b>. Live backend:
-  <code>https://mmm-back-end-anas.onrender.com/api/v1</code>. See
-  <code>API-REFERENCE.md</code> in the same folder for the plain-text version of this same
-  information.</p>
+  <p class="sub">The sole API reference for this platform, shared with the frontend team and the
+  modeling team, kept updated as the backend changes. Everything here reflects what's actually
+  built and deployed, not what's planned. Where something isn't built yet, it says so directly
+  instead of being left out.</p>
+  <p class="updated">Last updated <b>August 10, 2026</b>. Live backend, the only one that matters:
+  <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
 </header>
 
 <nav class="toc">
   <h2>On this page</h2>
   <ol>
-    <li><a href="#base">Base URL and environments</a></li>
+    <li><a href="#base">Base URL</a></li>
     <li><a href="#auth">Authentication</a></li>
+    <li><a href="#token">Getting a real token</a></li>
+    <li><a href="#conventions">CORS and response conventions</a></li>
     <li><a href="#errors">Error format and status codes</a></li>
     <li><a href="#health">GET /health</a></li>
     <li><a href="#me">GET /auth/me</a></li>
@@ -141,17 +142,18 @@
   </ol>
 </nav>
 
-<h2 class="section" id="base"><span class="num">01</span>Base URL and environments</h2>
+<h2 class="section" id="base"><span class="num">01</span>Base URL</h2>
 <table>
   <tr><th>Environment</th><th>URL</th></tr>
   <tr><td>Shared Dev (live now, Render)</td><td><code>https://mmm-back-end-anas.onrender.com/api/v1</code></td></tr>
-  <tr><td>Local development</td><td><code>http://localhost:3000/api/v1</code></td></tr>
 </table>
 <div class="watch">
   <span class="lbl">This is Dev infrastructure, not production</span>
-  <p>Render and Vercel are a stopgap until real Azure infrastructure exists (App Service, Postgres
-  Flexible Server). Don't treat this URL as a stable, permanent address, it will change when the
-  team moves to Azure. See <code>PLATFORM.md</code> for the full architecture picture.</p>
+  <p>Render is a stopgap until real Azure infrastructure exists (App Service, Postgres Flexible
+  Server). Don't treat this URL as a stable, permanent address, it will change when the team moves
+  to Azure. Local development against <code>localhost:3000</code> is possible for whoever is
+  actively working on the backend itself, but this document only tracks the one URL everyone else
+  should actually be pointed at.</p>
 </div>
 <p>Every route on this page sits under the <code>/api/v1</code> prefix already. There is no
 unprefixed API.</p>
@@ -181,7 +183,49 @@ access token.</p>
   provisioned into a brand-new tenant is automatically given the <code>administrator</code> role.</p>
 </div>
 
-<h2 class="section" id="errors"><span class="num">03</span>Error format and status codes</h2>
+<h2 class="section" id="token"><span class="num">03</span>Getting a real token</h2>
+<p class="section-why">For anyone testing the API directly, outside of a real signed-in frontend
+session. This is exactly how <code>TC-04</code> in the backend's own test suite gets verified.</p>
+
+<div class="card">
+  <h4>Postman</h4>
+  <ol>
+    <li>Import the collection and environment from <code>Backend/postman/</code> (or ask for a
+    copy if you don't have access to the repo).</li>
+    <li>Open the collection's own <b>Authorization</b> tab (not an individual request's), Type
+    should be <b>OAuth 2.0</b>.</li>
+    <li>Confirm the environment's <code>tenantId</code>, <code>clientId</code>, and
+    <code>scope</code> match the values in Section 02 above, in both the Initial Value and Current
+    Value columns.</li>
+    <li>Client Authentication must be set to <b>Send client credentials in body</b>, not Basic Auth
+    header, this app has no client secret (PKCE, public client).</li>
+    <li>Click <b>Get New Access Token</b>. A real Microsoft sign-in window opens, sign in with a
+    real <code>@convergentbt.com</code> account. First time, expect a consent screen, that's
+    individual user consent, nothing that needs an admin.</li>
+    <li>Click <b>Use Token</b> once it comes back. Any request in the collection now carries a real
+    <code>Authorization</code> header.</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h4>Anything else (curl, a script, another tool)</h4>
+  <p>Run the Authorization Code + PKCE flow yourself against
+  <code>https://login.microsoftonline.com/d5619769-1863-41fe-86e3-95000d84f2a6/oauth2/v2.0/authorize</code>,
+  using the Client ID and scope from Section 02. Once you have a token, calling the API is a plain
+  bearer-token request:</p>
+  <pre class="block"><code>curl https://mmm-back-end-anas.onrender.com/api/v1/auth/me \
+  -H "Authorization: Bearer &lt;your real token&gt;"</code></pre>
+</div>
+
+<h2 class="section" id="conventions"><span class="num">04</span>CORS and response conventions</h2>
+<ul>
+  <li><b>CORS</b> is wide open right now, any origin is allowed. Nothing needed on any client's
+  side for this specifically.</li>
+  <li><b>Successful responses</b> return the resource directly as JSON, no wrapper object, no
+  <code>{ "data": ... }</code> envelope.</li>
+</ul>
+
+<h2 class="section" id="errors"><span class="num">05</span>Error format and status codes</h2>
 <p class="section-why">Every error, from every endpoint, comes back in this exact shape:</p>
 <pre class="block"><code>{
   "statusCode": 404,
@@ -208,12 +252,12 @@ failures (multiple invalid fields listed together). Handle both shapes.</p>
   an oversight.</p>
 </div>
 
-<h2 class="section" id="health"><span class="num">04</span>GET /health</h2>
+<h2 class="section" id="health"><span class="num">06</span>GET /health</h2>
 <h3 class="endpoint"><span class="method get">GET</span>/health</h3>
 <p class="endpoint-desc">Public, no authentication required.</p>
 <pre class="block"><code>{ "status": "ok", "database": "connected", "timestamp": "2026-08-07T10:18:07.469Z" }</code></pre>
 
-<h2 class="section" id="me"><span class="num">05</span>GET /auth/me</h2>
+<h2 class="section" id="me"><span class="num">07</span>GET /auth/me</h2>
 <h3 class="endpoint"><span class="method get">GET</span>/auth/me</h3>
 <p class="endpoint-desc">Returns what the token resolved to, and this platform's own internal ids.
 The right first call to make when debugging any connection issue, if this fails, nothing else
@@ -228,7 +272,7 @@ will work either.</p>
   "userId": "this platform's own user id (uuid)"
 }</code></pre>
 
-<h2 class="section" id="projects"><span class="num">06</span>Projects</h2>
+<h2 class="section" id="projects"><span class="num">08</span>Projects</h2>
 <p class="section-why">The only real business entity implemented so far. Every route below requires
 auth and is automatically scoped to the caller's own tenant, enforced by the database itself
 (Row-Level Security), not just application code.</p>
@@ -246,6 +290,11 @@ auth and is automatically scoped to the caller's own tenant, enforced by the dat
   silently ignored. <code>status</code> cannot be set on create, every new project starts
   <code>"active"</code>.</p>
   <p><b>Response, 201:</b> the full project object, see the data model below.</p>
+  <p><b>Example</b></p>
+  <pre class="block"><code>curl -X POST https://mmm-back-end-anas.onrender.com/api/v1/projects \
+  -H "Authorization: Bearer &lt;your real token&gt;" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Q4 Brand Campaign","description":"First real project"}'</code></pre>
 </div>
 
 <h3 class="endpoint"><span class="method get">GET</span>/projects</h3>
@@ -285,7 +334,7 @@ gets set. A deleted project no longer appears in <code>GET /projects</code>, and
 <code>GET /projects/:id</code> returns <code>404</code> for it afterward. Same ownership rule as
 <code>PATCH</code>, non-owners get <code>403</code>. <b>Response, 204, no body.</b></p>
 
-<h2 class="section" id="model"><span class="num">07</span>Data model: Project</h2>
+<h2 class="section" id="model"><span class="num">09</span>Data model: Project</h2>
 <pre class="block"><code>{
   "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
   "createdAt": "2026-08-06T11:51:35.322Z",
@@ -310,7 +359,7 @@ gets set. A deleted project no longer appears in <code>GET /projects</code>, and
   <tr><td><code>deletedAt</code></td><td>ISO 8601 string or null</td><td>Non-null only on a soft-deleted row, which you won't normally see, deleted rows are excluded from responses</td></tr>
 </table>
 
-<h2 class="section" id="notbuilt"><span class="num">08</span>Not built yet</h2>
+<h2 class="section" id="notbuilt"><span class="num">10</span>Not built yet</h2>
 <p class="section-why">For both the frontend and modeling teams: do not build against these as if
 they exist. Calling them today returns <code>404</code>, route not found, not any signal that
 they're simply unfinished.</p>
@@ -334,7 +383,7 @@ they're simply unfinished.</p>
   same place, not a separate document that can drift out of sync.</p>
 </div>
 
-<h2 class="section" id="tenancy"><span class="num">09</span>Multi-tenancy</h2>
+<h2 class="section" id="tenancy"><span class="num">11</span>Multi-tenancy</h2>
 <ul>
   <li>Every real user belongs to exactly one tenant, resolved automatically from their Microsoft
   account on first login.</li>
@@ -345,9 +394,9 @@ they're simply unfinished.</p>
 
 <footer>
   <img class="footer-logo" src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
-  MMM Platform &middot; API Reference &middot; kept updated alongside the real backend. Questions or
-  anything that doesn't match what you observe: ask directly rather than guessing, this document is
-  meant to be corrected the moment it drifts from reality.
+  MMM Platform &middot; API Reference &middot; the sole reference, kept updated alongside the real
+  backend. Questions or anything that doesn't match what you observe: ask directly rather than
+  guessing, this document is meant to be corrected the moment it drifts from reality.
 </footer>
 
 </div>
