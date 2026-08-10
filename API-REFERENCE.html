@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API Reference · MMM Backend</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-error:#EF4444; --cbt-error-muted:#FDEDED; --cbt-error-dark:#B91C1C;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono);background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  pre code{background:none;border:none;padding:0}
+  a{color:var(--cbt-primary)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 36px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(32px,5vw,50px);
+    line-height:1.08;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:70ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+
+  nav.toc{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:0 0 40px}
+  nav.toc h2{font-family:var(--cbt-font-heading);font-size:1.05rem;margin:0 0 12px;color:var(--cbt-heading)}
+  nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+  nav.toc li{margin:5px 0;break-inside:avoid}
+  nav.toc a{color:var(--cbt-body);text-decoration:none;font-size:14px}
+  nav.toc a:hover{color:var(--cbt-primary)}
+
+  h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.7rem;
+    margin:56px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
+  h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.62em;
+    font-weight:600;margin-right:10px;vertical-align:middle}
+  h2.section:first-of-type{margin-top:0}
+  .section-why{color:var(--cbt-muted);margin:0 0 22px;max-width:72ch}
+
+  h3.endpoint{font-family:var(--cbt-font-mono);font-size:1.1rem;margin:32px 0 4px;color:var(--cbt-heading);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .method{font-family:var(--cbt-font-mono);font-size:11px;font-weight:700;letter-spacing:.04em;
+    padding:4px 10px;border-radius:6px;text-transform:uppercase}
+  .method.get{background:var(--cbt-blue-muted);color:var(--cbt-blue-dark)}
+  .method.post{background:var(--cbt-primary-muted);color:var(--cbt-primary-dark)}
+  .method.patch{background:var(--cbt-warning-muted);color:var(--cbt-warning-dark)}
+  .method.delete{background:var(--cbt-error-muted);color:var(--cbt-error-dark)}
+  .endpoint-desc{color:var(--cbt-muted);margin:6px 0 14px;max-width:72ch}
+
+  .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 18px}
+  .card h4{font-family:var(--cbt-font-heading);font-weight:600;font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
+  .card p{margin:0 0 12px;max-width:72ch}
+  .card ol,.card ul{padding-left:22px;margin:0 0 12px;max-width:72ch}
+  .card li{margin:6px 0}
+
+  pre.block{margin:0 0 16px;background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    border-radius:var(--cbt-radius-sm);padding:14px 18px;overflow-x:auto;font-size:13.5px;line-height:1.65}
+
+  .callout{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .callout p{margin:0}
+  .callout .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-primary-dark);display:block;margin-bottom:6px}
+
+  .watch{border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .watch p{margin:0}
+  .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+
+  table{width:100%;border-collapse:collapse;margin:0 0 20px;font-size:14px}
+  th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--cbt-muted);
+    font-weight:700;padding:0 12px 8px;border-bottom:1px solid var(--cbt-border)}
+  td{padding:10px 12px;border-bottom:1px solid var(--cbt-border);vertical-align:top}
+  td code{white-space:nowrap}
+
+  .status-grid{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+  .status-pill{font-family:var(--cbt-font-mono);font-size:12px;font-weight:600;padding:5px 12px;
+    border-radius:999px;border:1px solid var(--cbt-border);background:var(--cbt-surface)}
+
+  .not-built{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:0 0 18px}
+  .not-built h4{font-family:var(--cbt-font-heading);font-weight:700;margin:0 0 10px;color:var(--cbt-heading)}
+  .not-built ul{margin:0;padding-left:20px}
+  .not-built li{margin:6px 0}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:40px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>MMM Platform &middot; API Reference</span>
+</div>
+
+<header>
+  <div class="kicker">MMM Platform &middot; Backend &middot; Frontend &middot; Modeling</div>
+  <h1>The API, <span class="italic-accent">exactly</span> as it really is</h1>
+  <p class="sub">Shared with the frontend team and the modeling team, kept updated as the backend
+  changes. Everything here reflects what's actually built and deployed, not what's planned. Where
+  something isn't built yet, it says so directly instead of being left out.</p>
+  <p class="updated">Last updated <b>August 10, 2026</b>. Live backend:
+  <code>https://mmm-back-end-anas.onrender.com/api/v1</code>. See
+  <code>API-REFERENCE.md</code> in the same folder for the plain-text version of this same
+  information.</p>
+</header>
+
+<nav class="toc">
+  <h2>On this page</h2>
+  <ol>
+    <li><a href="#base">Base URL and environments</a></li>
+    <li><a href="#auth">Authentication</a></li>
+    <li><a href="#errors">Error format and status codes</a></li>
+    <li><a href="#health">GET /health</a></li>
+    <li><a href="#me">GET /auth/me</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#model">Data model: Project</a></li>
+    <li><a href="#notbuilt">Not built yet</a></li>
+    <li><a href="#tenancy">Multi-tenancy</a></li>
+  </ol>
+</nav>
+
+<h2 class="section" id="base"><span class="num">01</span>Base URL and environments</h2>
+<table>
+  <tr><th>Environment</th><th>URL</th></tr>
+  <tr><td>Shared Dev (live now, Render)</td><td><code>https://mmm-back-end-anas.onrender.com/api/v1</code></td></tr>
+  <tr><td>Local development</td><td><code>http://localhost:3000/api/v1</code></td></tr>
+</table>
+<div class="watch">
+  <span class="lbl">This is Dev infrastructure, not production</span>
+  <p>Render and Vercel are a stopgap until real Azure infrastructure exists (App Service, Postgres
+  Flexible Server). Don't treat this URL as a stable, permanent address, it will change when the
+  team moves to Azure. See <code>PLATFORM.md</code> for the full architecture picture.</p>
+</div>
+<p>Every route on this page sits under the <code>/api/v1</code> prefix already. There is no
+unprefixed API.</p>
+
+<h2 class="section" id="auth"><span class="num">02</span>Authentication</h2>
+<p class="section-why">Every route requires a valid bearer token except <code>GET /health</code>.
+There is no API key and no session cookie, authentication is exclusively a real Microsoft Entra ID
+access token.</p>
+
+<div class="card">
+  <table>
+    <tr><th>Value</th><th></th></tr>
+    <tr><td>Client ID</td><td><code>fa733969-d53d-46ed-81fc-119c740a5cc9</code></td></tr>
+    <tr><td>Tenant ID</td><td><code>d5619769-1863-41fe-86e3-95000d84f2a6</code></td></tr>
+    <tr><td>Scope</td><td><code>api://fa733969-d53d-46ed-81fc-119c740a5cc9/access_as_user</code></td></tr>
+    <tr><td>Header</td><td><code>Authorization: Bearer &lt;token&gt;</code></td></tr>
+  </table>
+  <p>Authorization Code + PKCE flow, no client secret, this is a public client (both the Postman
+  collection and the real frontend use it this way).</p>
+</div>
+
+<div class="callout">
+  <span class="lbl">First login provisions the account automatically</span>
+  <p>The first successful authenticated request from any real Microsoft account creates a tenant
+  and user record if none exists yet. No invite, no separate signup call. Everyone signing in from
+  the same company (<code>@convergentbt.com</code>) lands in one shared tenant. The first user
+  provisioned into a brand-new tenant is automatically given the <code>administrator</code> role.</p>
+</div>
+
+<h2 class="section" id="errors"><span class="num">03</span>Error format and status codes</h2>
+<p class="section-why">Every error, from every endpoint, comes back in this exact shape:</p>
+<pre class="block"><code>{
+  "statusCode": 404,
+  "message": "Project 1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3 not found.",
+  "path": "/api/v1/projects/1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "timestamp": "2026-08-07T10:18:26.902Z"
+}</code></pre>
+<p><code>message</code> is a plain string for most errors, or an array of strings for validation
+failures (multiple invalid fields listed together). Handle both shapes.</p>
+
+<div class="status-grid">
+  <span class="status-pill">200 success</span>
+  <span class="status-pill">201 created</span>
+  <span class="status-pill">204 success, no body</span>
+  <span class="status-pill">400 malformed input</span>
+  <span class="status-pill">401 missing/invalid token</span>
+  <span class="status-pill">403 not allowed</span>
+  <span class="status-pill">404 doesn't exist or isn't yours</span>
+</div>
+<div class="watch">
+  <span class="lbl">Row-Level Security means 404, not 403, across tenants</span>
+  <p>A project belonging to another tenant returns <code>404</code>, not <code>403</code>. There is
+  no way to tell "doesn't exist" apart from "not yours" from the response, that's intentional, not
+  an oversight.</p>
+</div>
+
+<h2 class="section" id="health"><span class="num">04</span>GET /health</h2>
+<h3 class="endpoint"><span class="method get">GET</span>/health</h3>
+<p class="endpoint-desc">Public, no authentication required.</p>
+<pre class="block"><code>{ "status": "ok", "database": "connected", "timestamp": "2026-08-07T10:18:07.469Z" }</code></pre>
+
+<h2 class="section" id="me"><span class="num">05</span>GET /auth/me</h2>
+<h3 class="endpoint"><span class="method get">GET</span>/auth/me</h3>
+<p class="endpoint-desc">Returns what the token resolved to, and this platform's own internal ids.
+The right first call to make when debugging any connection issue, if this fails, nothing else
+will work either.</p>
+<pre class="block"><code>{
+  "oid": "the Entra object id",
+  "tid": "the Entra tenant id that issued the token",
+  "email": "the signed-in user's email",
+  "name": "the signed-in user's display name",
+  "devBypass": false,
+  "tenantId": "this platform's own tenant id (uuid)",
+  "userId": "this platform's own user id (uuid)"
+}</code></pre>
+
+<h2 class="section" id="projects"><span class="num">06</span>Projects</h2>
+<p class="section-why">The only real business entity implemented so far. Every route below requires
+auth and is automatically scoped to the caller's own tenant, enforced by the database itself
+(Row-Level Security), not just application code.</p>
+
+<h3 class="endpoint"><span class="method post">POST</span>/projects</h3>
+<p class="endpoint-desc">Creates a project owned by the signed-in user, in their own tenant.</p>
+<div class="card">
+  <p><b>Request body</b></p>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Required</th><th>Constraints</th></tr>
+    <tr><td><code>name</code></td><td>string</td><td>yes</td><td>1 to 200 characters</td></tr>
+    <tr><td><code>description</code></td><td>string</td><td>no</td><td>up to 2000 characters</td></tr>
+  </table>
+  <p>Any field not in this list is rejected with <code>400</code>, unknown fields are never
+  silently ignored. <code>status</code> cannot be set on create, every new project starts
+  <code>"active"</code>.</p>
+  <p><b>Response, 201:</b> the full project object, see the data model below.</p>
+</div>
+
+<h3 class="endpoint"><span class="method get">GET</span>/projects</h3>
+<p class="endpoint-desc">Lists every project in the signed-in user's tenant. No pagination,
+filtering, or sorting yet, this returns the full list every time. Response is an array, possibly
+empty (<code>[]</code>).</p>
+
+<h3 class="endpoint"><span class="method get">GET</span>/projects/:id</h3>
+<p class="endpoint-desc">Returns one project by id.</p>
+<table>
+  <tr><th>Case</th><th>Response</th></tr>
+  <tr><td>Malformed id (not a valid UUID)</td><td><code>400</code></td></tr>
+  <tr><td>Well-formed id that doesn't exist, or belongs to another tenant</td><td><code>404</code></td></tr>
+  <tr><td>Otherwise</td><td><code>200</code>, the project object</td></tr>
+</table>
+
+<h3 class="endpoint"><span class="method patch">PATCH</span>/projects/:id</h3>
+<p class="endpoint-desc">Partial update. Only send the fields actually changing, fields you don't
+send are left completely untouched (a real bug where omitted fields used to get wiped to
+<code>null</code> was found and fixed August 6, this is safe to rely on now).</p>
+<div class="card">
+  <p><b>Request body</b>, any subset of:</p>
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Constraints</th></tr>
+    <tr><td><code>name</code></td><td>string</td><td>1 to 200 characters</td></tr>
+    <tr><td><code>description</code></td><td>string</td><td>up to 2000 characters</td></tr>
+    <tr><td><code>status</code></td><td>string</td><td><code>"active"</code> or <code>"archived"</code></td></tr>
+  </table>
+  <p><b>Only the project's owner may update it.</b> Anyone else, even in the same tenant, gets
+  <code>403</code>, <code>"Only the project owner can do this."</code></p>
+  <p><b>Response, 200:</b> the full, updated project object.</p>
+</div>
+
+<h3 class="endpoint"><span class="method delete">DELETE</span>/projects/:id</h3>
+<p class="endpoint-desc">Soft delete. The row is not removed from the database, <code>deletedAt</code>
+gets set. A deleted project no longer appears in <code>GET /projects</code>, and
+<code>GET /projects/:id</code> returns <code>404</code> for it afterward. Same ownership rule as
+<code>PATCH</code>, non-owners get <code>403</code>. <b>Response, 204, no body.</b></p>
+
+<h2 class="section" id="model"><span class="num">07</span>Data model: Project</h2>
+<pre class="block"><code>{
+  "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
+  "createdAt": "2026-08-06T11:51:35.322Z",
+  "updatedAt": "2026-08-06T12:03:11.837Z",
+  "tenantId": "c7d1d3f5-673f-428d-9f89-3125df7d4eb2",
+  "name": "Q4 Brand Campaign",
+  "description": "First real project",
+  "ownerId": "6d3f500e-acaf-4f21-a9b5-30621a8f34bc",
+  "status": "active",
+  "deletedAt": null
+}</code></pre>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td><code>id</code></td><td>uuid</td><td></td></tr>
+  <tr><td><code>createdAt</code></td><td>ISO 8601 string</td><td></td></tr>
+  <tr><td><code>updatedAt</code></td><td>ISO 8601 string</td><td></td></tr>
+  <tr><td><code>tenantId</code></td><td>uuid</td><td>Always the caller's own tenant</td></tr>
+  <tr><td><code>name</code></td><td>string</td><td></td></tr>
+  <tr><td><code>description</code></td><td>string or null</td><td></td></tr>
+  <tr><td><code>ownerId</code></td><td>uuid</td><td>Matches a <code>userId</code> from <code>/auth/me</code></td></tr>
+  <tr><td><code>status</code></td><td><code>"active"</code> or <code>"archived"</code></td><td></td></tr>
+  <tr><td><code>deletedAt</code></td><td>ISO 8601 string or null</td><td>Non-null only on a soft-deleted row, which you won't normally see, deleted rows are excluded from responses</td></tr>
+</table>
+
+<h2 class="section" id="notbuilt"><span class="num">08</span>Not built yet</h2>
+<p class="section-why">For both the frontend and modeling teams: do not build against these as if
+they exist. Calling them today returns <code>404</code>, route not found, not any signal that
+they're simply unfinished.</p>
+<div class="not-built">
+  <h4>Real, on the roadmap, not live</h4>
+  <ul>
+    <li><b>Datasets</b> (<code>/datasets</code>) &middot; <code>CMP-38</code> &middot; upload,
+    validation, Blob storage</li>
+    <li><b>Experiments</b> (<code>/experiments</code>) &middot; <code>CMP-39</code>/<code>CMP-43</code>
+    &middot; run, results, logs</li>
+    <li><b>Jobs / job queue</b> (<code>/jobs</code>) &middot; status polling, the interface the
+    Python modeling worker will actually talk through</li>
+    <li><b>Notifications</b> &middot; not started</li>
+  </ul>
+</div>
+<div class="watch">
+  <span class="lbl">For the modeling team specifically</span>
+  <p>The backend never fits a model itself, and the job queue contract between this API and the
+  Python worker hasn't been defined yet (that's <code>CMP-79</code> in the backend sequence, before
+  the actual job orchestration work). When that contract exists, it gets documented here, in the
+  same place, not a separate document that can drift out of sync.</p>
+</div>
+
+<h2 class="section" id="tenancy"><span class="num">09</span>Multi-tenancy</h2>
+<ul>
+  <li>Every real user belongs to exactly one tenant, resolved automatically from their Microsoft
+  account on first login.</li>
+  <li>Tenant isolation is enforced at the database level, Postgres Row-Level Security, not just
+  filtered in application code. Directly tested, not assumed: a query with no tenant context set
+  returns zero rows even for an admin database account, fails closed, not open.</li>
+</ul>
+
+<footer>
+  <img class="footer-logo" src="../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  MMM Platform &middot; API Reference &middot; kept updated alongside the real backend. Questions or
+  anything that doesn't match what you observe: ask directly rather than guessing, this document is
+  meant to be corrected the moment it drifts from reality.
+</footer>
+
+</div>
+</body>
+</html>
