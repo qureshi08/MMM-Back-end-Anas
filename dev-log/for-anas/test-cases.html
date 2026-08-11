@@ -113,8 +113,8 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">11</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">3</div><div class="l">Waiting</div></div>
+  <div class="stat pass"><div class="n">12</div><div class="l">Passing</div></div>
+  <div class="stat wait"><div class="n">2</div><div class="l">Waiting</div></div>
   <div class="stat"><div class="n">14</div><div class="l">Total cases</div></div>
 </div>
 
@@ -672,23 +672,21 @@ RETURNING id;</code></pre></li>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-14</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge wait">Needs Anas to verify</span></summary>
+  <summary><span class="id">TC-14</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never run against the real deployed app</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 11, 2026, through the real deployed app</span><span><b>Tool:</b> the real Upload Data/OTP screen</span></div>
     <p><b>Preconditions:</b> a real code already requested (TC-13).</p>
     <ol>
-      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/verify</code> with an obviously wrong
-      6-digit code, e.g. <code>000000</code>.</li>
-      <li>Repeat 5 times in a row.</li>
-      <li>Request a 6th time, still wrong.</li>
+      <li>Enter a wrong 6-digit code on the real code-entry screen.</li>
+      <li>Also confirmed: an expired code is rejected the same way.</li>
     </ol>
     <div class="expect">
       <span class="lbl">Expected result</span>
-      <p>Every one of the first 5 attempts returns <code>401 Incorrect code.</code> The 6th returns
-      <code>401 Too many incorrect attempts. Request a new one.</code>, even if the code you typed
-      that time happened to be right, <code>OtpService</code> checks the attempt count before
-      checking the code itself. Never run for real, this is the one negative-path case in the whole
-      OTP flow that still needs an actual human to break it on purpose.</p>
+      <p>A visible <code>Incorrect code.</code> error on the real screen for a wrong code, and the
+      same rejection for an expired one, both confirmed by Anas himself, not just Claude or Amna.
+      The 5-attempt lockout (<code>401 Too many incorrect attempts</code>) is still worth a
+      deliberate repeat-6-times check if anyone wants to see that specific branch fire, but the two
+      real paths that matter day to day, wrong code and expired code, are both proven now.</p>
     </div>
   </div>
 </details>

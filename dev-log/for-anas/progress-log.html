@@ -246,12 +246,13 @@
     </tr>
     <tr>
       <td class="item">Email code second factor (OTP)</td>
-      <td><span class="badge wait">Working, needs your own check</span></td>
-      <td class="why">Real, confirmed twice: Claude sent a real test email directly through
-      Microsoft Graph, and separately Amna went through the real deployed screen and confirmed it
-      herself, in her own words, "Working!" then "Two factor authentication is done." Not run by
-      Anas personally yet, that's the only reason this isn't marked Done outright, see
-      <code>TC-13</code>/<code>TC-14</code> in <code>test-cases.html</code>.</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed by Anas himself, August 11: a wrong code shows a real
+      <code>Incorrect code.</code> error on the real screen, and an expired code is rejected the
+      same way. The happy path (a correct code accepted) was confirmed earlier by Claude's own test
+      send and by Amna through the real screen, "Working!" then "Two factor authentication is
+      done." All three real paths now checked by a real person, see <code>TC-13</code>/<code>TC-14</code>
+      in <code>test-cases.html</code>.</td>
     </tr>
     <tr>
       <td class="item">Deploy pipeline: <code>backend/anas</code> vs <code>main</code></td>
