@@ -172,7 +172,7 @@
 one box from this picture.</p>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling and Projects are built and live, Datasets and Experiments-and-Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced. Two dashed, not-yet-built paths branch off: Datasets would connect to Blob Storage, and Experiments and Jobs would connect to a Job Queue, which would connect to a Python Modeling Worker. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling, the OTP email second factor, Projects, and Datasets are all built and live, Experiments and Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced, and also to Cloudflare R2, live, where dataset files actually live. One dashed, not-yet-built path branches off: Experiments and Jobs would connect to a Job Queue, which would connect to a Python Modeling Worker. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
 
 <text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">A REAL REQUEST, TOP TO BOTTOM</text>
 
@@ -201,35 +201,36 @@ one box from this picture.</p>
 <text x="60" y="284" font-size="12.5" font-weight="700" fill="#0C1A10">NESTJS BACKEND &middot; RENDER &middot; LIVE</text>
 <text x="60" y="302" font-size="11" font-family="JetBrains Mono, monospace" fill="#6B7280">mmm-back-end-anas.onrender.com/api/v1</text>
 
-<rect x="60" y="316" width="260" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<rect x="60" y="316" width="180" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="80" y="340" font-size="11.5" font-weight="700" fill="#007A3D">AUTH GUARD +</text>
 <text x="80" y="356" font-size="11.5" font-weight="700" fill="#007A3D">TENANT INTERCEPTOR</text>
-<text x="80" y="380" font-size="10.5" fill="#374151">Validates the real token,</text>
-<text x="80" y="396" font-size="10.5" fill="#374151">auto-provisions tenant/user</text>
-<text x="80" y="412" font-size="10.5" fill="#374151">on first login, sets</text>
-<text x="80" y="428" font-size="10.5" font-family="JetBrains Mono, monospace" fill="#374151">app.tenant_id</text>
-<text x="80" y="448" font-size="10.5" fill="#374151">before any query runs</text>
+<text x="80" y="380" font-size="10.5" font-weight="400" fill="#374151">Validates token, sets</text>
+<text x="80" y="396" font-size="10.5" font-weight="400" fill="#374151">app.tenant_id before</text>
+<text x="80" y="412" font-size="10.5" font-weight="400" fill="#374151">any query runs</text>
 
-<rect x="336" y="316" width="200" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="356" y="340" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS MODULE</text>
-<text x="356" y="364" font-size="10.5" fill="#374151">create &middot; list &middot; view</text>
-<text x="356" y="380" font-size="10.5" fill="#374151">edit &middot; soft delete</text>
-<text x="356" y="404" font-size="10.5" fill="#374151">Owner-only edit/delete,</text>
-<text x="356" y="420" font-size="10.5" fill="#374151">verified with a real</text>
-<text x="356" y="436" font-size="10.5" fill="#374151">second user</text>
+<rect x="252" y="316" width="157" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="272" y="340" font-size="11.5" font-weight="700" fill="#007A3D">OTP MODULE</text>
+<text x="272" y="364" font-size="10.5" font-weight="400" fill="#374151">Email code, real</text>
+<text x="272" y="380" font-size="10.5" font-weight="400" fill="#374151">second factor, Graph</text>
+<text x="272" y="396" font-size="10.5" font-weight="400" fill="#374151">mail, verified live</text>
 
-<rect x="552" y="316" width="176" height="150" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="572" y="340" font-size="11.5" font-weight="700" fill="#4B5563">DATASETS MODULE</text>
-<text x="572" y="364" font-size="10.5" fill="#6B7280">Not built yet</text>
-<text x="572" y="382" font-size="10.5" fill="#6B7280">CMP-38: upload, then</text>
-<text x="572" y="398" font-size="10.5" fill="#6B7280">Configure (column mapping),</text>
-<text x="572" y="414" font-size="10.5" fill="#6B7280">storage: Cloudflare R2</text>
+<rect x="421" y="316" width="160" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="441" y="340" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS MODULE</text>
+<text x="441" y="364" font-size="10.5" font-weight="400" fill="#374151">create - list - view</text>
+<text x="441" y="380" font-size="10.5" font-weight="400" fill="#374151">edit - soft delete</text>
+<text x="441" y="396" font-size="10.5" font-weight="400" fill="#374151">Owner-only edit/delete</text>
 
-<rect x="744" y="316" width="136" height="150" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="764" y="340" font-size="11" font-weight="700" fill="#4B5563">EXPERIMENTS</text>
-<text x="764" y="356" font-size="11" font-weight="700" fill="#4B5563">+ JOBS</text>
-<text x="764" y="380" font-size="10.5" fill="#6B7280">Not built yet</text>
-<text x="764" y="398" font-size="10.5" fill="#6B7280">CMP-39/43</text>
+<rect x="593" y="316" width="140" height="150" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="613" y="340" font-size="11.5" font-weight="700" fill="#007A3D">DATASETS MODULE</text>
+<text x="613" y="364" font-size="10.5" font-weight="400" fill="#374151">Upload + R2, live.</text>
+<text x="613" y="380" font-size="10.5" font-weight="400" fill="#374151">Configure, checks:</text>
+<text x="613" y="396" font-size="10.5" font-weight="400" fill="#374151">not built yet</text>
+
+<rect x="745" y="316" width="135" height="150" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="765" y="340" font-size="11.5" font-weight="700" fill="#4B5563">EXPERIMENTS</text>
+<text x="765" y="356" font-size="11.5" font-weight="700" fill="#4B5563">+ JOBS</text>
+<text x="765" y="380" font-size="10.5" font-weight="400" fill="#6B7280">Not built yet</text>
+<text x="765" y="396" font-size="10.5" font-weight="400" fill="#6B7280">CMP-39/43</text>
 
 <line x1="190" y1="490" x2="190" y2="516" stroke="#6B7280" stroke-width="1.6" marker-end="url(#arrow)"/>
 <text x="205" y="507" font-size="10.5" fill="#6B7280">the real query, tenant-scoped</text>
@@ -240,11 +241,11 @@ one box from this picture.</p>
 <text x="60" y="586" font-size="11" fill="#374151">admin role. tenants &middot; users &middot; projects</text>
 <text x="60" y="602" font-size="11" fill="#374151">hold real data for three real people.</text>
 
-<line x1="632" y1="466" x2="632" y2="516" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
-<rect x="552" y="522" width="176" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="572" y="546" font-size="11.5" font-weight="700" fill="#4B5563">CLOUDFLARE R2</text>
-<text x="572" y="566" font-size="10.5" fill="#6B7280">Dev stand-in for Blob</text>
-<text x="572" y="582" font-size="10.5" fill="#6B7280">CMP-38</text>
+<line x1="632" y1="466" x2="632" y2="516" stroke="#6B7280" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="552" y="522" width="176" height="70" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="572" y="546" font-size="11.5" font-weight="700" fill="#007A3D">CLOUDFLARE R2</text>
+<text x="572" y="566" font-size="10.5" fill="#374151">Dev stand-in for Blob,</text>
+<text x="572" y="582" font-size="10.5" fill="#374151">live: upload/download</text>
 
 <line x1="812" y1="466" x2="812" y2="516" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
 <rect x="744" y="522" width="136" height="70" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
@@ -309,37 +310,38 @@ one box from this picture.</p>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 210" role="img" aria-label="The navigation tunnel, confirmed 2026-08-11: sign in, then only a project list is visible with no other navigation, then Upload Data (a model dropdown plus the dataset file, same screen, same structure as Cassandra, one real model today, built to scale to more), then a Configure step mapping the dataset's columns, then a next step not yet decided. The first two steps are built and live; the last three are not built yet.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 210" role="img" aria-label="The navigation tunnel, updated 2026-08-11: sign in, then a real email code verification step confirmed working, then only a project list is visible with no other navigation, then Upload Data (a model dropdown plus the dataset file, backend live, no screen built yet), then Configure (column mapping, not built), then a next step not yet decided. The first three steps are built and live; the last three are not built yet.">
 <text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">THE TUNNEL: WHAT A SIGNED-IN USER CAN REACH, IN ORDER, NOTHING ELSE</text>
 
-<rect x="20" y="60" width="168" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<rect x="20" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="34" y="86" font-size="11.5" font-weight="700" fill="#007A3D">SIGN IN</text>
-<text x="34" y="106" font-size="10.5" fill="#374151">Microsoft account,</text>
-<text x="34" y="122" font-size="10.5" fill="#374151">MFA via Entra tenant</text>
-<line x1="188" y1="115" x2="199" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-
-<rect x="203" y="60" width="168" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="217" y="86" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS</text>
-<text x="217" y="106" font-size="10.5" fill="#374151">Only nav item shown.</text>
-<text x="217" y="122" font-size="10.5" fill="#374151">Create or pick one</text>
-<line x1="371" y1="115" x2="382" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
-
-<rect x="386" y="60" width="168" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="400" y="86" font-size="11.5" font-weight="700" fill="#4B5563">UPLOAD DATA</text>
-<text x="400" y="106" font-size="10.5" fill="#6B7280">Model dropdown (1 today,</text>
-<text x="400" y="122" font-size="10.5" fill="#6B7280">scalable) + the file</text>
-<line x1="554" y1="115" x2="565" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
-
-<rect x="569" y="60" width="168" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="583" y="86" font-size="11.5" font-weight="700" fill="#4B5563">CONFIGURE</text>
-<text x="583" y="106" font-size="10.5" fill="#6B7280">Column mapping,</text>
-<text x="583" y="122" font-size="10.5" fill="#6B7280">date/target/media/control</text>
-<line x1="737" y1="115" x2="748" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
-
-<rect x="752" y="60" width="168" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="766" y="86" font-size="11.5" font-weight="700" fill="#4B5563">NEXT STEP</text>
-<text x="766" y="106" font-size="10.5" fill="#6B7280">Run / Experiment,</text>
-<text x="766" y="122" font-size="10.5" fill="#6B7280">not decided yet</text>
+<text x="34" y="106" font-size="10.5" font-weight="400" fill="#374151">Microsoft account,</text>
+<text x="34" y="122" font-size="10.5" font-weight="400" fill="#374151">MFA via Entra tenant</text>
+<line x1="160" y1="115" x2="166" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
+<rect x="170" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="184" y="86" font-size="11.5" font-weight="700" fill="#007A3D">VERIFY</text>
+<text x="184" y="106" font-size="10.5" font-weight="400" fill="#374151">Email code, real,</text>
+<text x="184" y="122" font-size="10.5" font-weight="400" fill="#374151">confirmed by Amna</text>
+<line x1="310" y1="115" x2="316" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
+<rect x="320" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="334" y="86" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS</text>
+<text x="334" y="106" font-size="10.5" font-weight="400" fill="#374151">Only nav item shown.</text>
+<text x="334" y="122" font-size="10.5" font-weight="400" fill="#374151">Create or pick one</text>
+<line x1="460" y1="115" x2="466" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
+<rect x="470" y="60" width="140" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="484" y="86" font-size="11.5" font-weight="700" fill="#4B5563">UPLOAD DATA</text>
+<text x="484" y="106" font-size="10.5" font-weight="400" fill="#6B7280">Model + file, API</text>
+<text x="484" y="122" font-size="10.5" font-weight="400" fill="#6B7280">live, no screen yet</text>
+<line x1="610" y1="115" x2="616" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
+<rect x="620" y="60" width="140" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="634" y="86" font-size="11.5" font-weight="700" fill="#4B5563">CONFIGURE</text>
+<text x="634" y="106" font-size="10.5" font-weight="400" fill="#6B7280">Column mapping,</text>
+<text x="634" y="122" font-size="10.5" font-weight="400" fill="#6B7280">not built yet</text>
+<line x1="760" y1="115" x2="766" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
+<rect x="770" y="60" width="140" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="784" y="86" font-size="11.5" font-weight="700" fill="#4B5563">NEXT STEP</text>
+<text x="784" y="106" font-size="10.5" font-weight="400" fill="#6B7280">Run / Experiment,</text>
+<text x="784" y="122" font-size="10.5" font-weight="400" fill="#6B7280">not decided yet</text>
 
 <defs>
 <marker id="tunarrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
@@ -444,7 +446,7 @@ one box from this picture.</p>
 <h2 class="section" id="backend"><span class="num">03</span>The backend, file by file</h2>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 492" role="img" aria-label="Every backend module grouped into boxes: main and config, database and migrations, common utilities, health, auth, tenants and users all live and green; projects live and green; datasets and experiments-plus-jobs dashed grey, not built yet."><rect x="40" y="70" width="270" height="93" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 606" role="img" aria-label="Every backend module grouped into boxes: main and config, database and migrations, common utilities, health, auth, tenants and users, projects, and datasets are all live and green; the OTP module is also live and green, built 2026-08-11; experiments-plus-jobs is dashed grey, not built yet."><rect x="40" y="70" width="270" height="93" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="54" y="96" font-size="11.5" font-weight="700" fill="#007A3D">MAIN + CONFIG</text>
 <text x="54" y="114" font-size="10" font-weight="400" fill="#374151">main.ts</text>
 <text x="54" y="129" font-size="10" font-weight="400" fill="#374151">env.validation.ts</text>
@@ -481,14 +483,27 @@ one box from this picture.</p>
 <text x="54" y="423" font-size="10" font-weight="400" fill="#374151">dto/create-project.dto.ts</text>
 <text x="54" y="438" font-size="10" font-weight="400" fill="#374151">dto/update-project.dto.ts</text>
 <text x="54" y="453" font-size="10" font-weight="400" fill="#374151">CMP-41, full CRUD, built</text>
-<rect x="335" y="334" width="270" height="78" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="349" y="360" font-size="11.5" font-weight="700" fill="#4B5563">DATASETS MODULE</text>
-<text x="349" y="378" font-size="10" font-weight="400" fill="#6B7280">doesn't exist yet</text>
-<text x="349" y="393" font-size="10" font-weight="400" fill="#6B7280">CMP-38: model + dataset, R2</text>
-<rect x="630" y="334" width="270" height="78" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<rect x="335" y="334" width="270" height="138" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="349" y="360" font-size="11.5" font-weight="700" fill="#007A3D">DATASETS MODULE</text>
+<text x="349" y="378" font-size="10" font-weight="400" fill="#374151">datasets.controller.ts</text>
+<text x="349" y="393" font-size="10" font-weight="400" fill="#374151">datasets.service.ts</text>
+<text x="349" y="408" font-size="10" font-weight="400" fill="#374151">storage/cloudflare-r2-storage.service.ts</text>
+<text x="349" y="423" font-size="10" font-weight="400" fill="#374151">entities/dataset.entity.ts</text>
+<text x="349" y="438" font-size="10" font-weight="400" fill="#374151">CMP-38, upload + R2 live,</text>
+<text x="349" y="453" font-size="10" font-weight="400" fill="#374151">Configure/validation not built</text>
+<rect x="630" y="334" width="270" height="138" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
 <text x="644" y="360" font-size="11.5" font-weight="700" fill="#4B5563">EXPERIMENTS + JOBS</text>
 <text x="644" y="378" font-size="10" font-weight="400" fill="#6B7280">don't exist yet</text>
 <text x="644" y="393" font-size="10" font-weight="400" fill="#6B7280">CMP-39 / CMP-43 / CMP-79</text>
+<rect x="40" y="496" width="270" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="54" y="522" font-size="11.5" font-weight="700" fill="#007A3D">OTP MODULE</text>
+<text x="54" y="540" font-size="10" font-weight="400" fill="#374151">otp.controller.ts, otp.service.ts</text>
+<text x="54" y="555" font-size="10" font-weight="400" fill="#374151">mail/graph-mail.service.ts</text>
+<text x="54" y="570" font-size="10" font-weight="400" fill="#374151">Real email 2nd factor, live, tested</text>
+<rect x="335" y="496" width="270" height="90" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="349" y="522" font-size="11.5" font-weight="700" fill="#4B5563">otp-verified.interceptor.ts</text>
+<text x="349" y="540" font-size="10" font-weight="400" fill="#6B7280">Built, not wired to any route</text>
+<text x="349" y="555" font-size="10" font-weight="400" fill="#6B7280">yet, waiting on a frontend screen</text>
 </svg>
 </div>
 
@@ -593,8 +608,10 @@ one box from this picture.</p>
 </div>
 
 <h2 class="section" id="notyet"><span class="num">05</span>Not built yet</h2>
-<p class="figcap">Every dashed box in Section 00 and 03 above: Datasets, Experiments, Jobs, Blob
-Storage, Job Queue, the Python Modeling Worker.</p>
+<p class="figcap">Every dashed box in Section 00 and 03 above: Configure (column mapping and
+upload-time validation), Experiments, Jobs, Blob Storage, Job Queue, the Python Modeling Worker,
+and wiring <code>OtpVerifiedInterceptor</code> to any real route. Datasets itself moved out of this
+list 2026-08-11, upload and Cloudflare R2 storage are both real and live now.</p>
 
 <h2 class="section" id="azure"><span class="num">06</span>The Azure Marketplace target</h2>
 
