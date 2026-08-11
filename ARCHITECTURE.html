@@ -510,100 +510,175 @@ one box from this picture.</p>
 <h2 class="section" id="db"><span class="num">04</span>The database, column by column</h2>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 514" role="img" aria-label="Three real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, and projects additionally linked to users by an owner_id foreign key.">
-<rect x="320" y="30" width="300" height="162" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
-<rect x="320" y="30" width="300" height="32" rx="10" fill="#E6F5ED"/>
-<rect x="320" y="52" width="300" height="10" fill="#E6F5ED"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 906" role="img" aria-label="Five real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, then datasets linked to projects by a project_id foreign key and otp_codes linked to users by a user_id foreign key. Every table also carries its own tenant_id foreign key back to tenants, omitted from the arrows here for clarity but present in every one.">
+<rect x="300.0" y="30" width="340" height="162" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="300.0" y="30" width="340" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="300.0" y="52" width="340" height="10" fill="#E6F5ED"/>
 <text x="470.0" y="51" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">TENANTS</text>
-<text x="334" y="77" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
-<text x="492" y="77" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="608" y="77" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
-<text x="334" y="97" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
-<text x="492" y="97" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="334" y="117" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
-<text x="492" y="117" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="608" y="117" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
-<text x="334" y="137" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">external_key</text>
-<text x="492" y="137" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="608" y="137" font-size="9.5" font-weight="400" fill="#6B7280">unique</text>
-<text x="334" y="157" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="492" y="157" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="334" y="177" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="492" y="177" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<rect x="30" y="262" width="430" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
-<rect x="30" y="262" width="430" height="32" rx="10" fill="#E6F5ED"/>
-<rect x="30" y="284" width="430" height="10" fill="#E6F5ED"/>
-<text x="245.0" y="283" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">USERS</text>
-<text x="44" y="309" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
-<text x="202" y="309" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="318" y="309" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
-<text x="44" y="329" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
-<text x="202" y="329" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="318" y="329" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
-<text x="44" y="349" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">email</text>
-<text x="202" y="349" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="318" y="349" font-size="9.5" font-weight="400" fill="#6B7280">unique per tenant</text>
-<text x="44" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">first_name</text>
-<text x="202" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="44" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">last_name</text>
-<text x="202" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="44" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">global_role</text>
-<text x="202" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="318" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 4 values</text>
-<text x="44" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="202" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="44" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="202" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="44" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
-<text x="202" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="318" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
-<rect x="490" y="262" width="430" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
-<rect x="490" y="262" width="430" height="32" rx="10" fill="#E6F5ED"/>
-<rect x="490" y="284" width="430" height="10" fill="#E6F5ED"/>
-<text x="705.0" y="283" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">PROJECTS</text>
-<text x="504" y="309" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
-<text x="662" y="309" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="778" y="309" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
-<text x="504" y="329" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
-<text x="662" y="329" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="778" y="329" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
-<text x="504" y="349" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
-<text x="662" y="349" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="504" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">description</text>
-<text x="662" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="778" y="369" font-size="9.5" font-weight="400" fill="#6B7280">nullable</text>
-<text x="504" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">owner_id</text>
-<text x="662" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="778" y="389" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
-<text x="504" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
-<text x="662" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="778" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
-<text x="504" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="662" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="504" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="662" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="504" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
-<text x="662" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="778" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
-<line x1="420" y1="192" x2="220" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow)"/>
-<text x="280" y="221.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
-<line x1="620" y1="192" x2="760" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow)"/>
-<text x="660" y="221.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
-<line x1="460" y1="302" x2="490" y2="302" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow)"/>
-<text x="475.0" y="294" font-size="9.5" font-weight="400" fill="#6B7280" text-anchor="middle">owner_id FK</text>
-<defs><marker id="erdarrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
+<text x="314.0" y="77" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="472.0" y="77" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="600.0" y="77" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="314.0" y="97" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
+<text x="472.0" y="97" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="314.0" y="117" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
+<text x="472.0" y="117" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="600.0" y="117" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
+<text x="314.0" y="137" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">external_key</text>
+<text x="472.0" y="137" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="600.0" y="137" font-size="9.5" font-weight="400" fill="#6B7280">unique</text>
+<text x="314.0" y="157" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="472.0" y="157" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="314.0" y="177" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="472.0" y="177" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<rect x="40" y="262" width="420" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="40" y="262" width="420" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="40" y="284" width="420" height="10" fill="#E6F5ED"/>
+<text x="250.0" y="283" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">USERS</text>
+<text x="54" y="309" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="212" y="309" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="340" y="309" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="54" y="329" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
+<text x="212" y="329" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="340" y="329" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
+<text x="54" y="349" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">email</text>
+<text x="212" y="349" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="349" font-size="9.5" font-weight="400" fill="#6B7280">unique per tenant</text>
+<text x="54" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">first_name</text>
+<text x="212" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="54" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">last_name</text>
+<text x="212" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="54" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">global_role</text>
+<text x="212" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 4 values</text>
+<text x="54" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="212" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="54" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="212" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="54" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="212" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
+<rect x="480" y="262" width="420" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="480" y="262" width="420" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="480" y="284" width="420" height="10" fill="#E6F5ED"/>
+<text x="690.0" y="283" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">PROJECTS</text>
+<text x="494" y="309" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="652" y="309" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="780" y="309" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="494" y="329" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
+<text x="652" y="329" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="780" y="329" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
+<text x="494" y="349" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
+<text x="652" y="349" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="494" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">description</text>
+<text x="652" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="780" y="369" font-size="9.5" font-weight="400" fill="#6B7280">nullable</text>
+<text x="494" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">owner_id</text>
+<text x="652" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="780" y="389" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
+<text x="494" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
+<text x="652" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="780" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
+<text x="494" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="652" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="494" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="652" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="494" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="652" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="780" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
+<rect x="40" y="554" width="460" height="322" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="40" y="554" width="460" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="40" y="576" width="460" height="10" fill="#E6F5ED"/>
+<text x="270.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">DATASETS</text>
+<text x="54" y="601" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="212" y="601" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="340" y="601" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="54" y="621" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
+<text x="212" y="621" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="340" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
+<text x="54" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">project_id</text>
+<text x="212" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; projects, CASCADE</text>
+<text x="54" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
+<text x="212" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="54" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">model_type</text>
+<text x="212" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="681" font-size="9.5" font-weight="400" fill="#6B7280">check, 1 value today</text>
+<text x="54" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_provider</text>
+<text x="212" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="701" font-size="9.5" font-weight="400" fill="#6B7280">check, default r2</text>
+<text x="54" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_key</text>
+<text x="212" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="721" font-size="9.5" font-weight="400" fill="#6B7280">pointer, not the file</text>
+<text x="54" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_name</text>
+<text x="212" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="54" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_size_bytes</text>
+<text x="212" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">bigint</text>
+<text x="54" y="781" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">mime_type</text>
+<text x="212" y="781" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="54" y="801" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
+<text x="212" y="801" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="801" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
+<text x="54" y="821" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="212" y="821" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="54" y="841" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="212" y="841" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="54" y="861" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="212" y="861" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="861" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
+<rect x="520" y="554" width="380" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="520" y="554" width="380" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="520" y="576" width="380" height="10" fill="#E6F5ED"/>
+<text x="710.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">OTP_CODES</text>
+<text x="534" y="601" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="692" y="601" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="820" y="601" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="534" y="621" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
+<text x="692" y="621" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="820" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
+<text x="534" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">user_id</text>
+<text x="692" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="820" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
+<text x="534" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">code_hash</text>
+<text x="692" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="820" y="661" font-size="9.5" font-weight="400" fill="#6B7280">sha256, never the code</text>
+<text x="534" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">expires_at</text>
+<text x="692" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="820" y="681" font-size="9.5" font-weight="400" fill="#6B7280">10 min TTL</text>
+<text x="534" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">attempts</text>
+<text x="692" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">int</text>
+<text x="820" y="701" font-size="9.5" font-weight="400" fill="#6B7280">default 0, max 5</text>
+<text x="534" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">consumed_at</text>
+<text x="692" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="820" y="721" font-size="9.5" font-weight="400" fill="#6B7280">blocks replay</text>
+<text x="534" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="692" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="534" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="692" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<line x1="360.0" y1="192" x2="220" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="260.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
+<line x1="580.0" y1="192" x2="660" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="590.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
+<line x1="250.0" y1="484" x2="710.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="455.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">user_id FK</text>
+<line x1="690.0" y1="484" x2="270.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="450.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">project_id FK</text>
+<defs><marker id="erdarrow5" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
 </svg>
 </div>
+<p class="figcap">Every table also carries its own <code>tenant_id</code> straight back to
+<code>tenants</code>, the same <code>FORCE ROW LEVEL SECURITY</code> policy applies to all five,
+identical wording, see below. <code>datasets</code> and <code>otp_codes</code> are the two newest,
+built and migrated onto the real shared database 2026-08-11.</p>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 188" role="img" aria-label="The literal SQL that makes tenants unable to see each other's rows, run on both the users and projects tables.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 188" role="img" aria-label="The literal SQL that makes tenants unable to see each other's rows, run on all five tenant-owned tables: users, projects, datasets, and otp_codes.">
 <rect x="30" y="20" width="880" height="147.5" rx="7" fill="#0C1A10"/>
 <text x="44" y="43.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">ALTER TABLE "projects" ENABLE ROW LEVEL SECURITY;</text>
 <text x="44" y="59.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">ALTER TABLE "projects" FORCE ROW LEVEL SECURITY;   -- without FORCE, the app's own DB owner is exempt</text>
 <text x="44" y="91.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">CREATE POLICY "tenant_isolation" ON "projects"</text>
 <text x="44" y="107.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">  USING ("tenant_id" = current_setting('app.tenant_id', true)::uuid);</text>
 <text x="44" y="139.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">-- current_setting(..., true) = missing_ok: an unset session matches zero rows, not an error.</text>
-<text x="44" y="155.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">-- Fail closed, not open. Identical policy, same wording, on the users table.</text>
+<text x="44" y="155.5" font-size="11.5" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">-- Fail closed, not open. Identical policy, word for word, on users, datasets, and otp_codes too.</text>
 </svg>
 </div>
 
