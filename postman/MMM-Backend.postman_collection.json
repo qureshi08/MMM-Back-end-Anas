@@ -291,12 +291,148 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Datasets (CMP-38)",
+			"item": [
+				{
+					"name": "POST /projects/:projectId/datasets, upload a real file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"{{projectId}}",
+								"datasets"
+							]
+						},
+						"description": "Uploads a real file, stored in Cloudflare R2, with a real database row created for it. projectId is a Postman collection variable, set it once (right-click the collection, Edit, Variables tab) to a real project id from 'GET /projects, list' below, or from any project you already created. modelType must be exactly 'meridian', the only real value today, even though it's a real dropdown built to support more later.",
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Real Test Dataset",
+									"type": "text"
+								},
+								{
+									"key": "modelType",
+									"value": "meridian",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET /projects/:projectId/datasets, list",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"projects",
+								"{{projectId}}",
+								"datasets"
+							]
+						},
+						"description": "Every dataset uploaded for this project, most recent first."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Auth OTP (email second factor)",
+			"item": [
+				{
+					"name": "POST /auth/otp/request, send a real code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/otp/request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"otp",
+								"request"
+							]
+						},
+						"description": "No body needed. Sends a real 6-digit code to the signed-in user's own email, expires in 10 minutes. Check that inbox after sending this."
+					},
+					"response": []
+				},
+				{
+					"name": "POST /auth/otp/verify, check the code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/otp/verify",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"otp",
+								"verify"
+							]
+						},
+						"description": "Replace the code below with the real 6 digits from the email the request above sent you.",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
 		{
 			"key": "baseUrl",
 			"value": "http://localhost:3000"
+		},
+		{
+			"key": "projectId",
+			"value": ""
 		}
 	]
 }

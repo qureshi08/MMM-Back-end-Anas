@@ -113,8 +113,8 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">12</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">2</div><div class="l">Waiting</div></div>
+  <div class="stat pass"><div class="n">13</div><div class="l">Passing</div></div>
+  <div class="stat wait"><div class="n">1</div><div class="l">Waiting on you</div></div>
   <div class="stat"><div class="n">14</div><div class="l">Total cases</div></div>
 </div>
 
@@ -600,44 +600,94 @@ RETURNING id;</code></pre></li>
 
 <h2 class="section">Datasets (CMP-38)</h2>
 
+<div class="protocol" id="reimport-collection">
+  <h3>Do this first: re-import the Postman collection</h3>
+  <p style="margin:0 0 12px;max-width:72ch">Two new folders were just added to the collection file
+  itself, <b>Datasets (CMP-38)</b> and <b>Auth OTP</b>, real, ready-to-click requests, not something
+  to build from scratch. Postman doesn't see file changes on its own, it has to be told to
+  re-import.</p>
+  <ol style="margin:0 0 12px;max-width:72ch">
+    <li>In Postman, top left, <b>Import</b>.</li>
+    <li>Choose the file <code>Backend/postman/MMM-Backend.postman_collection.json</code> again.</li>
+    <li>Postman shows a <b>Replace</b> option since a collection with this name already exists,
+    choose that, not "Import as a copy." Your existing environment (with the real Render
+    <code>baseUrl</code> already set) is untouched, only the collection's requests update.</li>
+    <li>Confirm you now see <b>Datasets (CMP-38)</b> and <b>Auth OTP</b> as two new folders in the
+    left sidebar, alongside <b>Projects (CMP-41)</b>.</li>
+  </ol>
+</div>
+
 <details class="tc">
-  <summary><span class="id">TC-11</span><h3>Cloudflare R2: real upload, download, delete</h3><span class="badge wait">Needs Anas to verify</span></summary>
+  <summary><span class="id">TC-11</span><h3>Cloudflare R2: real upload, download, delete</h3><span class="badge pass">Passing (infrastructure check, nothing for you to run)</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>CloudflareR2StorageService</code>, not through the API)</span><span><b>Tool:</b> a throwaway <code>ts-node</code> script, deleted after</span></div>
-    <p><b>Preconditions:</b> <code>R2_ACCOUNT_ID</code>, <code>R2_ACCESS_KEY_ID</code>,
-    <code>R2_SECRET_ACCESS_KEY</code>, <code>R2_BUCKET_NAME</code> set in <code>.env</code>, the
-    real <code>mmm-datasets</code> bucket.</p>
-    <p><b>What ran:</b> uploaded a real text file to a real key, generated a real presigned download
-    URL, fetched that URL and confirmed the content came back byte-for-byte identical, then deleted
-    the object and confirmed cleanup.</p>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p><code>UPLOAD OK</code>, a real signed URL, the exact uploaded text on download, then
-      <code>DELETE OK</code>. All four happened. <b>This proves the storage credential works</b>,
-      not that a real user can upload a dataset through the app yet, that's TC-12, still waiting on
-      Amna's Upload Data screen.</p>
-    </div>
+    <p>This one isn't a step for you to repeat, there's no HTTP route that exercises raw storage on
+    its own, it's always wrapped inside a real dataset upload. It exists here only to record that
+    the storage credential itself was proven before TC-12 was ever attempted: a real file uploaded
+    to a real key, a real presigned download URL, fetched and confirmed byte-for-byte identical,
+    then deleted and confirmed gone. <b>TC-12 below is the real, hands-on case</b>, this one is
+    just the receipt that the ground underneath it is solid.</p>
   </div>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-12</span><h3>POST a real dataset, end to end</h3><span class="badge wait">Waiting</span></summary>
+  <summary><span class="id">TC-12</span><h3>Upload a real dataset, start to finish</h3><span class="badge wait">Needs Anas to run this</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, no UI to trigger it yet</span><span><b>Tool:</b> Postman, once someone runs it by hand</span></div>
-    <p><b>Preconditions:</b> a real signed-in user, a real project already created (TC-06), the
-    server pointed at the real Render database (both migrations are live there) and real R2
-    credentials.</p>
+    <div class="meta"><span><b>Last run:</b> never, this is the one still waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> the collection re-imported (see above), signed in for real in Postman
+    (the same "Get New Access Token" button you already used for the Projects requests, top right
+    of any request, under the Authorization tab, if it's expired just click it again).</p>
+
+    <p><b>Step 1, get a real project id.</b></p>
     <ol>
-      <li>Request <code>POST {{baseUrl}}/api/v1/projects/&lt;a real project id&gt;/datasets</code>,
-      multipart form data: <code>name</code> (text), <code>modelType</code> (text, must be exactly
-      <code>meridian</code>, the only real value today), <code>file</code> (an actual small CSV).</li>
+      <li>Open <b>Projects (CMP-41)</b> &rarr; <b>GET /projects, list</b> &rarr; <b>Send</b>.</li>
+      <li>In the response body, copy the <code>id</code> of any real project (any of yours, or
+      create a new one first with <b>POST /projects, create</b> if you'd rather use a fresh one).
+      It looks like <code>633b6759-eff9-4d41-8ba0-6c74c232de39</code>, a long string with dashes.</li>
     </ol>
+
+    <p><b>Step 2, save that id so every Datasets request can use it.</b></p>
+    <ol>
+      <li>Right-click the collection name, <b>MMM Backend</b>, at the very top of the sidebar,
+      choose <b>Edit</b>.</li>
+      <li>Open the <b>Variables</b> tab.</li>
+      <li>Find the row <code>projectId</code>, paste the id you copied into both the <b>Initial
+      value</b> and <b>Current value</b> columns (Postman has both, fill in both, the same way you
+      already did for <code>tenantId</code> when Real Microsoft login was first set up).</li>
+      <li><b>Save</b> (top right of that Edit panel).</li>
+    </ol>
+
+    <p><b>Step 3, get a real file to upload.</b> Any small CSV works. If you don't have one handy:
+    open Notepad, paste this in, <b>Save As</b>, filename <code>test-dataset.csv</code>, Save as
+    type <b>All Files</b> (so it doesn't become <code>.csv.txt</code>), save it somewhere you can
+    find again, like your Desktop:</p>
+    <pre><code>Date,Revenue,TV Spend
+2026-01-01,10000,500
+2026-01-08,10500,600
+2026-01-15,9800,450</code></pre>
+
+    <p><b>Step 4, send the real upload.</b></p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>POST /projects/:projectId/datasets, upload a real
+      file</b>.</li>
+      <li>Click the <b>Body</b> tab. You'll see three rows already there: <code>name</code>,
+      <code>modelType</code> (already filled in as <code>meridian</code>, leave it exactly as is),
+      and <code>file</code>.</li>
+      <li>On the <code>file</code> row, on the right side, click <b>Select Files</b>, and pick the
+      <code>test-dataset.csv</code> you just saved.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+
     <div class="expect">
       <span class="lbl">Expected result</span>
-      <p><code>201</code> with the real dataset row, including a real <code>storageKey</code>. This
-      is the one real gap left: the storage layer (TC-11) and the database migration are both
-      proven independently, but nobody has actually sent a real HTTP request through this exact
-      route yet. First person to try it, mark this Passing or Failing honestly, don't assume.</p>
+      <p>Status <code>201 Created</code>, bottom left of the response panel. The response body is
+      the real dataset row: a real <code>id</code>, <code>"modelType": "meridian"</code>, a real
+      <code>storageKey</code> starting with <code>tenants/</code>, <code>"fileName":
+      "test-dataset.csv"</code>, and <code>"status": "uploaded"</code>. If you see that, the whole
+      chain is real: your file went to Cloudflare R2, a real row went into the shared Render
+      database, and this page's "waiting" badge above should flip to <b>Passing</b>, mark it
+      yourself once you've seen it. If you get an error instead, copy the exact status code and
+      message, that's more useful than "it didn't work."</p>
     </div>
   </div>
 </details>
