@@ -10,6 +10,7 @@ import { UsersModule } from './modules/users/users.module';
 import { ProjectsModule } from './modules/projects/projects.module';
 import { DatasetsModule } from './modules/datasets/datasets.module';
 import { OtpModule } from './modules/otp/otp.module';
+import { SamplesModule } from './modules/samples/samples.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { OtpModule } from './modules/otp/otp.module';
     ProjectsModule,
     DatasetsModule,
     OtpModule,
+    SamplesModule,
   ],
 })
 export class AppModule {}
