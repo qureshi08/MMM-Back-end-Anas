@@ -108,14 +108,14 @@
   <p class="sub">Every real, hands-on check that exists for this backend, kept in one place instead
   of buried inside a status page. Re-run these after anything that could plausibly break them, not
   just the one time they were written.</p>
-  <p class="updated">Last updated <b>August 6, 2026</b>. Pulled out of
-  <code>for-anas/progress-log.html</code>, which was accumulating one-off walkthroughs instead of a
-  real, reusable suite.</p>
+  <p class="updated">Last updated <b>August 11, 2026</b>. Four new cases for Datasets (CMP-38) and
+  the email OTP second factor, two of them still genuinely waiting on someone to run them for real.</p>
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">10</div><div class="l">Passing</div></div>
-  <div class="stat"><div class="n">10</div><div class="l">Total cases</div></div>
+  <div class="stat pass"><div class="n">11</div><div class="l">Passing</div></div>
+  <div class="stat wait"><div class="n">3</div><div class="l">Waiting</div></div>
+  <div class="stat"><div class="n">14</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -595,6 +595,101 @@ RETURNING id;</code></pre></li>
       <li>Back in pgAdmin's Query Tool, clear it and run:
       <pre><code>DELETE FROM users WHERE email = 'throwaway-test-user@test.local';</code></pre></li>
     </ol>
+  </div>
+</details>
+
+<h2 class="section">Datasets (CMP-38)</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-11</span><h3>Cloudflare R2: real upload, download, delete</h3><span class="badge wait">Needs Anas to verify</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>CloudflareR2StorageService</code>, not through the API)</span><span><b>Tool:</b> a throwaway <code>ts-node</code> script, deleted after</span></div>
+    <p><b>Preconditions:</b> <code>R2_ACCOUNT_ID</code>, <code>R2_ACCESS_KEY_ID</code>,
+    <code>R2_SECRET_ACCESS_KEY</code>, <code>R2_BUCKET_NAME</code> set in <code>.env</code>, the
+    real <code>mmm-datasets</code> bucket.</p>
+    <p><b>What ran:</b> uploaded a real text file to a real key, generated a real presigned download
+    URL, fetched that URL and confirmed the content came back byte-for-byte identical, then deleted
+    the object and confirmed cleanup.</p>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>UPLOAD OK</code>, a real signed URL, the exact uploaded text on download, then
+      <code>DELETE OK</code>. All four happened. <b>This proves the storage credential works</b>,
+      not that a real user can upload a dataset through the app yet, that's TC-12, still waiting on
+      Amna's Upload Data screen.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-12</span><h3>POST a real dataset, end to end</h3><span class="badge wait">Waiting</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, no UI to trigger it yet</span><span><b>Tool:</b> Postman, once someone runs it by hand</span></div>
+    <p><b>Preconditions:</b> a real signed-in user, a real project already created (TC-06), the
+    server pointed at the real Render database (both migrations are live there) and real R2
+    credentials.</p>
+    <ol>
+      <li>Request <code>POST {{baseUrl}}/api/v1/projects/&lt;a real project id&gt;/datasets</code>,
+      multipart form data: <code>name</code> (text), <code>modelType</code> (text, must be exactly
+      <code>meridian</code>, the only real value today), <code>file</code> (an actual small CSV).</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>201</code> with the real dataset row, including a real <code>storageKey</code>. This
+      is the one real gap left: the storage layer (TC-11) and the database migration are both
+      proven independently, but nobody has actually sent a real HTTP request through this exact
+      route yet. First person to try it, mark this Passing or Failing honestly, don't assume.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section">Email code verification (OTP)</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-13</span><h3>A real code, sent to a real inbox</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>GraphMailService</code>) and Amna, same day, through the real deployed frontend</span><span><b>Tool:</b> a throwaway script, then Amna's real Upload Data/OTP screen against the real Render backend</span></div>
+    <p><b>Preconditions:</b> <code>GRAPH_MAIL_*</code> set, Farhan's admin consent for
+    <code>Mail.Send</code> granted, the app deployed to <code>main</code> (not just the working
+    branch, see <code>dev-log/raw/2026-08-11.md</code> for the real deploy-branch bug this caught).</p>
+    <ol>
+      <li>Sign in for real.</li>
+      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/request</code> (or trigger it from the real
+      screen).</li>
+      <li>Check the inbox for <code>GRAPH_MAIL_SENDER</code>, a real email with a 6-digit code
+      arrives within a minute or two.</li>
+      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/verify</code> with that code.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>202</code> on request, a real email lands, <code>204</code> on verify with the
+      correct code. Confirmed both ways: Claude's script sent a real test email directly, and
+      separately Amna went through the real screen and confirmed it herself, in her own words,
+      "Working!" then "Two factor authentication is done." Not run by Anas personally yet, worth a
+      quick self-check whenever convenient, not because there's doubt it works, just to keep the
+      "Anas ran it" rule honest.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-14</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge wait">Needs Anas to verify</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never run against the real deployed app</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> a real code already requested (TC-13).</p>
+    <ol>
+      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/verify</code> with an obviously wrong
+      6-digit code, e.g. <code>000000</code>.</li>
+      <li>Repeat 5 times in a row.</li>
+      <li>Request a 6th time, still wrong.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Every one of the first 5 attempts returns <code>401 Incorrect code.</code> The 6th returns
+      <code>401 Too many incorrect attempts. Request a new one.</code>, even if the code you typed
+      that time happened to be right, <code>OtpService</code> checks the attempt count before
+      checking the code itself. Never run for real, this is the one negative-path case in the whole
+      OTP flow that still needs an actual human to break it on purpose.</p>
+    </div>
   </div>
 </details>
 

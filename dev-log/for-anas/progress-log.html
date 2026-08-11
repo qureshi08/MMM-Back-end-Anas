@@ -118,11 +118,11 @@
   <h1>What's actually <span class="italic-accent">done</span></h1>
   <p class="sub">A plain-language record of what's been built in the backend, what's verified, and
   what's still waiting on something. Read this instead of asking. It's kept current.</p>
-  <p class="updated">Last updated <b>August 10, 2026</b>. Real Entra login is fully done on both
-  backend and frontend, confirmed independently across three real accounts. Projects CRUD
-  (<code>CMP-41</code>) is fully done end to end, real UI, real backend, real database, all
-  confirmed. The backend is deployed and live, and the frontend now genuinely talks to it, not mock
-  data.</p>
+  <p class="updated">Last updated <b>August 11, 2026</b>. Datasets (<code>CMP-38</code>) and a real
+  email one-time-code second factor are both built, deployed, and genuinely working, real mail
+  through Microsoft Graph, real file storage in Cloudflare R2, real database rows on the shared
+  Render database. A real deploy-branch bug was found and fixed the same day, see the row below,
+  worth reading even if nothing else is.</p>
 </header>
 
 <section class="tint">
@@ -233,6 +233,36 @@
       hardcoded name in the dashboard header. See <code>dev-log/raw/2026-08-10.md</code> for the full
       chain, including a real false alarm caused by a gap in how this was being verified, not a bug
       in the actual work.</td>
+    </tr>
+    <tr>
+      <td class="item">Datasets module (CMP-38)</td>
+      <td><span class="badge wait">Built, needs your check</span></td>
+      <td class="why">Entity, migration, controller, service all built and deployed. The database
+      table is live on the real Render database (migration run August 11). The storage layer
+      (Cloudflare R2) is proven working, real upload, real download, real delete, but by a Claude
+      script, not through the actual API route. Nobody has sent a real
+      <code>POST /projects/:id/datasets</code> request yet, no UI exists to trigger it. See
+      <code>TC-11</code>/<code>TC-12</code> in <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Email code second factor (OTP)</td>
+      <td><span class="badge wait">Working, needs your own check</span></td>
+      <td class="why">Real, confirmed twice: Claude sent a real test email directly through
+      Microsoft Graph, and separately Amna went through the real deployed screen and confirmed it
+      herself, in her own words, "Working!" then "Two factor authentication is done." Not run by
+      Anas personally yet, that's the only reason this isn't marked Done outright, see
+      <code>TC-13</code>/<code>TC-14</code> in <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Deploy pipeline: <code>backend/anas</code> vs <code>main</code></td>
+      <td><span class="badge done">Fixed</span></td>
+      <td class="why">Real bug, found the same day it mattered: every push all session went to the
+      working branch, <code>backend/anas</code>, never merged into <code>main</code>, which is what
+      Render actually deploys. The live service was running old code with neither Datasets nor OTP
+      in it at all, that's why Amna's first real test 404'd. Fixed by merging into <code>main</code>
+      and pushing; confirmed independently in Render's own deploy log, both
+      <code>OtpModule</code> and <code>DatasetsModule</code> shown initializing, status Live. Worth
+      remembering for every future push: <b>the working branch alone never reaches Render.</b></td>
     </tr>
   </table>
   <div class="legend">
