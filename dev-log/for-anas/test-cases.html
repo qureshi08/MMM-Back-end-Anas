@@ -679,15 +679,54 @@ RETURNING id;</code></pre></li>
     </ol>
 
     <div class="expect">
-      <span class="lbl">Expected result</span>
+      <span class="lbl">Expected result, the API</span>
       <p>Status <code>201 Created</code>, bottom left of the response panel. The response body is
       the real dataset row: a real <code>id</code>, <code>"modelType": "meridian"</code>, a real
       <code>storageKey</code> starting with <code>tenants/</code>, <code>"fileName":
-      "test-dataset.csv"</code>, and <code>"status": "uploaded"</code>. If you see that, the whole
-      chain is real: your file went to Cloudflare R2, a real row went into the shared Render
-      database, and this page's "waiting" badge above should flip to <b>Passing</b>, mark it
-      yourself once you've seen it. If you get an error instead, copy the exact status code and
-      message, that's more useful than "it didn't work."</p>
+      "test-dataset.csv"</code>, and <code>"status": "uploaded"</code>. Copy the <code>id</code>
+      from this response, you'll need it for Step 5. A 201 here is real, but it's only the API's
+      word for it, Steps 5 and 6 below check the database and the storage bucket directly, don't
+      skip them, that's the whole point of the note you sent about wanting more than API checks.</p>
+    </div>
+
+    <p><b>Step 5, confirm the row is really in the database, in pgAdmin, not just the API's word for it.</b></p>
+    <ol>
+      <li>Open pgAdmin, connect to the Render server the same way you already do for other checks.</li>
+      <li>Query Tool, run:
+      <pre><code>SELECT set_config('app.tenant_id', '&lt;your real tenant id&gt;', false);
+SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code></pre></li>
+      <li>Don't know your tenant id offhand? <code>tenants</code> has no RLS policy on it, so
+      <code>SELECT id, name FROM tenants;</code> always works, find yours by name.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, the database</span>
+      <p>One real row. <code>name</code> is <code>Real Test Dataset</code>, <code>model_type</code>
+      is <code>meridian</code>, <code>storage_provider</code> is <code>cloudflare_r2</code>,
+      <code>storage_key</code> is the same long path the API response showed you, <code>status</code>
+      is <code>uploaded</code>, and <code>created_at</code> is a real timestamp from just now, not
+      something you typed. If you skip the <code>set_config</code> line first, this returns 0 rows,
+      not an error, that's <code>FORCE ROW LEVEL SECURITY</code> working exactly as lesson 06
+      describes, not a bug.</p>
+    </div>
+
+    <p><b>Step 6, confirm the actual file is really in Cloudflare R2, not just a database row claiming it is.</b></p>
+    <ol>
+      <li>In a browser, go to your Cloudflare dashboard &rarr; <b>R2 Object Storage</b> &rarr;
+      <b>mmm-datasets</b>.</li>
+      <li>You won't see the file at the top level, the real key has folders in it. Click into
+      <code>tenants/</code>, then your real tenant id, then <code>projects/</code>, then the
+      project id from Step 1, then <code>datasets/</code>.</li>
+      <li>You should see one object there, a long filename starting with a UUID, ending in
+      <code>-test-dataset.csv</code>.</li>
+      <li>Click it, then <b>Download</b> (or preview, if Cloudflare offers one for a small text
+      file), and confirm it's the exact same three rows of CSV data you saved in Step 3.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, the storage bucket</span>
+      <p>A real file, sitting at exactly the key path <code>storage_key</code> said it would be at,
+      containing your exact CSV content, byte for byte. Three independent confirmations now agree:
+      the API said 201, the database has the real row, and Cloudflare has the real bytes. That's
+      what "Passing" should mean here, not just one of the three.</p>
     </div>
   </div>
 </details>
