@@ -2,7 +2,7 @@ import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nest
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { Project } from '../projects/entities/project.entity';
-import { Dataset, ModelType } from './entities/dataset.entity';
+import { Dataset } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
@@ -61,8 +61,7 @@ export class DatasetsService {
         tenantId,
         projectId,
         name: dto.name,
-        // Not caller-supplied — see ModelType's own comment, one real engine.
-        modelType: ModelType.MERIDIAN,
+        modelType: dto.modelType,
         storageKey,
         fileName: file.originalname,
         fileSizeBytes: file.size,

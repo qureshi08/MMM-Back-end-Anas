@@ -7,9 +7,13 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Same shape as `AddProjectsTable1785900000003`: RLS with `FORCE`, same
  * `tenant_isolation` policy wording, soft delete via `deleted_at`.
  *
- * `model_type` allows only 'meridian' — corrected same day, after reading
- * Hammad's real handover: there's one real modeling engine, not a picklist.
- * See `ModelType`'s own comment in `dataset.entity.ts`.
+ * `model_type` is a real, caller-supplied choice (confirmed 2026-08-11,
+ * final answer after two corrections that day): a dropdown, same shape as
+ * Cassandra's, deliberately built to scale to more models. Only 'meridian'
+ * is allowed today because that's the only one that's real yet, not
+ * because the column is fixed — adding a second real model later is a new
+ * migration widening this CHECK, not a schema redesign. No DEFAULT, on
+ * purpose: this has to be an explicit choice, not an implicit one.
  */
 export class AddDatasetsTable1785900000004 implements MigrationInterface {
   name = 'AddDatasetsTable1785900000004';
@@ -23,7 +27,7 @@ export class AddDatasetsTable1785900000004 implements MigrationInterface {
         "project_id"       uuid NOT NULL
                            CONSTRAINT "FK_datasets_project" REFERENCES "projects"("id") ON DELETE CASCADE,
         "name"             text NOT NULL,
-        "model_type"       text NOT NULL DEFAULT 'meridian'
+        "model_type"       text NOT NULL
                            CONSTRAINT "CHK_datasets_model_type" CHECK ("model_type" IN ('meridian')),
         "storage_provider" text NOT NULL DEFAULT 'cloudflare_r2'
                            CONSTRAINT "CHK_datasets_storage_provider" CHECK ("storage_provider" IN ('cloudflare_r2', 'azure_blob')),

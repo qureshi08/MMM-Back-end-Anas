@@ -452,13 +452,17 @@ they're simply unfinished.</p>
 <div class="not-built">
   <h4>Real, on the roadmap, not live</h4>
   <ul>
-    <li><b>Datasets</b> (<code>/datasets</code>) &middot; <code>CMP-38</code> &middot; upload,
-    validation. Storage is <b>Cloudflare R2</b> for now, not Azure Blob Storage, same pointer-only
+    <li><b>Datasets</b> (<code>/projects/:projectId/datasets</code>) &middot; <code>CMP-38</code>
+    &middot; upload, validation. Each dataset carries a real <code>modelType</code>, a dropdown,
+    same structure as Cassandra's own model picker, deliberately built to scale to more models.
+    Only one real value exists today (<code>meridian</code>), that's a roadmap fact, not a reason to
+    drop the field, see <code>dataset.entity.ts</code>'s own comment for the two corrections that
+    led here. Storage is <b>Cloudflare R2</b> for now, not Azure Blob Storage, same pointer-only
     pattern (Postgres holds metadata, never the file). Swapping the storage backend to Azure Blob
     later is a config change behind the same interface, not a rewrite.</li>
     <li><b>Configure</b> (column mapping) &middot; <code>CMP-38</code>/<code>CMP-79</code> &middot;
     date column, target/KPI column, media/control/organic columns, feeding the real modeling engine
-    contract, see below. Not a model-type choice, there's one real engine.</li>
+    contract, see below. A separate step from the model dropdown above, not the same thing.</li>
     <li><b>Experiments</b> (<code>/experiments</code>) &middot; <code>CMP-39</code>/<code>CMP-43</code>
     &middot; run, results, logs</li>
     <li><b>Jobs / job queue</b> (<code>/jobs</code>) &middot; status polling, the interface the
@@ -467,13 +471,11 @@ they're simply unfinished.</p>
   </ul>
 </div>
 <div class="watch">
-  <span class="lbl">The navigation order, confirmed 2026-08-11, corrected same day</span>
+  <span class="lbl">The navigation order, confirmed 2026-08-11</span>
   <p>Per direct feedback from Farhan: after signing in, a user should only ever see a project list,
-  no other navigation. After picking or creating a project, the next screen is dataset upload, then
-  Configure (column mapping), not an "Overview" or "Experiment" screen. The original version of this
-  note said the step after project was "model selection", that's corrected: our modeling engine (see
-  <code>dev-log/for-anas/modeling-engine-explained.html</code>) has one real model, Meridian, there's
-  nothing for a user to pick between.</p>
+  no other navigation. After picking or creating a project, the next screen is Upload Data, a model
+  dropdown plus the file, same screen, same structure as Cassandra's own flow. After that, Configure
+  (column mapping). Not an "Overview" or "Experiment" screen anywhere in this sequence.</p>
 </div>
 <div class="watch">
   <span class="lbl">For the modeling team specifically</span>

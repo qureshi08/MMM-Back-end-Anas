@@ -4,14 +4,15 @@ import { Tenant } from '../../tenants/entities/tenant.entity';
 import { Project } from '../../projects/entities/project.entity';
 
 /**
- * Corrected 2026-08-11, same day it was written: `project-context.md` said
- * Meridian vs PyMC-Marketing was still undecided, so this started as a
- * user-facing picklist between the two. Hammad's real handover
- * (`dev-log/for-anas/modeling-engine-explained.html` Section 04) shows
- * that's stale — there's only one real engine, Meridian, already built and
- * proven. Kept as a single-value enum, not removed outright, so a row still
- * says which engine trained it if a second one is ever added for real; a
- * dataset is never created with anything else, see `DatasetsService`.
+ * Corrected twice in one day. First pass: `project-context.md` said
+ * Meridian vs PyMC-Marketing was undecided, so this started as a
+ * user-facing picklist between the two. Second pass, after Hammad's real
+ * handover confirmed there's only one real engine today, this briefly
+ * became a fixed, non-caller-supplied value. Final, confirmed answer
+ * (2026-08-11): keep it a real, caller-supplied dropdown, same structure
+ * and flow as Cassandra's own model-type picker, deliberately built to
+ * scale to more models later. Today it only has one real value, that's a
+ * fact about the roadmap, not a reason to remove the choice from the API.
  */
 export enum ModelType {
   MERIDIAN = 'meridian',

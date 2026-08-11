@@ -258,15 +258,22 @@ It reads exactly the one JSON at <code>dataset_reference</code>. Building that J
 shape of <code>CMP-79</code>, which every earlier doc on this project listed as "not yet defined."
 It is defined now, by this handover.</p>
 
-<h2 class="section"><span class="num">04</span>Where "model selection" came from, and why it's wrong</h2>
+<h2 class="section"><span class="num">04</span>Where "model selection" came from, and the final answer</h2>
 <p class="section-why">Farhan's screenshot showed Cassandra letting a user pick between Sibyl,
-Robyn, and Meridian. That's real, for Cassandra. It doesn't apply here.</p>
+Robyn, and Meridian. Real, for Cassandra. Not real for us, not yet, but the dropdown stays anyway.</p>
 <div class="watch">
   <span class="lbl">There's only one real engine, already built</span>
   <p>Hammad's handover is explicit: "Given a marketing dataset, it trains a real model through
-  Google's Meridian." One engine, already proven on real GPU training, more than once. There's
-  nothing for a user to choose between. Farhan's request almost certainly came from looking at
-  Cassandra, a tool that genuinely supports several engines, without knowing ours doesn't need to.</p>
+  Google's Meridian." One engine, already proven on real GPU training, more than once. Farhan's
+  request almost certainly came from looking at Cassandra, a tool that genuinely supports several
+  engines, without knowing ours only has one today.</p>
+</div>
+<div class="pull">
+  <p><b>The final, confirmed answer</b>: keep the dropdown. One real option in it today
+  (<code>meridian</code>), but the field itself is real and caller-supplied, same structure and flow
+  as Cassandra's, built to scale to more models later without a redesign. Today's dataset upload
+  screen and API both carry a real <code>modelType</code> choice, it just currently has one correct
+  answer.</p>
 </div>
 <p>What Cassandra's screens actually are, though, is still useful, just not as a model picker. Its
 wizard steps line up almost field-for-field with what Hammad's real contract needs:</p>
@@ -352,17 +359,14 @@ that changes what the real deployed system looks like.</p>
   work is the assembly step in Section 03 above: taking an uploaded dataset plus a column-mapping
   step plus a configuration step, producing the one JSON file, saving it to Blob (Cloudflare R2 for
   now), and sending the small pointer message to the queue.</p>
-  <p><b>The Dataset schema built earlier today needs a real correction.</b> It currently has a
-  <code>modelType</code> picklist (<code>meridian</code> / <code>pymc_marketing</code>), based on the
-  old, now-stale assumption that the engine wasn't decided yet. It is decided, it's Meridian, and
-  there's nothing to pick. That field should come out, or stay only as an internal, fixed value, not
-  a real screen a user sees.</p>
-  <p><b>Amna's prompt needs the same correction.</b> It currently describes a "model selection"
-  screen between project and dataset. That should become a Configure step after dataset upload,
-  matching the real mapping table in Section 04, not a model picker.</p>
-  <p><b>Worth a short message to Farhan</b>, so the "model selection" request doesn't resurface
-  later: Cassandra supports multiple engines, ours doesn't need to, Hammad's handover confirms
-  Meridian is the one real engine, already built and proven.</p>
+  <p><b>The Dataset schema is settled, final answer.</b> <code>modelType</code> is a real,
+  caller-supplied dropdown, one value today (<code>meridian</code>), built to scale, same structure
+  as Cassandra's own picker. See Section 04's confirmed answer above.</p>
+  <p><b>The tunnel is: Sign in &rarr; Projects &rarr; Upload Data &rarr; Configure.</b> Upload Data
+  is one screen carrying both the model dropdown and the file, matching Cassandra's own combined
+  screen exactly. Configure comes after, column mapping only, a separate step from the model choice.</p>
+  <p><b>Confirmed with Farhan already</b>: the dropdown stays, one real option today, built to scale.
+  Nothing further to resolve on this point.</p>
 </div>
 
 <div class="maintain">
