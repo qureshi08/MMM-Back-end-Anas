@@ -133,8 +133,34 @@
   </ol>
 </div>
 
+<div class="protocol" id="postman-web">
+  <h3>Testing with Postman Web against the real deployed backend, everything pre-wired</h3>
+  <p style="margin:0 0 12px;max-width:72ch">This is the real path for every case below, no local
+  server, no manual setup. Two files are already prepared in <code>Backend/postman/</code>:</p>
+  <ol style="margin:0 0 14px">
+    <li><code>MMM-Backend.postman_collection.json</code>: every real request, already built</li>
+    <li><code>MMM-Backend.postman_environment.render.json</code>: every real value already filled
+    in: the live Render URL, the real Entra tenant and client IDs, the real scope. Nothing to type.</li>
+  </ol>
+  <ol style="margin:0 0 0">
+    <li>Go to <a href="https://web.postman.co" target="_blank" rel="noopener">web.postman.co</a>,
+    sign in (a free account is fine).</li>
+    <li><b>Import</b> (top left) &rarr; drag in both files above, or select them from
+    <code>Backend/postman/</code>.</li>
+    <li>Top right, the environment dropdown (probably says "No Environment") &rarr; select
+    <b>MMM Backend &middot; Render (real, deployed)</b>.</li>
+    <li>Open the <b>MMM Backend</b> collection &rarr; <b>Authorization</b> tab (collection-level,
+    not a single request) &rarr; click <b>Get New Access Token</b>. A real Microsoft sign-in popup
+    opens, sign in with your real account.</li>
+    <li>Once it says "Authentication complete", click <b>Use Token</b>. Every request in the
+    collection now sends it automatically, nothing more to configure.</li>
+  </ol>
+  <p style="margin:14px 0 0;max-width:72ch">From here, every case below is just: open the request,
+  click <b>Send</b>, read the real response. No terminal, no <code>.env</code>, no local server.</p>
+</div>
+
 <div class="protocol" id="starting-the-server">
-  <h3>Starting the server, whenever a case says "server running"</h3>
+  <h3>Local server instead, only if a case specifically needs it</h3>
   <p style="margin:0 0 12px;max-width:72ch">Open PowerShell fresh (or a new tab if you already have
   one open elsewhere) and run exactly this, as one block, in order:</p>
   <pre style="background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-sm);padding:12px 16px;overflow-x:auto;font-size:13px;line-height:1.6;margin:10px 0"><code>cd D:\Anas\MMM\Backend

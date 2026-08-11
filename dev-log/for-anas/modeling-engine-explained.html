@@ -347,26 +347,28 @@ that changes what the real deployed system looks like.</p>
 </div>
 
 <h2 class="section"><span class="num">07</span>What's next</h2>
-<div class="card">
-  <p><b>Read the four documents, in this order</b>: <code>Handover_Overview_v2.docx</code> first
-  (the big picture, already summarized above), then <code>Codebase_Reference_v2.docx</code> (every
-  file, what it does), then <code>Execution_Guide_v2.docx</code> (how to actually run it),
-  then <code>MMM API Contracts - v6 Draft.docx</code> (the exact shapes above, in full).
-  <code>Results_Field_Glossary_v2.docx</code> is a reference for later, once results actually need
-  displaying.</p>
-  <p><b><code>CMP-79</code> is answerable now.</b> It was tracked as "define the job queue message
-  contract," and that contract already exists, in the API Contracts document. The real remaining
-  work is the assembly step in Section 03 above: taking an uploaded dataset plus a column-mapping
-  step plus a configuration step, producing the one JSON file, saving it to Blob (Cloudflare R2 for
-  now), and sending the small pointer message to the queue.</p>
-  <p><b>The Dataset schema is settled, final answer.</b> <code>modelType</code> is a real,
-  caller-supplied dropdown, one value today (<code>meridian</code>), built to scale, same structure
-  as Cassandra's own picker. See Section 04's confirmed answer above.</p>
-  <p><b>The tunnel is: Sign in &rarr; Projects &rarr; Upload Data &rarr; Configure.</b> Upload Data
-  is one screen carrying both the model dropdown and the file, matching Cassandra's own combined
-  screen exactly. Configure comes after, column mapping only, a separate step from the model choice.</p>
-  <p><b>Confirmed with Farhan already</b>: the dropdown stays, one real option today, built to scale.
-  Nothing further to resolve on this point.</p>
+<div class="checklist">
+  <div class="col proven">
+    <h4>Settled, no longer open questions</h4>
+    <ul>
+      <li><code>CMP-79</code> is answerable now, the contract already exists in Hammad's API
+      Contracts document, not still undefined</li>
+      <li>The Dataset schema is final: <code>modelType</code> is a real dropdown, one value today
+      (<code>meridian</code>), built to scale, confirmed with Farhan</li>
+      <li>The tunnel is settled: Sign in &rarr; Projects &rarr; Upload Data &rarr; Configure, Upload
+      Data carries both the model dropdown and the file on one screen</li>
+    </ul>
+  </div>
+  <div class="col gap">
+    <h4>Real work still ahead</h4>
+    <ul>
+      <li>Read the four documents in order: Handover Overview, Codebase Reference, Execution Guide,
+      then API Contracts, <code>Results_Field_Glossary_v2.docx</code> later, as a reference</li>
+      <li>Build the assembly step (Section 03): dataset + Configure answers &rarr; one JSON &rarr;
+      Blob &rarr; the queue message, this is what actually makes <code>CMP-79</code> work, not just
+      be documented</li>
+    </ul>
+  </div>
 </div>
 
 <div class="maintain">
