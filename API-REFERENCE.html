@@ -121,7 +121,7 @@
   modeling team, kept updated as the backend changes. Everything here reflects what's actually
   built and deployed, not what's planned. Where something isn't built yet, it says so directly
   instead of being left out.</p>
-  <p class="updated">Last updated <b>August 10, 2026</b>. Live backend, the only one that matters:
+  <p class="updated">Last updated <b>August 11, 2026</b>. Live backend, the only one that matters:
   <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
 </header>
 
@@ -453,7 +453,12 @@ they're simply unfinished.</p>
   <h4>Real, on the roadmap, not live</h4>
   <ul>
     <li><b>Datasets</b> (<code>/datasets</code>) &middot; <code>CMP-38</code> &middot; upload,
-    validation, Blob storage</li>
+    validation. Storage is <b>Cloudflare R2</b> for now, not Azure Blob Storage, same pointer-only
+    pattern (Postgres holds metadata, never the file). Swapping the storage backend to Azure Blob
+    later is a config change behind the same interface, not a rewrite.</li>
+    <li><b>Configure</b> (column mapping) &middot; <code>CMP-38</code>/<code>CMP-79</code> &middot;
+    date column, target/KPI column, media/control/organic columns, feeding the real modeling engine
+    contract, see below. Not a model-type choice, there's one real engine.</li>
     <li><b>Experiments</b> (<code>/experiments</code>) &middot; <code>CMP-39</code>/<code>CMP-43</code>
     &middot; run, results, logs</li>
     <li><b>Jobs / job queue</b> (<code>/jobs</code>) &middot; status polling, the interface the
@@ -462,11 +467,24 @@ they're simply unfinished.</p>
   </ul>
 </div>
 <div class="watch">
+  <span class="lbl">The navigation order, confirmed 2026-08-11, corrected same day</span>
+  <p>Per direct feedback from Farhan: after signing in, a user should only ever see a project list,
+  no other navigation. After picking or creating a project, the next screen is dataset upload, then
+  Configure (column mapping), not an "Overview" or "Experiment" screen. The original version of this
+  note said the step after project was "model selection", that's corrected: our modeling engine (see
+  <code>dev-log/for-anas/modeling-engine-explained.html</code>) has one real model, Meridian, there's
+  nothing for a user to pick between.</p>
+</div>
+<div class="watch">
   <span class="lbl">For the modeling team specifically</span>
-  <p>The backend never fits a model itself, and the job queue contract between this API and the
-  Python worker hasn't been defined yet (that's <code>CMP-79</code> in the backend sequence, before
-  the actual job orchestration work). When that contract exists, it gets documented here, in the
-  same place, not a separate document that can drift out of sync.</p>
+  <p>The backend never fits a model itself. The job queue contract with the Python worker
+  (<code>CMP-79</code>) is no longer undefined, it's Hammad's own handover,
+  <code>MMM API Contracts - v6 Draft.docx</code>: a queue message carries only
+  <code>{ job_id, dataset_reference }</code>, where <code>dataset_reference</code> points at one
+  pre-assembled JSON file (raw data, column mapping, KPI type, per-channel model configuration,
+  optional target budget) that this backend is responsible for building and saving to Blob storage,
+  not the worker. Full trace in <code>dev-log/for-anas/modeling-engine-explained.html</code> Section
+  03. When the real endpoint exists here, it gets documented in this same place.</p>
 </div>
 
 <h2 class="section" id="tenancy"><span class="num">11</span>Multi-tenancy</h2>

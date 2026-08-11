@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What Hammad actually built &middot; MMM Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono);background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+  a{color:var(--cbt-primary)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 36px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.1;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:70ch;margin:0}
+  .updated{margin-top:18px;font-size:12.5px;color:var(--cbt-muted)}
+  .updated b{color:var(--cbt-heading)}
+
+  .legend{display:flex;gap:20px;flex-wrap:wrap;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);
+    padding:18px 24px;margin:0 0 32px;font-size:13.5px}
+  .legend .item{display:flex;align-items:center;gap:8px}
+  .legend .swatch{width:18px;height:18px;border-radius:5px;flex-shrink:0}
+  .legend .swatch.live{background:var(--cbt-primary-muted);border:2px solid var(--cbt-primary)}
+  .legend .swatch.notbuilt{background:var(--cbt-white);border:2px dashed var(--cbt-muted)}
+  .legend .swatch.err{background:var(--cbt-warning-muted);border:2px solid var(--cbt-warning)}
+
+  svg{max-width:100%;height:auto;display:block}
+  .figwrap{margin:0 0 28px;overflow-x:auto;background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:20px}
+  .figcap{font-size:12px;color:var(--cbt-muted);margin:-16px 0 32px;padding:0 4px}
+
+  h2.section{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.55rem;
+    margin:56px 0 6px;color:var(--cbt-heading);scroll-margin-top:20px}
+  h2.section .num{color:var(--cbt-primary);font-family:var(--cbt-font-mono);font-size:.6em;
+    font-weight:600;margin-right:10px;vertical-align:middle}
+  .section-why{color:var(--cbt-muted);margin:0 0 20px;max-width:72ch}
+
+  .card{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 26px;margin:0 0 16px}
+  .card p{margin:0 0 10px;max-width:72ch}
+  .card p:last-child{margin-bottom:0}
+
+  .pull{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .pull p{margin:0;color:var(--cbt-heading)}
+
+  .watch{border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:14px 0}
+  .watch .lbl{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--cbt-warning-dark);display:block;margin-bottom:6px}
+  .watch p{margin:0}
+
+  table.map{width:100%;border-collapse:collapse;font-size:13.5px;margin:0 0 26px}
+  table.map th{text-align:left;background:var(--cbt-surface);color:var(--cbt-muted);font-weight:600;
+    font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;padding:10px 14px;border-bottom:1px solid var(--cbt-border)}
+  table.map td{padding:12px 14px;border-bottom:1px solid var(--cbt-border);vertical-align:top}
+  table.map td.screen{font-weight:700;color:var(--cbt-heading);white-space:nowrap}
+  table.map td code{white-space:nowrap}
+
+  .checklist{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:0 0 30px}
+  .checklist .col{border-radius:var(--cbt-radius-lg);padding:20px 24px}
+  .checklist .col.proven{background:var(--cbt-primary-muted);border:1px solid var(--cbt-primary)}
+  .checklist .col.gap{background:var(--cbt-warning-muted);border:1px solid var(--cbt-warning)}
+  .checklist h4{font-family:var(--cbt-font-heading);font-weight:700;font-size:1rem;margin:0 0 12px}
+  .checklist.col.proven h4{color:var(--cbt-primary-dark)}
+  .checklist ul{margin:0;padding-left:20px}
+  .checklist li{margin:8px 0;font-size:13.5px}
+  @media (max-width:640px){.checklist{grid-template-columns:1fr}}
+
+  .maintain{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:40px 0 0}
+  .maintain h3{font-family:var(--cbt-font-heading);font-weight:700;font-size:1.15rem;margin:0 0 12px;color:var(--cbt-heading)}
+  .maintain ol{margin:0;padding-left:20px}
+  .maintain li{margin:8px 0}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:40px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>MMM Platform &middot; Modeling engine, explained</span>
+</div>
+
+<header>
+  <div class="kicker">For Anas &middot; Hammad's handover, read before you touch it</div>
+  <h1>What Hammad <span class="italic-accent">actually</span> built</h1>
+  <p class="sub">Four documents and a folder of code landed on August 7. You haven't opened any of
+  them yet. This is the real version, in the order it matters, plus the one thing in here that
+  changes what you were about to build.</p>
+  <p class="updated">Written <b>August 11, 2026</b>, from Hammad's own handover documents,
+  <code>Resources/Handover MMM - Hammad/</code>.</p>
+</header>
+
+<div class="legend">
+  <div class="item"><span class="swatch live"></span> Real, proven, working today</div>
+  <div class="item"><span class="swatch notbuilt"></span> Planned, not built yet</div>
+  <div class="item"><span class="swatch err"></span> Where a job actually fails</div>
+</div>
+
+<h2 class="section" style="margin-top:0"><span class="num">01</span>Why this can't be one API call</h2>
+<p class="section-why">A two-sentence reminder, not a re-teach, this part you already have in
+<code>ARCHITECTURE.html</code>.</p>
+<div class="pull">
+  <p>A real model can take minutes to hours to train. So the backend never trains anything itself,
+  it hands the job to a separate worker and moves on. Everything below is what that worker,
+  Hammad's part, actually is.</p>
+</div>
+
+<h2 class="section"><span class="num">02</span>The three real pieces, tracing one real job</h2>
+<p class="section-why">Not a description of the code, a trace: a real job, <code>job_id</code>
+<code>"abc123"</code>, followed from the moment it's sent to the moment its results are ready. Every
+box below is a real file Hammad wrote, doing exactly the one thing it says.</p>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1265" role="img" aria-label="One real job, abc123, traced from entering the queue to completed results: queued, picked up by Celery, fetched and structurally checked (with the real failure shown if that check fails), the real data-value checks and warnings, configuration and training, results extraction and packaging, then available at status and results endpoints.">
+<line x1="66" y1="57" x2="66" y2="1262" stroke="#E2E8E4" stroke-width="2"/>
+<rect x="96" y="30" width="798" height="151.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="57" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="62" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">1</text>
+<text x="114" y="61" font-size="13.5" font-weight="700" fill="#007A3D">A job enters the queue</text>
+<text x="114" y="83" font-size="11.5" font-weight="400" fill="#374151">Not the dataset itself, a tiny message: which job, and where the</text>
+<text x="114" y="100" font-size="11.5" font-weight="400" fill="#374151">real file is. Service Bus messages stay small on purpose.</text>
+<rect x="114" y="112" width="762" height="51.0" rx="7" fill="#0C1A10"/>
+<text x="128" y="135" font-size="11" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">{ "job_id": "abc123",</text>
+<text x="128" y="151" font-size="11" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">  "dataset_reference": "&lt;pointer to a pre-assembled JSON file in Blob Storage&gt;" }</text>
+<rect x="96" y="207" width="798" height="90.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="234" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="239" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">2</text>
+<text x="114" y="238" font-size="13.5" font-weight="700" fill="#007A3D">Celery picks it up, calls POST /train</text>
+<text x="114" y="260" font-size="11.5" font-weight="400" fill="#374151">tasks.py's one job, run_job, makes a real HTTP call to api.py's</text>
+<text x="114" y="277" font-size="11.5" font-weight="400" fill="#374151">/train endpoint and waits for it to finish or fail.</text>
+<rect x="96" y="323" width="798" height="124.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="350" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="355" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">3</text>
+<text x="114" y="354" font-size="13.5" font-weight="700" fill="#007A3D">The file is fetched and checked, before anything trains</text>
+<text x="114" y="376" font-size="11.5" font-weight="400" fill="#374151">job_processor.py runs fetch_data.py (reads the JSON at the pointer)</text>
+<text x="114" y="393" font-size="11.5" font-weight="400" fill="#374151">then validate_fetched_data.py: a structural check only, are the</text>
+<text x="114" y="410" font-size="11.5" font-weight="400" fill="#374151">right keys present, are the types correct. Nothing about whether</text>
+<text x="114" y="427" font-size="11.5" font-weight="400" fill="#374151">the numbers themselves make sense, that comes next.</text>
+<rect x="96" y="473" width="798" height="134.0" rx="12" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.8"/>
+<circle cx="66" cy="500" r="17" fill="#FEF7E7" stroke="#F59E0B" stroke-width="2"/>
+<text x="66" y="505" font-size="13" font-weight="700" fill="#8A5A06" font-family="JetBrains Mono, monospace" text-anchor="middle">4</text>
+<text x="114" y="504" font-size="13.5" font-weight="700" fill="#8A5A06">If the structure is wrong, the job stops right here</text>
+<text x="114" y="526" font-size="11.5" font-weight="400" fill="#374151">No training attempted. The error is specific, not a generic failure.</text>
+<rect x="114" y="538" width="762" height="51.0" rx="7" fill="#0C1A10"/>
+<text x="128" y="561" font-size="11" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">{ "status": "failed",</text>
+<text x="128" y="577" font-size="11" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">  "error_message": "df: expected a list, received a string." }</text>
+<rect x="96" y="633" width="798" height="124.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="660" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="665" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">5</text>
+<text x="114" y="664" font-size="13.5" font-weight="700" fill="#007A3D">If the structure is right, the real pipeline runs</text>
+<text x="114" y="686" font-size="11.5" font-weight="400" fill="#374151">validate_data.py: real checks now (negative spend, missing values,</text>
+<text x="114" y="703" font-size="11.5" font-weight="400" fill="#374151">bad dates, duplicate dates), a hard error here also stops the job.</text>
+<text x="114" y="720" font-size="11.5" font-weight="400" fill="#374151">optimize_data.py: data-quality warnings (gaps, outliers, low-spend</text>
+<text x="114" y="737" font-size="11.5" font-weight="400" fill="#374151">channels), informational only, this never blocks training.</text>
+<rect x="96" y="783" width="798" height="169.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="810" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="815" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">6</text>
+<text x="114" y="814" font-size="13.5" font-weight="700" fill="#007A3D">Configuration is built, then training runs, the slow step</text>
+<text x="114" y="836" font-size="11.5" font-weight="400" fill="#374151">calibrate_and_hyperparameterize.py computes sensible defaults for</text>
+<text x="114" y="853" font-size="11.5" font-weight="400" fill="#374151">carryover, saturation, and calibration, then applies whatever the</text>
+<text x="114" y="870" font-size="11.5" font-weight="400" fill="#374151">request overrode. train_model.py builds Meridian's real inputs and</text>
+<text x="114" y="887" font-size="11.5" font-weight="400" fill="#374151">trains. Progress is visible the whole time, GET /status/abc123:</text>
+<rect x="114" y="899" width="762" height="35.0" rx="7" fill="#0C1A10"/>
+<text x="128" y="922" font-size="11" font-weight="400" fill="#D7F5E3" font-family="JetBrains Mono, monospace">{ "status": "running", "progress": 0.42, "job_id": "abc123" }</text>
+<rect x="96" y="978" width="798" height="141.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="1005" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="1010" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">7</text>
+<text x="114" y="1009" font-size="13.5" font-weight="700" fill="#007A3D">Results are extracted, budget allocation runs, output is packaged</text>
+<text x="114" y="1031" font-size="11.5" font-weight="400" fill="#374151">model_results.py pulls channel performance, accuracy, and curve</text>
+<text x="114" y="1048" font-size="11.5" font-weight="400" fill="#374151">data out of the trained model. budget_allocation.py runs Meridian's</text>
+<text x="114" y="1065" font-size="11.5" font-weight="400" fill="#374151">own optimizer against a requested budget, or the dataset's own</text>
+<text x="114" y="1082" font-size="11.5" font-weight="400" fill="#374151">historical total if none was given. standardize_results.py packages</text>
+<text x="114" y="1099" font-size="11.5" font-weight="400" fill="#374151">all of it into the one shape GET /results/abc123 actually returns.</text>
+<rect x="96" y="1145" width="798" height="90.0" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
+<circle cx="66" cy="1172" r="17" fill="#E6F5ED" stroke="#00994D" stroke-width="2"/>
+<text x="66" y="1177" font-size="13" font-weight="700" fill="#007A3D" font-family="JetBrains Mono, monospace" text-anchor="middle">8</text>
+<text x="114" y="1176" font-size="13.5" font-weight="700" fill="#007A3D">Done: status is completed, results are available</text>
+<text x="114" y="1198" font-size="11.5" font-weight="400" fill="#374151">Both GET /status/abc123 and GET /results/abc123 now return real,</text>
+<text x="114" y="1215" font-size="11.5" font-weight="400" fill="#374151">final data, checkable independently, at any point after this.</text>
+</svg>
+</div>
+<p class="figcap">Three real files run this whole trace: <code>api.py</code> (the three endpoints),
+<code>celery_app.py</code> + <code>tasks.py</code> (the queue and worker), and
+<code>job_processor.py</code> (ties every modeling step together in order).</p>
+
+<h2 class="section"><span class="num">03</span>The one job that's still yours</h2>
+<p class="section-why">The single most important thing in this whole handover. Hammad's own
+document says it directly: the pre-assembly step, joining the raw dataset, the column mapping, and
+the model configuration into one file, "is not this scope's responsibility." It's ours.</p>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 430" role="img" aria-label="Three real inputs, the raw uploaded file, the column mapping the user chose, and the model configuration, converge into one assembly step which is our backend, not Hammad's worker. That step produces one JSON file saved to Blob storage, and only a small pointer to that file, the dataset reference, is what actually gets sent to the job queue.">
+<rect x="30" y="30" width="270" height="130" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="44" y="56" font-size="11.5" font-weight="700" fill="#007A3D">RAW UPLOADED FILE</text>
+<text x="44" y="74" font-size="10" font-weight="400" fill="#374151">"Date": "2022-01-03"</text>
+<text x="44" y="89" font-size="10" font-weight="400" fill="#374151">"Accounts Subscriptions": 4182</text>
+<text x="44" y="104" font-size="10" font-weight="400" fill="#374151">"TV Cost": 0</text>
+<text x="44" y="119" font-size="10" font-weight="400" fill="#374151">"Meta Cost": 11637.193</text>
+<text x="44" y="134" font-size="10" font-weight="400" fill="#374151">CMP-38, what a user uploads</text>
+<rect x="335" y="30" width="270" height="130" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="349" y="56" font-size="11.5" font-weight="700" fill="#007A3D">COLUMN MAPPING</text>
+<text x="349" y="74" font-size="10" font-weight="400" fill="#374151">date_column: "Date"</text>
+<text x="349" y="89" font-size="10" font-weight="400" fill="#374151">target_column: "Accounts...</text>
+<text x="349" y="104" font-size="10" font-weight="400" fill="#374151">media_columns: [TV Cost, ...]</text>
+<text x="349" y="119" font-size="10" font-weight="400" fill="#374151">chosen on the Configure screen</text>
+<rect x="640" y="30" width="270" height="130" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="654" y="56" font-size="11.5" font-weight="700" fill="#007A3D">MODEL CONFIGURATION</text>
+<text x="654" y="74" font-size="10" font-weight="400" fill="#374151">kpi_type: "non_revenue"</text>
+<text x="654" y="89" font-size="10" font-weight="400" fill="#374151">TV Cost: carryover 0.85,</text>
+<text x="654" y="104" font-size="10" font-weight="400" fill="#374151">saturation 1.5</text>
+<text x="654" y="119" font-size="10" font-weight="400" fill="#374151">calibration, target_budget</text>
+<line x1="165" y1="160" x2="470" y2="205" stroke="#6B7280" stroke-width="1.6"/>
+<line x1="470" y1="160" x2="470" y2="205" stroke="#6B7280" stroke-width="1.6"/>
+<line x1="775" y1="160" x2="470" y2="205" stroke="#6B7280" stroke-width="1.6"/>
+<circle cx="470" cy="205" r="4" fill="#6B7280"/>
+<line x1="470" y1="205" x2="470" y2="231" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
+<rect x="220" y="235" width="500" height="60" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="234" y="261" font-size="11.5" font-weight="700" fill="#4B5563">ASSEMBLY, THIS IS OUR BACKEND'S JOB, NOT HAMMAD'S</text>
+<text x="234" y="279" font-size="10" font-weight="400" fill="#6B7280">Not built yet. Combines the three inputs above into one structured file.</text>
+<line x1="470" y1="295" x2="470" y2="321" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
+<rect x="320" y="325" width="300" height="55" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="334" y="351" font-size="11.5" font-weight="700" fill="#4B5563">ONE JSON FILE, SAVED TO BLOB</text>
+<text x="334" y="369" font-size="10" font-weight="400" fill="#6B7280">Cloudflare R2 for now, Azure Blob Storage later</text>
+<line x1="470" y1="380" x2="470" y2="406" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
+<text x="470" y="415" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">a small pointer, "dataset_reference", is the only</text>
+<text x="470" y="430" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">thing that actually reaches Hammad's queue</text>
+<defs><marker id="massembly" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
+</svg>
+</div>
+<p class="figcap">Hammad's code never touches the raw file, and never queries more than one file.
+It reads exactly the one JSON at <code>dataset_reference</code>. Building that JSON is the real
+shape of <code>CMP-79</code>, which every earlier doc on this project listed as "not yet defined."
+It is defined now, by this handover.</p>
+
+<h2 class="section"><span class="num">04</span>Where "model selection" came from, and why it's wrong</h2>
+<p class="section-why">Farhan's screenshot showed Cassandra letting a user pick between Sibyl,
+Robyn, and Meridian. That's real, for Cassandra. It doesn't apply here.</p>
+<div class="watch">
+  <span class="lbl">There's only one real engine, already built</span>
+  <p>Hammad's handover is explicit: "Given a marketing dataset, it trains a real model through
+  Google's Meridian." One engine, already proven on real GPU training, more than once. There's
+  nothing for a user to choose between. Farhan's request almost certainly came from looking at
+  Cassandra, a tool that genuinely supports several engines, without knowing ours doesn't need to.</p>
+</div>
+<p>What Cassandra's screens actually are, though, is still useful, just not as a model picker. Its
+wizard steps line up almost field-for-field with what Hammad's real contract needs:</p>
+<table class="map">
+<tr><th>Cassandra's screen</th><th>What it really is, in Hammad's contract</th></tr>
+<tr><td class="screen">Upload Data</td><td>The raw file itself, <code>CMP-38</code></td></tr>
+<tr><td class="screen">Configure</td><td><code>column_mapping</code> (date/target/media/control/organic
+columns) and <code>kpi_type</code></td></tr>
+<tr><td class="screen">Optimize</td><td>The date range the training actually runs against</td></tr>
+<tr><td class="screen">Calibrate</td><td><code>model_configuration.calibration</code>
+(<code>contribution_belief_percent</code>, <code>confidence_percent</code>)</td></tr>
+<tr><td class="screen">Hyperparameterization</td><td><code>model_configuration.channels</code>, per-channel
+<code>carryover</code> and <code>saturation</code></td></tr>
+</table>
+<p>Not a screen to build today, this table exists so the next real design conversation starts from
+the actual contract, not a guess at one.</p>
+
+<h2 class="section"><span class="num">05</span>Colab was never the destination</h2>
+<p class="section-why">Answering your direct question: yes, this was already the plan, this
+handover doesn't change it.</p>
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 190" role="img" aria-label="Colab plus ngrok is a real, proven testing bridge, used only because training needs a GPU the local machine does not have. It is not the deployment target. The real target, unchanged by this handover, is Azure Container Apps, already the plan in Architecture dot html.">
+<rect x="30" y="30" width="420" height="130" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="44" y="56" font-size="11.5" font-weight="700" fill="#007A3D">COLAB + NGROK, TODAY</text>
+<text x="44" y="74" font-size="10" font-weight="400" fill="#374151">Real, proven: training runs on a real GPU,</text>
+<text x="44" y="89" font-size="10" font-weight="400" fill="#374151">end to end, more than once.</text>
+<text x="44" y="104" font-size="10" font-weight="400" fill="#374151">A temporary public URL (ngrok) lets the</text>
+<text x="44" y="119" font-size="10" font-weight="400" fill="#374151">local queue reach it.</text>
+<text x="44" y="134" font-size="10" font-weight="400" fill="#374151">"A bridge for testing only, no place in</text>
+<text x="44" y="149" font-size="10" font-weight="400" fill="#374151">the production architecture." (Hammad)</text>
+<line x1="450" y1="95" x2="486" y2="95" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#mcolab)"/>
+<rect x="490" y="30" width="420" height="130" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="504" y="56" font-size="11.5" font-weight="700" fill="#4B5563">AZURE CONTAINER APPS, THE TARGET</text>
+<text x="504" y="74" font-size="10" font-weight="400" fill="#6B7280">Not built yet. Already the plan before this</text>
+<text x="504" y="89" font-size="10" font-weight="400" fill="#6B7280">handover, unchanged by it.</text>
+<text x="504" y="104" font-size="10" font-weight="400" fill="#6B7280">Scales a real container to zero when idle,</text>
+<text x="504" y="119" font-size="10" font-weight="400" fill="#6B7280">starts one per job on demand.</text>
+<text x="504" y="134" font-size="10" font-weight="400" fill="#6B7280">Same box already in ARCHITECTURE.html</text>
+<text x="504" y="149" font-size="10" font-weight="400" fill="#6B7280">Section 06.</text>
+<defs><marker id="mcolab" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker></defs>
+</svg>
+</div>
+<p class="figcap">Colab has a GPU, the local machine testing this doesn't, so training is bridged
+over to it through a temporary public URL (ngrok) for testing and demo purposes only. Nothing about
+that changes what the real deployed system looks like.</p>
+
+<h2 class="section"><span class="num">06</span>What's proven, and what's still a known gap</h2>
+<p class="section-why">Straight from Hammad's own overview, not softened, not guessed at.</p>
+<div class="checklist">
+  <div class="col proven">
+    <h4>Fully proven, tested multiple times</h4>
+    <ul>
+      <li>The full pipeline: fetch, structural check, real data validation, warnings, configuration,
+      training, results extraction, budget allocation, packaging</li>
+      <li>The queue and worker system, jobs sent, picked up, processed, checked independently after</li>
+      <li>Multiple jobs queuing correctly, successes and failures both handled cleanly</li>
+      <li>Real Meridian training on real GPU compute, real sane results, not placeholder data</li>
+      <li>The full local-plus-Colab setup, run end to end more than once</li>
+    </ul>
+  </div>
+  <div class="col gap">
+    <h4>Built and working, with known open gaps</h4>
+    <ul>
+      <li>Results are written to Redis as a stand-in, not a real database yet. The schema decision
+      exists, the write doesn't</li>
+      <li><code>saturation_curves</code>' effect field isn't yet confirmed to be a clean percentage</li>
+      <li>Budget allocation's structured-data extraction leans on a less-documented Meridian method,
+      flagged directly in the code's own comments</li>
+    </ul>
+  </div>
+</div>
+
+<h2 class="section"><span class="num">07</span>What's next</h2>
+<div class="card">
+  <p><b>Read the four documents, in this order</b>: <code>Handover_Overview_v2.docx</code> first
+  (the big picture, already summarized above), then <code>Codebase_Reference_v2.docx</code> (every
+  file, what it does), then <code>Execution_Guide_v2.docx</code> (how to actually run it),
+  then <code>MMM API Contracts - v6 Draft.docx</code> (the exact shapes above, in full).
+  <code>Results_Field_Glossary_v2.docx</code> is a reference for later, once results actually need
+  displaying.</p>
+  <p><b><code>CMP-79</code> is answerable now.</b> It was tracked as "define the job queue message
+  contract," and that contract already exists, in the API Contracts document. The real remaining
+  work is the assembly step in Section 03 above: taking an uploaded dataset plus a column-mapping
+  step plus a configuration step, producing the one JSON file, saving it to Blob (Cloudflare R2 for
+  now), and sending the small pointer message to the queue.</p>
+  <p><b>The Dataset schema built earlier today needs a real correction.</b> It currently has a
+  <code>modelType</code> picklist (<code>meridian</code> / <code>pymc_marketing</code>), based on the
+  old, now-stale assumption that the engine wasn't decided yet. It is decided, it's Meridian, and
+  there's nothing to pick. That field should come out, or stay only as an internal, fixed value, not
+  a real screen a user sees.</p>
+  <p><b>Amna's prompt needs the same correction.</b> It currently describes a "model selection"
+  screen between project and dataset. That should become a Configure step after dataset upload,
+  matching the real mapping table in Section 04, not a model picker.</p>
+  <p><b>Worth a short message to Farhan</b>, so the "model selection" request doesn't resurface
+  later: Cassandra supports multiple engines, ours doesn't need to, Hammad's handover confirms
+  Meridian is the one real engine, already built and proven.</p>
+</div>
+
+<div class="maintain">
+  <h3>Keeping this page real</h3>
+  <ol>
+    <li>When the assembly step (Section 03) actually gets built, its box in the diagram changes from
+    dashed grey to solid green, same convention as every other page on this project.</li>
+    <li>When Hammad's known gaps (Section 06) get closed, move the item from the amber column to the
+    green one, don't just delete it, a closed gap is still worth knowing was ever open.</li>
+    <li>If the real contract in <code>MMM API Contracts</code> changes version, this page's Section 02
+    and 03 examples need to be checked against the new version, not assumed still accurate.</li>
+  </ol>
+</div>
+
+<footer>
+  <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  MMM Platform &middot; written from Hammad's real handover documents, not a summary of a summary.
+</footer>
+
+</div>
+</body>
+</html>

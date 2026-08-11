@@ -8,6 +8,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { UsersModule } from './modules/users/users.module';
 import { ProjectsModule } from './modules/projects/projects.module';
+import { DatasetsModule } from './modules/datasets/datasets.module';
+import { OtpModule } from './modules/otp/otp.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { ProjectsModule } from './modules/projects/projects.module';
     TenantsModule,
     UsersModule,
     ProjectsModule,
+    DatasetsModule,
+    OtpModule,
   ],
 })
 export class AppModule {}
