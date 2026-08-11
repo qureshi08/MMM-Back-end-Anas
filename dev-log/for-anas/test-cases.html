@@ -113,9 +113,9 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">13</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">1</div><div class="l">Waiting on you</div></div>
-  <div class="stat"><div class="n">14</div><div class="l">Total cases</div></div>
+  <div class="stat pass"><div class="n">15</div><div class="l">Passing</div></div>
+  <div class="stat wait"><div class="n">5</div><div class="l">Waiting on you</div></div>
+  <div class="stat"><div class="n">20</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -805,6 +805,141 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
     </div>
   </div>
 </details>
+
+<h2 class="section">Sample dataset download (CMP-38)</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-15</span><h3>Sample dataset download, no sign-in needed</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026, a real local server plus a real <code>curl</code> request</span><span><b>Tool:</b> a browser link, or <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code> in Postman with no Authorization needed</span></div>
+    <p>Answers the "add a sample dataset to download" request: a real 16-week CSV, in the exact
+    column shape Hammad's model expects (<code>Date</code>, one KPI column, then the media and
+    control columns) sits in the repo at <code>Backend/samples/sample-dataset.csv</code> and is
+    served back byte for byte, no authentication required, since there's nothing tenant-specific or
+    sensitive in an example file.</p>
+    <ol>
+      <li>In a browser, or a new tab, go to
+      <code>https://mmm-back-end-anas.onrender.com/api/v1/samples/dataset.csv</code>.</li>
+      <li>Or in Postman: a new request, <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code>, no
+      auth tab needed, <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The file downloads (browser) or the response body shows the real CSV (Postman), status
+      <code>200</code>, header <code>Content-Disposition: attachment; filename="sample-dataset.csv"</code>.
+      Verified locally: correct headers, correct <code>Content-Type: text/csv</code>, and the body
+      matches the file on disk exactly. This is what Amna's "Download sample dataset" link on the
+      Upload Data screen should point at.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section">The whole frontend, start to finish</h2>
+<p style="margin:0 0 20px;max-width:72ch">Everything above tests the backend directly, through Postman.
+This section is different: it's <b>only the real deployed app in a browser</b>, clicking through
+exactly what Amna and Farhan built, in the exact order a real user hits it. No Postman, no pgAdmin,
+nothing but your own eyes on the screen. Five steps, each one either works or it doesn't.</p>
+
+<details class="tc">
+  <summary><span class="id">TC-16</span><h3>Step 1, Sign in</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> not run end to end by Anas as one continuous pass yet</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
+    <ol>
+      <li>Open the real frontend URL (ask Farhan for the current Vercel link if you don't have it
+      pinned already).</li>
+      <li>Click sign in, pick your Microsoft account.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Microsoft's own real sign-in screen appears, you approve it, and you land back inside the
+      app, no error page, no blank screen.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-17</span><h3>Step 2, Verify (the email code)</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-16 done, still signed in</span></div>
+    <ol>
+      <li>The app should show a code-entry screen right after sign-in.</li>
+      <li>Check your inbox (the one tied to the Microsoft account you signed in with) for a real
+      6-digit code from <code>muhammad.anas.quershi@convergentbt.com</code>.</li>
+      <li>Type the 6 digits in, submit.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The email arrives within a minute or two, the correct code is accepted and the app moves
+      you forward. You already proved the reverse of this in TC-14 (a wrong code gets rejected with
+      "Incorrect code."), this step just confirms the correct path.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-18</span><h3>Step 3, Projects</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-17 done</span></div>
+    <ol>
+      <li>You should land on a project list, and nothing else in the navigation, no sidebar of
+      other sections. That's deliberate, see the tunnel diagram in <code>ARCHITECTURE.html</code>.</li>
+      <li>Create a new project, or open an existing one.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>A real project is created or opened, and you're taken to the Upload Data screen for it.
+      If you create one, check it's really there afterward with <b>GET /projects, list</b> in
+      Postman, same as TC-06 through TC-10 already prove for the API side.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-19</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-18 done, a project open</span></div>
+    <ol>
+      <li>On the Upload Data screen, look for the <b>Download sample dataset</b> link (see the note
+      to Amna about wiring this to TC-15's endpoint, below).</li>
+      <li>Click it, confirm a real CSV downloads.</li>
+      <li>Pick a model from the dropdown (only <code>Meridian</code> exists today, that's expected,
+      see the Cassandra note in <code>modeling-engine-explained.html</code> Section 04).</li>
+      <li>Drop or browse to a real file, either the sample you just downloaded or your own, click
+      <b>Continue</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The sample downloads correctly (TC-15's endpoint). The upload succeeds and the screen
+      moves you forward. This is the exact same real operation TC-12 already proved works at the
+      API, database and storage layers, this step just confirms the real screen calls it correctly
+      too. If it fails here but TC-12 passed in Postman, the bug is in the frontend's request, not
+      the backend, tell Amna that distinction directly.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-20</span><h3>Step 5, Configure</h3><span class="badge wait">Not built yet, expected to stop here</span></summary>
+  <div class="body">
+    <p>Configure (column mapping) isn't built on either side yet, backend or frontend, see the
+    dashed box in the tunnel diagram. Reaching Upload Data and completing TC-19 is the real finish
+    line for the frontend today. If the app dead-ends, errors, or shows a placeholder right after
+    Upload Data, that's expected, not a bug to report.</p>
+  </div>
+</details>
+
+<div class="protocol" id="amna-sample-link">
+  <h3>Note to pass to Amna: wiring the sample download link</h3>
+  <p style="margin:0 0 12px;max-width:72ch">The new endpoint is real and live:
+  <code>GET https://mmm-back-end-anas.onrender.com/api/v1/samples/dataset.csv</code>. No
+  authentication header needed, it's a plain public file download, so the "Download sample
+  dataset" link on the Upload Data screen can just be a normal <code>&lt;a href&gt;</code> pointing
+  straight at that URL, no fetch call, no token, no special handling. A real click downloads
+  <code>sample-dataset.csv</code>, 16 weeks of data in the same columns the upload expects:
+  <code>Date</code>, one KPI column (<code>Accounts Subscriptions</code>), then the media and
+  control columns (<code>Google Display Cost</code>, <code>TV Cost</code>, <code>Meta Cost</code>,
+  and so on, plus the 0/1 flag columns for holidays and promotions).</p>
+</div>
 
 <footer>
   <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
