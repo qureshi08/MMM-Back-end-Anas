@@ -24,6 +24,39 @@ export enum DatasetStatus {
   FAILED = 'failed',
 }
 
+export enum KpiType {
+  REVENUE = 'revenue',
+  NON_REVENUE = 'non_revenue',
+}
+
+/** What the Configure screen actually collects, matching Hammad's `column_mapping` field for field. */
+export interface ColumnMapping {
+  dateColumn: string;
+  targetColumn: string;
+  mediaColumns: string[];
+  controlColumns: string[];
+  organicColumns: string[];
+}
+
+/** What the Optimize screen collects: the date range the training run actually uses. */
+export interface DateRange {
+  startDate: string;
+  endDate: string;
+}
+
+/** What the Calibrate screen collects, matching `model_configuration.calibration`. */
+export interface Calibration {
+  contributionBeliefPercent: number;
+  confidencePercent: number;
+}
+
+/** One row per channel from the Hyperparameterization screen, matching `model_configuration.channels`. */
+export interface ChannelHyperparameter {
+  channel: string;
+  carryover: number;
+  saturation: number;
+}
+
 /**
  * `StorageProvider` exists so a dataset's row always says which backend its
  * file actually lives in, not just which one is configured today. Dev runs
@@ -84,6 +117,21 @@ export class Dataset extends BaseEntity {
 
   @Column({ type: 'text', enum: DatasetStatus, default: DatasetStatus.UPLOADED })
   status: DatasetStatus;
+
+  @Column({ name: 'column_mapping', type: 'jsonb', nullable: true })
+  columnMapping: ColumnMapping | null;
+
+  @Column({ name: 'kpi_type', type: 'text', enum: KpiType, nullable: true })
+  kpiType: KpiType | null;
+
+  @Column({ name: 'date_range', type: 'jsonb', nullable: true })
+  dateRange: DateRange | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  calibration: Calibration | null;
+
+  @Column({ name: 'channel_hyperparameters', type: 'jsonb', nullable: true })
+  channelHyperparameters: ChannelHyperparameter[] | null;
 
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at' })
   deletedAt: Date | null;

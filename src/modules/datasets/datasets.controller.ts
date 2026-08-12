@@ -9,6 +9,7 @@ import {
   Param,
   ParseFilePipe,
   ParseUUIDPipe,
+  Patch,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -17,6 +18,10 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { DatasetsService } from './datasets.service';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
+import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
+import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
+import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
+import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { Dataset } from './entities/dataset.entity';
@@ -62,5 +67,41 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     return this.datasets.remove(id, user.userId!);
+  }
+
+  @Patch('datasets/:id/configuration')
+  configure(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: ConfigureDatasetDto,
+  ): Promise<Dataset> {
+    return this.datasets.configure(id, user.userId!, dto);
+  }
+
+  @Patch('datasets/:id/optimize')
+  optimize(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: OptimizeDatasetDto,
+  ): Promise<Dataset> {
+    return this.datasets.optimize(id, user.userId!, dto);
+  }
+
+  @Patch('datasets/:id/calibration')
+  calibrate(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CalibrateDatasetDto,
+  ): Promise<Dataset> {
+    return this.datasets.calibrate(id, user.userId!, dto);
+  }
+
+  @Patch('datasets/:id/hyperparameters')
+  hyperparameterize(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: HyperparameterizeDatasetDto,
+  ): Promise<Dataset> {
+    return this.datasets.hyperparameterize(id, user.userId!, dto);
   }
 }

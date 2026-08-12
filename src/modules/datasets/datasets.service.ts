@@ -1,12 +1,21 @@
-import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { Project } from '../projects/entities/project.entity';
 import { Dataset, DatasetStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
+import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
+import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
+import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
+import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
+import {
+  assertChannelsMatchMediaColumns,
+  assertNoDuplicateColumns,
+  assertValidDateRange,
+} from './validators/validate-configuration';
 
 /**
  * `datasets` has Row-Level Security, same reasoning as `ProjectsService`:
@@ -102,5 +111,86 @@ export class DatasetsService {
     const project = await this.findProjectOrThrow(dataset.projectId);
     this.assertProjectOwner(project, requesterId);
     await this.repo().softDelete(id);
+  }
+
+  /** Same ownership rule every other write on a dataset uses: the project owner, via the dataset's project. */
+  private async findOwnedDatasetOrThrow(id: string, requesterId: string): Promise<Dataset> {
+    const dataset = await this.findOne(id);
+    const project = await this.findProjectOrThrow(dataset.projectId);
+    this.assertProjectOwner(project, requesterId);
+    return dataset;
+  }
+
+  /**
+   * The Configure step (CMP-79-adjacent). This is the piece Save
+   * Configuration had nothing to call before today.
+   */
+  async configure(id: string, requesterId: string, dto: ConfigureDatasetDto): Promise<Dataset> {
+    await this.findOwnedDatasetOrThrow(id, requesterId);
+
+    const organicColumns = dto.organicColumns ?? [];
+    assertNoDuplicateColumns([dto.dateColumn, dto.targetColumn, ...dto.mediaColumns, ...dto.controlColumns, ...organicColumns]);
+
+    await this.repo().update(id, {
+      columnMapping: {
+        dateColumn: dto.dateColumn,
+        targetColumn: dto.targetColumn,
+        mediaColumns: dto.mediaColumns,
+        controlColumns: dto.controlColumns,
+        organicColumns,
+      },
+      kpiType: dto.kpiType,
+    });
+    return this.findOne(id);
+  }
+
+  /** The Optimize step: the date range the training run actually uses. */
+  async optimize(id: string, requesterId: string, dto: OptimizeDatasetDto): Promise<Dataset> {
+    await this.findOwnedDatasetOrThrow(id, requesterId);
+    assertValidDateRange(dto.startDate, dto.endDate);
+
+    await this.repo().update(id, { dateRange: { startDate: dto.startDate, endDate: dto.endDate } });
+    return this.findOne(id);
+  }
+
+  /** The Calibrate step: model_configuration.calibration. */
+  async calibrate(id: string, requesterId: string, dto: CalibrateDatasetDto): Promise<Dataset> {
+    await this.findOwnedDatasetOrThrow(id, requesterId);
+
+    await this.repo().update(id, {
+      calibration: {
+        contributionBeliefPercent: dto.contributionBeliefPercent,
+        confidencePercent: dto.confidencePercent,
+      },
+    });
+    return this.findOne(id);
+  }
+
+  /**
+   * The Hyperparameterization step: model_configuration.channels. Requires
+   * Configure to already be saved, and requires the channel names to be
+   * exactly the media columns Configure named, no more, no fewer, since
+   * Hammad's model needs one carryover/saturation pair per real media
+   * channel, not an arbitrary list.
+   */
+  async hyperparameterize(id: string, requesterId: string, dto: HyperparameterizeDatasetDto): Promise<Dataset> {
+    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, hyperparameters are set per media column.');
+    }
+    assertChannelsMatchMediaColumns(
+      dataset.columnMapping.mediaColumns,
+      dto.channels.map((c) => c.channel),
+    );
+
+    await this.repo().update(id, {
+      channelHyperparameters: dto.channels.map((c) => ({
+        channel: c.channel,
+        carryover: c.carryover,
+        saturation: c.saturation,
+      })),
+    });
+    return this.findOne(id);
   }
 }
