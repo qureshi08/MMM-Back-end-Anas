@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hammad Call Prep · MMM</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --cbt-primary:#00994D; --cbt-primary-dark:#007A3D; --cbt-primary-muted:#E6F5ED;
+    --cbt-white:#FFFFFF;   --cbt-surface:#F7F8F7;      --cbt-border:#E2E8E4;
+    --cbt-muted:#6B7280;   --cbt-body:#374151;         --cbt-heading:#0C1A10;
+    --cbt-warning:#F59E0B; --cbt-warning-muted:#FEF7E7; --cbt-warning-dark:#8A5A06;
+    --cbt-blue:#2563EB; --cbt-blue-muted:#EAF1FD; --cbt-blue-dark:#1D4ED8;
+    --cbt-font-heading:"Playfair Display",Georgia,"Times New Roman",serif;
+    --cbt-font-body:"DM Sans","Helvetica Neue",Arial,sans-serif;
+    --cbt-font-mono:"JetBrains Mono","Courier New",monospace;
+    --cbt-radius-sm:6px; --cbt-radius-md:12px; --cbt-radius-lg:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cbt-white);color:var(--cbt-body);
+    font:16px/1.68 var(--cbt-font-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px 100px}
+  code{font-family:var(--cbt-font-mono);background:var(--cbt-surface);border:1px solid var(--cbt-border);
+    padding:1px 6px;border-radius:4px;font-size:.88em;color:var(--cbt-heading)}
+
+  .brandbar{display:flex;align-items:center;gap:14px;padding:22px 0 0}
+  .brandbar img{height:32px;width:auto;display:block}
+  .brandbar span{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--cbt-muted);
+    padding-left:14px;border-left:1px solid var(--cbt-border)}
+  header{padding:26px 0 36px}
+  .kicker{color:var(--cbt-primary);font-weight:600;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  h1{font-family:var(--cbt-font-heading);font-weight:700;font-size:clamp(30px,5vw,46px);
+    line-height:1.1;margin:14px 0 16px;letter-spacing:-.02em;color:var(--cbt-heading)}
+  .italic-accent{font-style:italic;color:var(--cbt-primary)}
+  .sub{color:var(--cbt-muted);font-size:1.1rem;max-width:66ch;margin:0}
+
+  h2.section{font-family:var(--cbt-font-heading);font-size:1.5rem;font-weight:700;color:var(--cbt-heading);
+    margin:48px 0 6px}
+  .section-why{color:var(--cbt-muted);font-size:14px;margin:0 0 20px;max-width:68ch}
+
+  .pull{border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+    border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:16px 0}
+  .pull p{margin:0}
+
+  .qcard{border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);padding:22px 24px;margin:0 0 18px}
+  .qcard .n{display:inline-block;font-family:var(--cbt-font-mono);font-size:11px;font-weight:700;
+    color:var(--cbt-primary-dark);background:var(--cbt-primary-muted);border-radius:999px;
+    padding:3px 10px;margin-bottom:10px}
+  .qcard h3{font-family:var(--cbt-font-heading);font-size:1.2rem;font-weight:700;margin:0 0 10px;color:var(--cbt-heading)}
+  .qcard .ask{background:var(--cbt-surface);border-radius:var(--cbt-radius-sm);padding:12px 16px;
+    font-size:15px;margin:0 0 12px;font-weight:600;color:var(--cbt-heading)}
+  .qcard .why{margin:0;font-size:14.5px;color:var(--cbt-body)}
+  .qcard .why b{color:var(--cbt-heading)}
+
+  .known{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:24px 28px;margin:0 0 20px}
+  .known h4{font-family:var(--cbt-font-heading);font-size:1.05rem;margin:0 0 10px;color:var(--cbt-heading)}
+  .known ul{margin:0;padding-left:20px}
+  .known li{margin:6px 0;font-size:14.5px}
+
+  .figwrap{margin:20px 0}
+  svg{width:100%;height:auto;display:block}
+  .figcap{color:var(--cbt-muted);font-size:13px;margin:8px 0 0;max-width:70ch}
+
+  .writeback{background:var(--cbt-primary);color:#fff;border-radius:var(--cbt-radius-lg);padding:26px 28px;margin:36px 0}
+  .writeback h3{font-family:var(--cbt-font-heading);margin:0 0 10px;font-size:1.2rem}
+  .writeback ol{margin:0;padding-left:20px}
+  .writeback li{margin:6px 0}
+
+  footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
+    margin-top:40px;color:var(--cbt-muted);font-size:13.5px}
+  .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="brandbar">
+  <img src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  <span>Hammad call prep</span>
+</div>
+
+<header>
+  <div class="kicker">MMM Platform &middot; Before you talk to Hammad</div>
+  <h1>What to <span class="italic-accent">actually ask</span></h1>
+  <p class="sub">You said it yourself: you don't want to walk in and vibe it. This page is the fix.
+  Everything below the first section is real, taken from Hammad's own handover documents, already
+  read and built against. You don't need to re-derive any of it in the call, only ask what's still
+  genuinely unknown.</p>
+</header>
+
+<h2 class="section">What you already know, so you don't waste time re-asking it</h2>
+<p class="section-why">All of this came from Hammad's own four handover documents, and has already
+shaped real code. Say it back to him if you want to confirm you're both on the same page, but there's
+nothing here to figure out live.</p>
+
+<div class="known">
+  <h4>The real pipeline, already proven, tested more than once</h4>
+  <ul>
+    <li>A job enters a queue as a tiny message: <code>{"job_id": "abc123", "dataset_reference": "&lt;pointer to one file&gt;"}</code>. Not the dataset itself, just a pointer.</li>
+    <li>His worker fetches that one file, checks its structure, checks the real data (negative spend, bad dates, missing values), then trains a real Meridian model on real GPU compute.</li>
+    <li>Progress is checkable while it runs: <code>GET /status/abc123</code> returns something like <code>{"status": "running", "progress": 0.42}</code>.</li>
+    <li>When done: <code>GET /results/abc123</code> returns channel performance, accuracy, and budget allocation, real numbers, not placeholders.</li>
+    <li>Today this whole thing runs through Colab (for the free GPU) plus ngrok (a temporary public link so our queue can reach it). Hammad's own words: "a bridge for testing only, no place in the production architecture."</li>
+  </ul>
+</div>
+
+<div class="known">
+  <h4>What's ours to build, not his, already scoped as CMP-79</h4>
+  <ul>
+    <li>Hammad's worker never sees the raw uploaded file, the Configure answers, or the model settings separately. It reads exactly one JSON file, already assembled.</li>
+    <li>Building that one JSON, from the real dataset plus everything a user picked in Configure, Optimize, Calibrate and Hyperparameterization, is explicitly <b>our</b> job, stated directly in his own document, not an open question.</li>
+    <li>That assembly step is the one real piece of backend work still ahead. It is not built yet.</li>
+  </ul>
+</div>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 260" role="img" aria-label="A real dataset and everything a user configured flow into an assembly step, which is our job and not yet built, producing one JSON file saved to storage. Only a small pointer to that file is sent to Hammad's queue. From there his worker takes over, already proven, already tested.">
+<rect x="20" y="30" width="220" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="34" y="56" font-size="11.5" font-weight="700" fill="#007A3D">DATASET + CONFIGURE</text>
+<text x="34" y="74" font-size="10" font-weight="400" fill="#374151">Real, live, built by us</text>
+<text x="34" y="89" font-size="10" font-weight="400" fill="#374151">confirmed working today</text>
+<line x1="240" y1="75" x2="276" y2="75" stroke="#6B7280" stroke-width="1.6" marker-end="url(#hcparrow)"/>
+<rect x="280" y="30" width="220" height="90" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="294" y="56" font-size="11.5" font-weight="700" fill="#4B5563">ASSEMBLY (CMP-79)</text>
+<text x="294" y="74" font-size="10" font-weight="400" fill="#6B7280">Not built yet. Ours, not his.</text>
+<text x="294" y="89" font-size="10" font-weight="400" fill="#6B7280">Makes the one real JSON file.</text>
+<line x1="500" y1="75" x2="536" y2="75" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#hcparrowgrey)"/>
+<rect x="540" y="30" width="180" height="90" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="554" y="56" font-size="11.5" font-weight="700" fill="#4B5563">ONE JSON FILE</text>
+<text x="554" y="74" font-size="10" font-weight="400" fill="#6B7280">Saved to storage,</text>
+<text x="554" y="89" font-size="10" font-weight="400" fill="#6B7280">a pointer sent onward</text>
+<line x1="720" y1="75" x2="756" y2="75" stroke="#F59E0B" stroke-width="2" marker-end="url(#hcparrowamber)"/>
+<rect x="760" y="20" width="160" height="110" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="2"/>
+<text x="774" y="46" font-size="11.5" font-weight="700" fill="#8A5A06">HAMMAD'S QUEUE</text>
+<text x="774" y="64" font-size="10" font-weight="400" fill="#374151">Where does this</text>
+<text x="774" y="79" font-size="10" font-weight="400" fill="#374151">pointer actually</text>
+<text x="774" y="94" font-size="10" font-weight="400" fill="#374151">go, right now?</text>
+<text x="774" y="112" font-size="10" font-weight="700" fill="#8A5A06">ASK THIS</text>
+<line x1="900" y1="120" x2="900" y2="156" stroke="#6B7280" stroke-width="1.6" marker-end="url(#hcparrow)"/>
+<rect x="620" y="160" width="300" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="634" y="186" font-size="11.5" font-weight="700" fill="#007A3D">TRAIN, THEN RESULTS</text>
+<text x="634" y="204" font-size="10" font-weight="400" fill="#374151">Proven, tested, real GPU training,</text>
+<text x="634" y="219" font-size="10" font-weight="400" fill="#374151">real results. Nothing to ask here,</text>
+<text x="634" y="234" font-size="10" font-weight="400" fill="#374151">this part already works.</text>
+<defs>
+<marker id="hcparrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
+<marker id="hcparrowgrey" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker>
+<marker id="hcparrowamber" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#F59E0B"/></marker>
+</defs>
+</svg>
+</div>
+<p class="figcap">Green means built and proven. Dashed grey means ours to build, not started. Amber
+is the one real unknown, the whole reason for today's call.</p>
+
+<h2 class="section">The real questions, in order</h2>
+<p class="section-why">Six questions. The first one is the one that actually blocks everything else,
+ask it first, the rest are follow-ups off whatever he says.</p>
+
+<div class="qcard">
+  <span class="n">Ask 1, the real blocker</span>
+  <h3>Where does a job actually go, right now, today?</h3>
+  <p class="ask">"When our backend has a real job ready, what's the actual address you want us to
+  send it to, this week?"</p>
+  <p class="why"><b>Why:</b> His worker runs through Colab plus ngrok, a temporary public link that
+  changes every time he restarts it. Without a real, current, reachable address, we can build the
+  assembly step (Ask 3 below) but have nowhere real to send its output. This is the one thing that
+  actually stops backend work from continuing past today.</p>
+</div>
+
+<div class="qcard">
+  <span class="n">Ask 2</span>
+  <h3>Is that address stable enough to build against, or only for a live demo?</h3>
+  <p class="ask">"If that link changes every time you restart Colab, how do we know when it's changed?
+  Should we treat this as throwaway for now, or is it stable enough to actually wire up?"</p>
+  <p class="why"><b>Why:</b> If it's genuinely temporary, building real integration against it is
+  wasted effort, better to fake/stub the call and wait for Azure Container Apps (already the real
+  target, unrelated to this decision). If it's stable enough for now, we build against it directly.</p>
+</div>
+
+<div class="qcard">
+  <span class="n">Ask 3</span>
+  <h3>Confirm the exact shape of the one JSON file we have to build</h3>
+  <p class="ask">"We're building the file that gets pointed at by <code>dataset_reference</code>,
+  containing the raw data plus <code>column_mapping</code>, <code>kpi_type</code>, and
+  <code>model_configuration</code> (calibration and per-channel carryover/saturation). Is that still
+  the exact real shape, or has anything changed since the API Contracts document?"</p>
+  <p class="why"><b>Why:</b> This is the one piece of real backend work left before a job can even be
+  attempted. Better to confirm the shape once, out loud, than build it and find out it drifted.</p>
+</div>
+
+<div class="qcard">
+  <span class="n">Ask 4</span>
+  <h3>Who creates the job_id, us or him?</h3>
+  <p class="ask">"The queue message includes a <code>job_id</code>, does our backend generate that,
+  or does something on your side hand one back to us first?"</p>
+  <p class="why"><b>Why:</b> Small but concrete, changes exactly what our assembly step has to do. If
+  we generate it, that's one line of code. If his side issues it, there's a request/response step
+  before the real job can even be queued.</p>
+</div>
+
+<div class="qcard">
+  <span class="n">Ask 5</span>
+  <h3>Does the status/results polling need auth?</h3>
+  <p class="ask">"GET /status/:id and GET /results/:id, is that endpoint open right now, or does it
+  need a token? If it needs one, what kind?"</p>
+  <p class="why"><b>Why:</b> If our backend needs to poll for a job's status to show the user real
+  progress, it needs to know how to authenticate to his endpoint. Missing this means a working
+  assembly step still can't check on its own job.</p>
+</div>
+
+<div class="qcard">
+  <span class="n">Ask 6</span>
+  <h3>Timeline: when does this move off Colab and ngrok?</h3>
+  <p class="ask">"Roughly when do you expect to move this to something permanent? Should we plan
+  around that date, or treat it as open-ended for now?"</p>
+  <p class="why"><b>Why:</b> Not urgent to answer today, but worth knowing whether "temporary" means
+  next week or next quarter, changes how much effort is worth investing in Colab/ngrok specifically
+  versus waiting.</p>
+</div>
+
+<div class="writeback">
+  <h3>After the call, bring back exactly this</h3>
+  <ol>
+    <li>The real, current address/URL his worker is reachable at (Ask 1).</li>
+    <li>Whether that address is worth building against now, or should be stubbed (Ask 2).</li>
+    <li>Any correction to the JSON shape above, if the contract changed (Ask 3).</li>
+    <li>Who generates <code>job_id</code> (Ask 4).</li>
+    <li>What auth, if any, the status/results endpoints need (Ask 5).</li>
+  </ol>
+</div>
+
+<footer>
+  <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
+  MMM Platform &middot; built from Hammad's real handover documents (<code>dev-log/for-anas/modeling-engine-explained.html</code>
+  covers the full trace, this page is only the part that's still genuinely open).
+</footer>
+
+</div>
+</body>
+</html>
