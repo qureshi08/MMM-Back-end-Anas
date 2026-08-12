@@ -46,6 +46,7 @@
   .legend .swatch.live{background:var(--cbt-primary-muted);border:2px solid var(--cbt-primary)}
   .legend .swatch.notbuilt{background:var(--cbt-white);border:2px dashed var(--cbt-muted)}
   .legend .swatch.auth{background:var(--cbt-blue-muted);border:2px solid var(--cbt-blue)}
+  .legend .swatch.partial{background:var(--cbt-warning-muted);border:2px solid var(--cbt-warning)}
 
   .toc{display:flex;flex-wrap:wrap;gap:8px 10px;margin:0 0 32px;padding:0}
   .toc a{font-size:12.5px;font-weight:600;color:var(--cbt-heading);text-decoration:none;
@@ -147,7 +148,7 @@
   and the exact Azure resources each piece becomes once there's a subscription to deploy it into. A
   living document: this page gets a small edit the same day anything on it changes state, not
   rewritten from scratch each time.</p>
-  <p class="updated">Last updated <b>August 11, 2026</b>. Confirmed against the real, deployed system
+  <p class="updated">Last updated <b>August 12, 2026</b>. Confirmed against the real, deployed system
   and the real source files, not the plan for either.</p>
 </header>
 
@@ -155,6 +156,7 @@
   <div class="item"><span class="swatch live"></span> Built and live, verified for real</div>
   <div class="item"><span class="swatch auth"></span> A third party the system talks to (Microsoft)</div>
   <div class="item"><span class="swatch notbuilt"></span> Planned, not built yet</div>
+  <div class="item"><span class="swatch partial"></span> Partly built: screen exists, not wired to a real backend endpoint yet</div>
 </div>
 
 <div class="toc">
@@ -310,7 +312,7 @@ one box from this picture.</p>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 210" role="img" aria-label="The navigation tunnel, updated 2026-08-11: sign in, then a real email code verification step confirmed working, then only a project list is visible with no other navigation, then Upload Data, a real screen built by Amna with a model dropdown, a file drop zone and a sample dataset download link, then Configure (column mapping, not built), then a next step not yet decided. The first four steps are built and live; the last two are not built yet.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 210" role="img" aria-label="The navigation tunnel, updated 2026-08-12: sign in, then a real email code verification step confirmed working, then only a project list is visible with no other navigation, then Upload Data, a real screen built by Amna with a model dropdown, a file drop zone and a sample dataset download link, then Configure, a real screen with column mapping fields matching Hammad's contract, but Save Configuration has no backend endpoint to call yet so the flow dead ends there, then a next step not yet decided. The first four steps are built and live, Configure is partly built, the last step is not built yet.">
 <text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">THE TUNNEL: WHAT A SIGNED-IN USER CAN REACH, IN ORDER, NOTHING ELSE</text>
 
 <rect x="20" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
@@ -333,10 +335,10 @@ one box from this picture.</p>
 <text x="484" y="106" font-size="10.5" font-weight="400" fill="#374151">Model + file, real</text>
 <text x="484" y="122" font-size="10.5" font-weight="400" fill="#374151">screen, built by Amna</text>
 <line x1="610" y1="115" x2="616" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
-<rect x="620" y="60" width="140" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="634" y="86" font-size="11.5" font-weight="700" fill="#4B5563">CONFIGURE</text>
-<text x="634" y="106" font-size="10.5" font-weight="400" fill="#6B7280">Column mapping,</text>
-<text x="634" y="122" font-size="10.5" font-weight="400" fill="#6B7280">not built yet</text>
+<rect x="620" y="60" width="140" height="110" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6"/>
+<text x="634" y="86" font-size="11.5" font-weight="700" fill="#8A5A06">CONFIGURE</text>
+<text x="634" y="106" font-size="10.5" font-weight="400" fill="#374151">Screen built, save</text>
+<text x="634" y="122" font-size="10.5" font-weight="400" fill="#374151">not wired up yet</text>
 <line x1="760" y1="115" x2="766" y2="115" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#tunarrowgrey)"/>
 <rect x="770" y="60" width="140" height="110" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
 <text x="784" y="86" font-size="11.5" font-weight="700" fill="#4B5563">NEXT STEP</text>
