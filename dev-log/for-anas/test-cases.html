@@ -120,15 +120,14 @@
   <p class="sub">Every real, hands-on check that exists for this backend, kept in one place instead
   of buried inside a status page. Re-run these after anything that could plausibly break them, not
   just the one time they were written.</p>
-  <p class="updated">Last updated <b>August 12, 2026</b>. Reorganized after Anas said this file had
-  become hard to follow: cases renumbered into the order you'd actually hit them, a "three ways to
-  test this" section added up front, and four new cases for the real Configure/Optimize/Calibrate/
-  Hyperparameterization endpoints built today.</p>
+  <p class="updated">Last updated <b>August 12, 2026</b>. All 25 cases passing, confirmed by Anas
+  himself in one real session: the whole tunnel end to end (sign in, verify, projects, upload data,
+  Configure) plus the full Configure/Optimize/Calibrate/Hyperparameterization flow in Postman. First
+  time every case in this file has been personally proven, not just built.</p>
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">20</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">5</div><div class="l">Waiting on you</div></div>
+  <div class="stat pass"><div class="n">25</div><div class="l">Passing</div></div>
   <div class="stat"><div class="n">25</div><div class="l">Total cases</div></div>
 </div>
 
@@ -1052,9 +1051,9 @@ exactly what Amna and Farhan built, in the exact order a real user hits it. No P
 nothing but your own eyes on the screen. Five steps, each one either works or it doesn't.</p>
 
 <details class="tc">
-  <summary><span class="id">TC-21</span><h3>Step 1, Sign in</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-21</span><h3>Step 1, Sign in</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> not run end to end by Anas as one continuous pass yet</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
     <ol>
       <li>Open the real frontend URL (ask Farhan for the current Vercel link if you don't have it
       pinned already).</li>
@@ -1069,9 +1068,9 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-22</span><h3>Step 2, Verify (the email code)</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-22</span><h3>Step 2, Verify (the email code)</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-21 done, still signed in</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-21 done, still signed in</span></div>
     <ol>
       <li>The app should show a code-entry screen right after sign-in.</li>
       <li>Check your inbox (the one tied to the Microsoft account you signed in with) for a real
@@ -1088,9 +1087,9 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-23</span><h3>Step 3, Projects</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-23</span><h3>Step 3, Projects</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-22 done</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-22 done</span></div>
     <ol>
       <li>You should land on a project list, and nothing else in the navigation, no sidebar of
       other sections. That's deliberate, see the tunnel diagram in <code>ARCHITECTURE.html</code>.</li>
@@ -1106,9 +1105,9 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-24</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-24</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-23 done, a project open</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-23 done, a project open</span></div>
     <ol>
       <li>On the Upload Data screen, look for the <b>Download sample dataset</b> link (see the note
       to Amna about wiring this to TC-14's endpoint, below).</li>
@@ -1130,24 +1129,22 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-25</span><h3>Step 5, Configure, still dead-ends at Save for a different reason now</h3><span class="badge wait">Backend ready, frontend not wired yet</span></summary>
+  <summary><span class="id">TC-25</span><h3>Step 5, Configure, now actually saves for real</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend (before the backend endpoint existed)</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend, confirmed working after Amna wired it to the real endpoint</span></div>
     <ol>
       <li>After TC-24's upload, you land on the real Configure screen: Date column, Target/KPI
       column, Revenue/Non-revenue toggle, Media columns, Control columns, Organic columns.</li>
-      <li>Fill in real values (see the tunnel diagram's amber Configure box, or TC-15 above for what
-      each field means and a real worked example) and click <b>Save configuration</b>.</li>
+      <li>Fill in real values and click <b>Save configuration</b>.</li>
     </ol>
     <div class="expect">
-      <span class="lbl">Expected result, today</span>
-      <p>Still just <code>Configuration saved.</code> with nothing moving forward. But the reason
-      changed on 2026-08-12: the backend endpoint this button needs
-      (<code>PATCH /datasets/:id/configuration</code>, proven working in TC-15 above) is real and
-      live now. What's missing is only that Amna's screen doesn't call it yet, see
-      <code>dev-log/for-anas/prompt-for-amna-claude.md</code>, already handed to her. Once she wires
-      it in, re-run this exact case and expect real forward movement, that's the signal this one is
-      finally fixed.</p>
+      <span class="lbl">Expected result</span>
+      <p>A real save, confirmed by Anas ("configuration is working, saved done"): the screen's Save
+      button now actually calls <code>PATCH /datasets/:id/configuration</code> and the real value
+      lands on the dataset row, same as proving it directly in Postman (TC-15). This was the exact
+      dead end flagged on 2026-08-12, now closed. Still open: whether Save also moves the screen
+      forward to Optimize afterward, or just confirms and stays put, worth a quick look next time
+      through, not blocking.</p>
     </div>
   </div>
 </details>
