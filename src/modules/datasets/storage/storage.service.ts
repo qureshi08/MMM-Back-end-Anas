@@ -21,5 +21,8 @@ export interface StorageService {
    */
   downloadPrefix(key: string, maxBytes: number): Promise<Buffer>;
 
+  /** The whole file. Only call this when the real content is actually needed (e.g. assembling a job payload), not just a header preview. */
+  download(key: string): Promise<Buffer>;
+
   delete(key: string): Promise<void>;
 }

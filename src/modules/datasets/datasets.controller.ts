@@ -109,4 +109,13 @@ export class DatasetsController {
   ): Promise<Dataset> {
     return this.datasets.hyperparameterize(id, user.userId!, dto);
   }
+
+  /**
+   * Builds and saves the real job file, generates a real job_id. Does not send anything to
+   * Hammad's worker, there's nowhere stable to send it yet — see the service method's own comment.
+   */
+  @Post('datasets/:id/assemble')
+  assemble(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.assemble(id, user.userId!);
+  }
 }

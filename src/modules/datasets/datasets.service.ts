@@ -19,6 +19,9 @@ import {
 } from './validators/validate-configuration';
 import { extractCsvHeaders } from './validators/extract-csv-headers';
 import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-column-roles';
+import { parseCsvRows } from './assembly/parse-csv-rows';
+import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
+import { buildJobPayload } from './assembly/build-job-payload';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -228,5 +231,42 @@ export class DatasetsService {
       })),
     });
     return this.findOne(id);
+  }
+
+  /**
+   * CMP-79: the one real piece of backend work Hammad's contract still needs. Builds the actual
+   * JSON file his worker would read, saves it to storage, and generates a real job_id (our side
+   * generates it, confirmed directly with Hammad 2026-08-12) — but does not send it anywhere.
+   * There's nowhere stable to send it yet: his worker only exists behind a Colab/ngrok bridge he
+   * doesn't actively manage. This stops at the real artifact so it can be inspected and confirmed
+   * correct before the final "send it" step gets built, once there's a real address to send it to.
+   */
+  async assemble(id: string, requesterId: string): Promise<{ jobId: string; datasetReference: string; payload: unknown }> {
+    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+
+    const missing: string[] = [];
+    if (!dataset.columnMapping || !dataset.kpiType) missing.push('Configure');
+    if (!dataset.dateRange) missing.push('Optimize');
+    if (!dataset.calibration) missing.push('Calibrate');
+    if (!dataset.channelHyperparameters) missing.push('Hyperparameterization');
+    if (missing.length > 0) {
+      throw new BadRequestException(`Save these steps first: ${missing.join(', ')}.`);
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const allRows = parseCsvRows(fileBuffer);
+    const rows = filterRowsByDateRange(
+      allRows,
+      dataset.columnMapping!.dateColumn,
+      dataset.dateRange!.startDate,
+      dataset.dateRange!.endDate,
+    );
+    const payload = buildJobPayload(dataset, rows);
+
+    const jobId = randomUUID();
+    const datasetReference = `tenants/${dataset.tenantId}/projects/${dataset.projectId}/datasets/${dataset.id}/jobs/${jobId}.json`;
+    await this.storage.upload(datasetReference, Buffer.from(JSON.stringify(payload, null, 2)), 'application/json');
+
+    return { jobId, datasetReference, payload };
   }
 }

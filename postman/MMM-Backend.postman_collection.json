@@ -545,6 +545,28 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "POST /datasets/:id/assemble, build the real job file (CMP-79)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/assemble",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "assemble"
+              ]
+            },
+            "description": "Builds the real job JSON matching Hammad's exact contract (df, column_mapping, kpi_type, revenue_per_kpi_value, model_configuration), saves it to R2, generates a real job_id, and returns { jobId, datasetReference, payload }. Requires Configure, Optimize, Calibrate and Hyperparameterization all saved first, or returns 400 naming which step is missing. Does NOT send anything to Hammad's worker, there is nowhere stable to send it yet."
+          },
+          "response": []
         }
       ]
     },
