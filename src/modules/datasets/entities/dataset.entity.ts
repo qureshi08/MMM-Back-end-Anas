@@ -29,13 +29,18 @@ export enum KpiType {
   NON_REVENUE = 'non_revenue',
 }
 
-/** What the Configure screen actually collects, matching Hammad's `column_mapping` field for field. */
+/**
+ * What the Configure screen actually collects, matching Hammad's `column_mapping` field for field.
+ * `geoColumns` added 2026-08-12: present in Hammad's real API Contracts document, with his own note
+ * that it "is not yet present in the current database schema, this needs to be added there." It now is.
+ */
 export interface ColumnMapping {
   dateColumn: string;
   targetColumn: string;
   mediaColumns: string[];
   controlColumns: string[];
   organicColumns: string[];
+  geoColumns: string[];
 }
 
 /** What the Optimize screen collects: the date range the training run actually uses. */
@@ -123,6 +128,14 @@ export class Dataset extends BaseEntity {
 
   @Column({ name: 'kpi_type', type: 'text', enum: KpiType, nullable: true })
   kpiType: KpiType | null;
+
+  /**
+   * Hammad's contract: "required only if kpi_type is non_revenue; otherwise null." Real dollar
+   * value of one unit of the KPI (subscriptions, signups, ...), needed to convert a non-revenue
+   * outcome into a real dollar figure the model can optimize against.
+   */
+  @Column({ name: 'revenue_per_kpi_value', type: 'numeric', nullable: true })
+  revenuePerKpiValue: number | null;
 
   @Column({ name: 'date_range', type: 'jsonb', nullable: true })
   dateRange: DateRange | null;

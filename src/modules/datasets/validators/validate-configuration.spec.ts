@@ -1,7 +1,9 @@
 import { BadRequestException } from '@nestjs/common';
+import { KpiType } from '../entities/dataset.entity';
 import {
   assertChannelsMatchMediaColumns,
   assertNoDuplicateColumns,
+  assertRevenuePerKpiValueMatchesKpiType,
   assertValidDateRange,
 } from './validate-configuration';
 
@@ -56,5 +58,25 @@ describe('assertChannelsMatchMediaColumns', () => {
     expect(() =>
       assertChannelsMatchMediaColumns(mediaColumns, ['TV Cost', 'TV Cost', 'Meta Cost']),
     ).toThrow(BadRequestException);
+  });
+});
+
+describe('assertRevenuePerKpiValueMatchesKpiType', () => {
+  it('accepts non_revenue with a real value provided', () => {
+    expect(() => assertRevenuePerKpiValueMatchesKpiType(KpiType.NON_REVENUE, 50)).not.toThrow();
+  });
+
+  it('rejects non_revenue with no value provided', () => {
+    expect(() => assertRevenuePerKpiValueMatchesKpiType(KpiType.NON_REVENUE, undefined)).toThrow(
+      BadRequestException,
+    );
+  });
+
+  it('accepts revenue with no value provided', () => {
+    expect(() => assertRevenuePerKpiValueMatchesKpiType(KpiType.REVENUE, undefined)).not.toThrow();
+  });
+
+  it('rejects revenue with a value provided anyway', () => {
+    expect(() => assertRevenuePerKpiValueMatchesKpiType(KpiType.REVENUE, 50)).toThrow(BadRequestException);
   });
 });

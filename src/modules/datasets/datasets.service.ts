@@ -14,6 +14,7 @@ import { validateDatasetFile } from './validators/validate-dataset-file';
 import {
   assertChannelsMatchMediaColumns,
   assertNoDuplicateColumns,
+  assertRevenuePerKpiValueMatchesKpiType,
   assertValidDateRange,
 } from './validators/validate-configuration';
 import { extractCsvHeaders } from './validators/extract-csv-headers';
@@ -153,7 +154,16 @@ export class DatasetsService {
     await this.findOwnedDatasetOrThrow(id, requesterId);
 
     const organicColumns = dto.organicColumns ?? [];
-    assertNoDuplicateColumns([dto.dateColumn, dto.targetColumn, ...dto.mediaColumns, ...dto.controlColumns, ...organicColumns]);
+    const geoColumns = dto.geoColumns ?? [];
+    assertNoDuplicateColumns([
+      dto.dateColumn,
+      dto.targetColumn,
+      ...dto.mediaColumns,
+      ...dto.controlColumns,
+      ...organicColumns,
+      ...geoColumns,
+    ]);
+    assertRevenuePerKpiValueMatchesKpiType(dto.kpiType, dto.revenuePerKpiValue);
 
     await this.repo().update(id, {
       columnMapping: {
@@ -162,8 +172,10 @@ export class DatasetsService {
         mediaColumns: dto.mediaColumns,
         controlColumns: dto.controlColumns,
         organicColumns,
+        geoColumns,
       },
       kpiType: dto.kpiType,
+      revenuePerKpiValue: dto.revenuePerKpiValue ?? null,
     });
     return this.findOne(id);
   }

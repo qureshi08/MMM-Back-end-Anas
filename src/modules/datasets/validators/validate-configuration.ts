@@ -1,4 +1,26 @@
 import { BadRequestException } from '@nestjs/common';
+import { KpiType } from '../entities/dataset.entity';
+
+/**
+ * Configure: Hammad's contract, word for word: "required only if kpi_type is non_revenue;
+ * otherwise null." A revenue KPI is already in dollars, converting it to dollars again is
+ * meaningless, so the field must be absent there, not just optional.
+ */
+export function assertRevenuePerKpiValueMatchesKpiType(
+  kpiType: KpiType,
+  revenuePerKpiValue: number | undefined,
+): void {
+  if (kpiType === KpiType.NON_REVENUE && (revenuePerKpiValue === undefined || revenuePerKpiValue === null)) {
+    throw new BadRequestException(
+      'revenuePerKpiValue is required when kpiType is "non_revenue" — the real dollar value of one unit of this KPI.',
+    );
+  }
+  if (kpiType === KpiType.REVENUE && revenuePerKpiValue !== undefined && revenuePerKpiValue !== null) {
+    throw new BadRequestException(
+      'revenuePerKpiValue must be left out when kpiType is "revenue" — the KPI is already in dollars.',
+    );
+  }
+}
 
 /** Configure: date, target, media, control and organic columns must each mean one real thing. */
 export function assertNoDuplicateColumns(allColumns: string[]): void {
