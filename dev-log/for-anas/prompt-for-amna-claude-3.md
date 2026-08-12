@@ -72,14 +72,19 @@ compute a real progress state, no backend change needed for this part:
 
 Build a real page (or repurpose the project's own page) that lists a project's datasets with this
 computed status and a progress bar, same shape as Cassandra's table, with a `Continue Setup` action
-that resumes wherever that dataset left off. There's no `Train Model` action to add yet, that one
-genuinely doesn't exist on the backend, see below, don't build a button for it that does nothing.
+that resumes wherever that dataset left off.
 
-## 3. What's still correctly not built, so nothing gets built to paper over it
+## 3. What's still correctly not built, and how to end the flow honestly instead of abruptly
 
-`Train Model` / `View Model` don't exist because there's no real place yet for the backend to send a
-"start training" job, that's a live, blocking question to the modeling team (Hammad), being asked
-directly tomorrow. Once that's answered, a real endpoint gets built and a real prompt will follow.
-Until then, `Ready (100%)` in the table above should read as "every input collected," not "trained,"
-and there's deliberately no `Train Model` button yet, an honest "not built yet" placeholder is
-correct here, not a fake one that does nothing when clicked.
+`Train Model` doesn't exist yet because there's no real place for the backend to send a "start
+training" job, that's a live, blocking question to the modeling team (Hammad), being asked directly
+tomorrow. Once that's answered, a real endpoint gets built and a real prompt will follow. That does
+not mean Hyperparameterization should just dead-end with nothing after it, a hard stop reads as
+broken, not as "not built yet."
+
+Instead, give the flow a real last screen: once Hyperparameterization is saved, show something like
+"Setup complete" with a `Train Model` button that's visibly disabled (grayed out, a "Coming soon"
+label or tooltip), maybe a line explaining training isn't wired up yet. Same idea in the models list
+from part (b) above: a dataset at 100% shows `Train Model`, disabled, not `Continue Setup` (there's
+nothing left to configure) and not a working button (there's nowhere to send the job yet). Honest
+about what's missing, but the product stops feeling like it just ends.
