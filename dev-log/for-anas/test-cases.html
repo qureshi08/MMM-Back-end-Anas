@@ -127,8 +127,8 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">16</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">9</div><div class="l">Waiting on you</div></div>
+  <div class="stat pass"><div class="n">20</div><div class="l">Passing</div></div>
+  <div class="stat wait"><div class="n">5</div><div class="l">Waiting on you</div></div>
   <div class="stat"><div class="n">25</div><div class="l">Total cases</div></div>
 </div>
 
@@ -709,9 +709,9 @@ RETURNING id;</code></pre></li>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-12</span><h3>Upload a real dataset, start to finish</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-12</span><h3>Upload a real dataset, start to finish</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, this is the one still waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend, real 201 with a real dataset id and "status": "validated"</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> the collection re-imported (see above), signed in for real in Postman
     (the same "Get New Access Token" button you already used for the Projects requests, top right
     of any request, under the Authorization tab, if it's expired just click it again).</p>
@@ -869,9 +869,9 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 
 
 <details class="tc">
-  <summary><span class="id">TC-15</span><h3>Save Configure via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-15</span><h3>Save Configure via Postman</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> the collection re-imported (see the box above <a href="#reimport-collection">Do this first</a>,
     re-import again now, this session added five new requests to the <b>Datasets (CMP-38)</b>
     folder), TC-12 done so you have a real dataset <code>id</code>.</p>
@@ -915,9 +915,9 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-16</span><h3>Save Optimize via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-16</span><h3>Save Optimize via Postman</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> TC-15 done (or not, this one doesn't actually depend on Configure being
     saved first, only Hyperparameterization does).</p>
     <ol>
@@ -941,9 +941,9 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-17</span><h3>Save Calibrate via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-17</span><h3>Save Calibrate via Postman</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <ol>
       <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>PATCH /datasets/:id/calibration, Calibrate
       step</b>.</li>
@@ -960,9 +960,9 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-18</span><h3>Save Hyperparameterization via Postman, and watch the one real dependency</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <summary><span class="id">TC-18</span><h3>Save Hyperparameterization via Postman, and watch the one real dependency</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
-    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> <b>TC-15 (Configure) must be done first on this same dataset</b>, this
     is the one endpoint of the four that actually checks another step already happened.</p>
     <ol>
