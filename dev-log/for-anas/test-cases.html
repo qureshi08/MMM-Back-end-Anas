@@ -113,9 +113,9 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">15</div><div class="l">Passing</div></div>
+  <div class="stat pass"><div class="n">16</div><div class="l">Passing</div></div>
   <div class="stat wait"><div class="n">5</div><div class="l">Waiting on you</div></div>
-  <div class="stat"><div class="n">20</div><div class="l">Total cases</div></div>
+  <div class="stat"><div class="n">21</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -919,12 +919,54 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-20</span><h3>Step 5, Configure</h3><span class="badge wait">Not built yet, expected to stop here</span></summary>
+  <summary><span class="id">TC-20</span><h3>Step 5, Configure, expected to dead-end at Save</h3><span class="badge wait">Confirmed dead end, backend piece missing</span></summary>
   <div class="body">
-    <p>Configure (column mapping) isn't built on either side yet, backend or frontend, see the
-    dashed box in the tunnel diagram. Reaching Upload Data and completing TC-19 is the real finish
-    line for the frontend today. If the app dead-ends, errors, or shows a placeholder right after
-    Upload Data, that's expected, not a bug to report.</p>
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span></div>
+    <ol>
+      <li>After TC-19's upload, you land on the real Configure screen: Date column, Target/KPI
+      column, Revenue/Non-revenue toggle, Media columns, Control columns, Organic columns.</li>
+      <li>Fill in real values (see the tunnel diagram's amber Configure box, or the walkthrough
+      below, for what each field means) and click <b>Save configuration</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, today</span>
+      <p>The screen says <code>Configuration saved.</code>, but nothing moves forward, confirmed by
+      Anas. That's expected right now, not a bug in Amna's screen: there is no backend endpoint yet
+      to actually receive and store the column mapping, see <code>dev-log/raw/2026-08-11.md</code>.
+      Once that endpoint exists, this case gets rewritten to expect real forward movement.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-21</span><h3>Upload validation: wrong or fake files are rejected</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 12, 2026, a real Jest suite plus a direct script against the real sample dataset</span><span><b>Tool:</b> <code>src/modules/datasets/validators/validate-dataset-file.spec.ts</code> (9 real cases, all passing), and Postman for the hands-on version below</span></div>
+    <p>Until now, the upload endpoint accepted any file at all, any extension, any bytes, straight
+    into R2. That's fixed: every upload is checked before it's ever stored. Extension has to be
+    <code>.csv</code>, <code>.xlsx</code> or <code>.parquet</code> (matching what the real screen
+    says), and the file's actual bytes have to match that extension, not just its name. A CSV has to
+    decode as real text with a header row and at least one data row. An XLSX has to start with a real
+    zip signature. A Parquet file has to carry its real <code>PAR1</code> magic bytes at both ends.
+    Renaming <code>malware.exe</code> to <code>malware.csv</code> does not get past this.</p>
+    <p><b>To try it yourself in Postman:</b></p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>POST /projects/:projectId/datasets, upload a real
+      file</b> (same request as TC-12).</li>
+      <li>On the <code>file</code> row, instead of a real CSV, pick any random file with a
+      <code>.csv</code> extension that isn't actually CSV data (rename a screenshot's file extension
+      to <code>.csv</code>, for example).</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>400 Bad Request</code>, with a real, specific message, for example <code>"This file has
+      a .csv extension but contains binary data, not text."</code> No row gets created, nothing lands
+      in R2, TC-11's "confirm it's really in the bucket" check would find nothing there either way.
+      Try again with a real CSV (TC-12's file) and it succeeds normally, status
+      <code>"validated"</code> on the returned row instead of the old default
+      <code>"uploaded"</code>, since it's now actually been checked, not just accepted.</p>
+    </div>
   </div>
 </details>
 
