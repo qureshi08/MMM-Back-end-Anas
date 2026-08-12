@@ -118,11 +118,14 @@
   <h1>What's actually <span class="italic-accent">done</span></h1>
   <p class="sub">A plain-language record of what's been built in the backend, what's verified, and
   what's still waiting on something. Read this instead of asking. It's kept current.</p>
-  <p class="updated">Last updated <b>August 11, 2026</b>. Datasets (<code>CMP-38</code>) and a real
-  email one-time-code second factor are both built, deployed, and genuinely working, real mail
-  through Microsoft Graph, real file storage in Cloudflare R2, real database rows on the shared
-  Render database. A real deploy-branch bug was found and fixed the same day, see the row below,
-  worth reading even if nothing else is.</p>
+  <p class="updated">Last updated <b>August 12, 2026</b>. The whole model-configuration flow
+  (Upload Data through Hyperparameterization) is real, live, and confirmed working end to end by
+  Anas himself, both in Postman and through the real deployed frontend. All 25 cases in
+  <code>test-cases.html</code> are passing, the first time that's been true. Talked to Hammad
+  directly today: <code>job_id</code> is ours to generate, and two real fields his contract
+  requires (<code>geo_columns</code>, <code>revenue_per_kpi_value</code>) were missing and are now
+  built. What's left is real, and it's not backend code, see "What's actually blocking progress"
+  below.</p>
 </header>
 
 <section class="tint">
@@ -235,14 +238,51 @@
       in the actual work.</td>
     </tr>
     <tr>
-      <td class="item">Datasets module (CMP-38)</td>
-      <td><span class="badge wait">Built, needs your check</span></td>
-      <td class="why">Entity, migration, controller, service all built and deployed. The database
-      table is live on the real Render database (migration run August 11). The storage layer
-      (Cloudflare R2) is proven working, real upload, real download, real delete, but by a Claude
-      script, not through the actual API route. Nobody has sent a real
-      <code>POST /projects/:id/datasets</code> request yet, no UI exists to trigger it. See
-      <code>TC-11</code>/<code>TC-12</code> in <code>test-cases.html</code>.</td>
+      <td class="item">Datasets module (CMP-38): upload, validation, real column names</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed by Anas himself, August 12, both in Postman and through the real
+      deployed frontend: a real file uploads, gets validated (extension plus real byte-signature
+      checks, not just a filename check), and its real column names come back with plain
+      name-pattern suggestions (date, target, media, control columns) for Configure to pre-fill,
+      the way Cassandra does it. See <code>TC-12</code>, <code>TC-13</code> in
+      <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Model configuration: Configure, Optimize, Calibrate, Hyperparameterization</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed by Anas himself, August 12, one continuous real session: all four
+      steps save for real, both via direct Postman requests and through the real deployed frontend
+      (Amna wired Configure's Save button the same day this was flagged as broken). Hyperparameterization
+      enforces a real dependency, its channel list must exactly match Configure's saved media
+      columns. See <code>TC-15</code> through <code>TC-18</code>, <code>TC-25</code> in
+      <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Two real fields Hammad's contract requires: geo_columns, revenue_per_kpi_value</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Found by cross-checking Hammad's own API Contracts document after he looked at
+      the real frontend and said data "feels missing." Both real, both required by his contract
+      (one conditionally), both now built, migrated to the real Render database, and covered by
+      real tests. Not yet in the frontend, Amna has the spec
+      (<code>prompt-for-amna-claude-5.md</code>).</td>
+    </tr>
+    <tr>
+      <td class="item">Frontend: models list, navigation hierarchy, real model names, delete</td>
+      <td><span class="badge wait">In progress, with Amna</span></td>
+      <td class="why">A real per-project Models list with progress bars now exists (built by Amna
+      the same day it was requested), but the flow still reads as one flat sequence instead of a
+      real hierarchy (global nav vs. one model's own nav), models are named after the raw uploaded
+      filename instead of a real chosen name, and there's no delete for test rows. Full spec handed
+      to Amna, <code>prompt-for-amna-claude-4.md</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Assembly step (CMP-79): dataset + Configure answers &rarr; one real job</td>
+      <td><span class="badge wait">Not started</span></td>
+      <td class="why">The one real piece of backend work left before a model can actually train.
+      Genuinely blocked, not just unscheduled: there's nowhere stable to send a real job yet, see
+      "What's actually blocking progress" below. <code>Train Model</code> exists on the real
+      frontend now, correctly disabled with a "Coming soon" label rather than silently doing
+      nothing.</td>
     </tr>
     <tr>
       <td class="item">Email code second factor (OTP)</td>
@@ -516,6 +556,14 @@
   <h2>What's actually blocking progress</h2>
   <h3>Not a to-do list. A short list of real blockers</h3>
   <ol class="openlist">
+    <li><b>Nowhere stable to send a real training job.</b> Hammad's own worker runs through Colab
+    plus ngrok, a bridge he doesn't actively manage or track, "just testing," in his own words. Real
+    backend work (the assembly step, CMP-79) can build the actual job file, but has nothing reliable
+    to send it to yet. Recommendation, still to confirm with Farhan: build the real assembly step up
+    to that last step and stub the send, rather than wiring against a moving target.</li>
+    <li><b>Auth for reaching Hammad's worker, undecided.</b> His side has no requirement, it's ours
+    to propose. Recommendation: a shared API key over HTTPS, nothing more complex needed until this
+    moves to a real Azure-hosted target.</li>
     <li><b>Company Azure subscription.</b> A separate thing from the tenant above: this is the paid
     hosting account, and has to be created under a company identity, never a personal Microsoft
     account. Until it exists, nothing can actually run on Azure. Only blocks "Running on Azure" now,
