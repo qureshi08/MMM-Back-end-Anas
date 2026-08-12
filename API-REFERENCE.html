@@ -121,8 +121,9 @@
   modeling team, kept updated as the backend changes. Everything here reflects what's actually
   built and deployed, not what's planned. Where something isn't built yet, it says so directly
   instead of being left out.</p>
-  <p class="updated">Last updated <b>August 11, 2026</b>. Live backend, the only one that matters:
-  <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
+  <p class="updated">Last updated <b>August 12, 2026</b>. Datasets and the whole model-configuration
+  flow (Section 09) are real and live now, including the assembly step. Live backend, the only one
+  that matters: <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
 </header>
 
 <nav class="toc">
@@ -136,6 +137,8 @@
     <li><a href="#health">GET /health</a></li>
     <li><a href="#me">GET /auth/me</a></li>
     <li><a href="#projects">Projects</a></li>
+    <li><a href="#datasets">Datasets &amp; model configuration</a></li>
+    <li><a href="#otp">Email code second factor (OTP)</a></li>
     <li><a href="#model">Data model: Project</a></li>
     <li><a href="#notbuilt">Not built yet</a></li>
     <li><a href="#tenancy">Multi-tenancy</a></li>
@@ -420,7 +423,131 @@ gets set. A deleted project no longer appears in <code>GET /projects</code>, and
   show.</p>
 </div>
 
-<h2 class="section" id="model"><span class="num">09</span>Data model: Project</h2>
+<h2 class="section" id="datasets"><span class="num">09</span>Datasets &amp; model configuration (CMP-38, CMP-79)</h2>
+<p class="section-why">Everything below is real and live, not a plan. All routes require auth and
+are scoped to the caller's own tenant, same as Projects. A dataset is one model-in-progress: upload
+the file, then Configure, Optimize, Calibrate and Hyperparameterization each save one real piece
+onto the same dataset row.</p>
+
+<h3 class="endpoint"><span class="method post">POST</span>/projects/:projectId/datasets</h3>
+<p class="endpoint-desc">Uploads a real file (multipart form-data: <code>name</code>,
+<code>modelType</code>, <code>file</code>), stored in Cloudflare R2. Rejects the file (400) before
+it ever reaches storage if its extension isn't <code>.csv</code>/<code>.xlsx</code>/<code>.parquet</code>,
+or its actual bytes don't match that extension (a renamed file doesn't get through). On success, the
+row's <code>status</code> is <code>"validated"</code>.</p>
+<div class="card">
+  <pre class="block"><code>curl -X POST https://mmm-back-end-anas.onrender.com/api/v1/projects/&lt;projectId&gt;/datasets \
+  -H "Authorization: Bearer &lt;your real token&gt;" \
+  -F "name=Real Test Dataset" -F "modelType=meridian" -F "file=@sample-dataset.csv"</code></pre>
+  <p><b>Response, 201</b></p>
+  <pre class="block"><code>{
+  "id": "d9a0b0e8-98a4-4d6c-b8c8-2e268ea4d6b6",
+  "projectId": "633b6759-eff9-4d41-8ba0-6c74c232de39",
+  "name": "Real Test Dataset",
+  "modelType": "meridian",
+  "storageProvider": "cloudflare_r2",
+  "storageKey": "tenants/&lt;tenantId&gt;/projects/&lt;projectId&gt;/datasets/&lt;uuid&gt;-sample-dataset.csv",
+  "fileName": "sample-dataset.csv",
+  "status": "validated",
+  "columnMapping": null, "kpiType": null, "dateRange": null, "calibration": null,
+  "channelHyperparameters": null
+}</code></pre>
+</div>
+
+<h3 class="endpoint"><span class="method get">GET</span>/projects/:projectId/datasets</h3>
+<p class="endpoint-desc">Every dataset for a project, most recent first.</p>
+
+<h3 class="endpoint"><span class="method get">GET</span>/datasets/:id</h3>
+<p class="endpoint-desc">One dataset, including whatever configuration is already saved (each field
+below is <code>null</code> until its own step is saved).</p>
+
+<h3 class="endpoint"><span class="method get">GET</span>/datasets/:id/columns</h3>
+<p class="endpoint-desc">The real header row from the uploaded file (CSV only today), plus a plain
+name-pattern guess at each column's role, meant to pre-fill Configure instead of asking the user to
+retype column names from memory.</p>
+<div class="card">
+  <p><b>Response, 200</b></p>
+  <pre class="block"><code>{
+  "columns": ["Date", "Accounts Subscriptions", "TV Cost", "Meta Cost", "Dates_School_Holidays"],
+  "suggestions": {
+    "dateColumn": "Date", "targetColumn": "Accounts Subscriptions",
+    "mediaColumns": ["TV Cost", "Meta Cost"], "controlColumns": ["Dates_School_Holidays"],
+    "organicColumns": []
+  }
+}</code></pre>
+</div>
+
+<h3 class="endpoint"><span class="method patch">PATCH</span>/datasets/:id/configuration</h3>
+<p class="endpoint-desc">The Configure step, matching Hammad's <code>column_mapping</code> +
+<code>kpi_type</code> + <code>revenue_per_kpi_value</code> exactly.</p>
+<div class="card">
+  <table>
+    <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+    <tr><td><code>dateColumn</code>, <code>targetColumn</code></td><td>string</td><td>required</td></tr>
+    <tr><td><code>kpiType</code></td><td>string</td><td><code>"revenue"</code> or <code>"non_revenue"</code></td></tr>
+    <tr><td><code>revenuePerKpiValue</code></td><td>number</td><td>required if <code>kpiType</code> is <code>non_revenue</code>, must be absent if <code>revenue</code>, 400 either way if violated</td></tr>
+    <tr><td><code>mediaColumns</code></td><td>string[]</td><td>at least one</td></tr>
+    <tr><td><code>controlColumns</code></td><td>string[]</td><td>can be empty</td></tr>
+    <tr><td><code>organicColumns</code>, <code>geoColumns</code></td><td>string[]</td><td>optional</td></tr>
+  </table>
+  <p>400 if the same column name is reused across date/target/media/control/organic/geo.</p>
+</div>
+
+<h3 class="endpoint"><span class="method patch">PATCH</span>/datasets/:id/optimize</h3>
+<p class="endpoint-desc">Body: <code>{ startDate, endDate }</code>, real ISO dates. 400 if
+<code>startDate</code> isn't before <code>endDate</code>.</p>
+
+<h3 class="endpoint"><span class="method patch">PATCH</span>/datasets/:id/calibration</h3>
+<p class="endpoint-desc">Body: <code>{ contributionBeliefPercent, confidencePercent }</code>, both
+0 to 100.</p>
+
+<h3 class="endpoint"><span class="method patch">PATCH</span>/datasets/:id/hyperparameters</h3>
+<p class="endpoint-desc">Body: <code>{ channels: [{ channel, carryover, saturation }] }</code>.
+Requires Configure already saved, and the channel list must exactly match Configure's
+<code>mediaColumns</code>, no more, no fewer, 400 naming exactly what's missing or unexpected
+otherwise. <code>carryover</code> is 0 to 1, <code>saturation</code> is 0 or above.</p>
+
+<h3 class="endpoint"><span class="method post">POST</span>/datasets/:id/assemble</h3>
+<p class="endpoint-desc">Requires Configure, Optimize, Calibrate and Hyperparameterization all
+saved (400 naming which is missing otherwise). Builds the one real JSON file Hammad's contract
+needs, saves it to R2, generates a real <code>job_id</code>. <b>Sends nothing to Hammad's worker</b>,
+there's nowhere stable to send it yet, see Section 11.</p>
+<div class="card">
+  <p><b>Response, 201</b></p>
+  <pre class="block"><code>{
+  "jobId": "3f2a1c9e-...",
+  "datasetReference": "tenants/&lt;tenantId&gt;/projects/&lt;projectId&gt;/datasets/&lt;id&gt;/jobs/&lt;jobId&gt;.json",
+  "payload": {
+    "df": [ { "Date": "2025-01-06", "Accounts Subscriptions": 3251, "TV Cost": 0, ... } ],
+    "column_mapping": { "date_column": "Date", "target_column": "Accounts Subscriptions",
+      "media_columns": ["TV Cost", "Meta Cost"], "control_columns": ["Promotion"],
+      "organic_columns": [], "geo_columns": [] },
+    "kpi_type": "non_revenue", "revenue_per_kpi_value": 50,
+    "model_configuration": {
+      "channels": { "TV Cost": { "carryover": 0.85, "saturation": 1.5 } },
+      "calibration": { "contribution_belief_percent": 30, "confidence_percent": 80 }
+    }
+  }
+}</code></pre>
+</div>
+
+<h3 class="endpoint"><span class="method get">GET</span>/samples/dataset.csv</h3>
+<p class="endpoint-desc"><code>@Public()</code>, no auth needed. A real 16-week sample CSV, in the
+exact column shape Hammad's model expects, for the "Download sample dataset" link.</p>
+
+<h2 class="section" id="otp"><span class="num">10</span>Email code second factor (OTP)</h2>
+<p class="section-why">A real second factor, not Entra's own MFA (see
+<code>dev-log/for-anas/modeling-engine-explained.html</code>'s sibling docs for why). A 6-digit
+code, SHA-256 hashed, never stored plaintext, 10-minute expiry, 5-attempt lockout.</p>
+<h3 class="endpoint"><span class="method post">POST</span>/auth/otp/request</h3>
+<p class="endpoint-desc">Sends a real code to the signed-in user's real inbox via Microsoft Graph.
+<code>202</code> on success.</p>
+<h3 class="endpoint"><span class="method post">POST</span>/auth/otp/verify</h3>
+<p class="endpoint-desc">Body: <code>{ code }</code>. <code>204</code> on a correct code,
+<code>401</code> (<code>"Incorrect code."</code>) on a wrong one, same for expired, and after 5
+wrong attempts (<code>"Too many incorrect attempts"</code>).</p>
+
+<h2 class="section" id="model"><span class="num">11</span>Data model: Project</h2>
 <pre class="block"><code>{
   "id": "1f32fa3b-1fef-4b06-8fc0-1d8eeb35d0a3",
   "createdAt": "2026-08-06T11:51:35.322Z",
@@ -445,51 +572,47 @@ gets set. A deleted project no longer appears in <code>GET /projects</code>, and
   <tr><td><code>deletedAt</code></td><td>ISO 8601 string or null</td><td>Non-null only on a soft-deleted row, which you won't normally see, deleted rows are excluded from responses</td></tr>
 </table>
 
-<h2 class="section" id="notbuilt"><span class="num">10</span>Not built yet</h2>
+<h2 class="section" id="notbuilt"><span class="num">12</span>Not built yet</h2>
 <p class="section-why">For both the frontend and modeling teams: do not build against these as if
 they exist. Calling them today returns <code>404</code>, route not found, not any signal that
 they're simply unfinished.</p>
 <div class="not-built">
   <h4>Real, on the roadmap, not live</h4>
   <ul>
-    <li><b>Datasets</b> (<code>/projects/:projectId/datasets</code>) &middot; <code>CMP-38</code>
-    &middot; upload, validation. Each dataset carries a real <code>modelType</code>, a dropdown,
-    same structure as Cassandra's own model picker, deliberately built to scale to more models.
-    Only one real value exists today (<code>meridian</code>), that's a roadmap fact, not a reason to
-    drop the field, see <code>dataset.entity.ts</code>'s own comment for the two corrections that
-    led here. Storage is <b>Cloudflare R2</b> for now, not Azure Blob Storage, same pointer-only
-    pattern (Postgres holds metadata, never the file). Swapping the storage backend to Azure Blob
-    later is a config change behind the same interface, not a rewrite.</li>
-    <li><b>Configure</b> (column mapping) &middot; <code>CMP-38</code>/<code>CMP-79</code> &middot;
-    date column, target/KPI column, media/control/organic columns, feeding the real modeling engine
-    contract, see below. A separate step from the model dropdown above, not the same thing.</li>
+    <li><b>Sending an assembled job to Hammad's worker.</b> <code>POST /datasets/:id/assemble</code>
+    (Section 09) builds the real file and stops there, deliberately. There's nowhere stable to send
+    it yet, Hammad's worker only exists behind a Colab/ngrok bridge he doesn't actively manage.
+    Blocked on two real decisions still with Farhan: auth to reach it, and whether to build against
+    Colab/ngrok at all given how unstable it is.</li>
+    <li><b>Job status / results polling</b> (<code>GET /status/:jobId</code>, <code>GET /results/:jobId</code>)
+    &middot; the interface that would let the frontend show real training progress. Waits on the
+    same decision above, there's nothing to poll until a job can actually be sent.</li>
     <li><b>Experiments</b> (<code>/experiments</code>) &middot; <code>CMP-39</code>/<code>CMP-43</code>
     &middot; run, results, logs</li>
-    <li><b>Jobs / job queue</b> (<code>/jobs</code>) &middot; status polling, the interface the
-    Python modeling worker will actually talk through</li>
     <li><b>Notifications</b> &middot; not started</li>
   </ul>
 </div>
 <div class="watch">
-  <span class="lbl">The navigation order, confirmed 2026-08-11</span>
-  <p>Per direct feedback from Farhan: after signing in, a user should only ever see a project list,
-  no other navigation. After picking or creating a project, the next screen is Upload Data, a model
-  dropdown plus the file, same screen, same structure as Cassandra's own flow. After that, Configure
-  (column mapping). Not an "Overview" or "Experiment" screen anywhere in this sequence.</p>
+  <span class="lbl">The navigation, real as of 2026-08-12</span>
+  <p>Sign in &rarr; Verify (OTP) &rarr; Projects &rarr; a real per-project Models list (progress bar
+  per model) &rarr; one model's own flow (Upload Data, Configure, Optimize, Calibrate,
+  Hyperparameterization), which always leads back to the Models list, not a dead end. A persistent
+  nav (Models list, Back to Projects, Sign out) is visible on every screen, including inside a
+  model's own flow, not just the top-level ones. See <code>ARCHITECTURE.html</code> Section 01 for
+  the real diagram.</p>
 </div>
 <div class="watch">
   <span class="lbl">For the modeling team specifically</span>
   <p>The backend never fits a model itself. The job queue contract with the Python worker
-  (<code>CMP-79</code>) is no longer undefined, it's Hammad's own handover,
-  <code>MMM API Contracts - v6 Draft.docx</code>: a queue message carries only
-  <code>{ job_id, dataset_reference }</code>, where <code>dataset_reference</code> points at one
-  pre-assembled JSON file (raw data, column mapping, KPI type, per-channel model configuration,
-  optional target budget) that this backend is responsible for building and saving to Blob storage,
-  not the worker. Full trace in <code>dev-log/for-anas/modeling-engine-explained.html</code> Section
-  03. When the real endpoint exists here, it gets documented in this same place.</p>
+  (<code>CMP-79</code>) is Hammad's own handover, <code>MMM API Contracts - v6 Draft.docx</code>: a
+  queue message carries only <code>{ job_id, dataset_reference }</code>, where
+  <code>dataset_reference</code> points at one pre-assembled JSON file that Section 09's
+  <code>POST /datasets/:id/assemble</code> now really builds and saves. What's still missing is only
+  the send, not the assembly. Full trace in
+  <code>dev-log/for-anas/modeling-engine-explained.html</code> Section 03.</p>
 </div>
 
-<h2 class="section" id="tenancy"><span class="num">11</span>Multi-tenancy</h2>
+<h2 class="section" id="tenancy"><span class="num">13</span>Multi-tenancy</h2>
 <ul>
   <li>Every real user belongs to exactly one tenant, resolved automatically from their Microsoft
   account on first login.</li>

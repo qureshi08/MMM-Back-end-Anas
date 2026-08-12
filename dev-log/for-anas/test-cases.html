@@ -127,7 +127,7 @@
 </header>
 
 <div class="summary">
-  <div class="stat pass"><div class="n">26</div><div class="l">Passing</div></div>
+  <div class="stat pass"><div class="n">26</div><div class="l">Passed</div></div>
   <div class="stat"><div class="n">26</div><div class="l">Total cases</div></div>
 </div>
 
@@ -136,7 +136,7 @@
   <ol>
     <li>Every real, testable piece of the backend gets a case here, the same day it's built, same
     rule as the dev log itself.</li>
-    <li>A case only gets marked <b>Passing</b> once <b>Anas</b> has personally run it and it worked,
+    <li>A case only gets marked <b>Passed</b> once <b>Anas</b> has personally run it and it worked,
     matching the same rule as the rest of the dev log, Claude checking it isn't enough.</li>
     <li>Re-run the whole list after anything that plausibly touches it: a dependency upgrade, a
     schema change, moving to a new machine, before showing this to anyone outside the team. There's
@@ -223,7 +223,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 <h2 class="section" id="section-database">Database</h2>
 
 <details class="tc">
-  <summary><span class="id">TC-01</span><h3>Database round trip, in pgAdmin</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-01</span><h3>Database round trip, in pgAdmin</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026</span><span><b>Tool:</b> pgAdmin 4</span></div>
     <p><b>Preconditions:</b> Docker Postgres running (<code>docker compose up -d</code>), pgAdmin
@@ -249,7 +249,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 <h2 class="section" id="section-auth">Auth</h2>
 
 <details class="tc">
-  <summary><span class="id">TC-02</span><h3>Health check reaches the database</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-02</span><h3>Health check reaches the database</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026 (Postman)</span><span><b>Tool:</b> Postman or a browser</span></div>
     <p><b>Preconditions:</b> the server running (see
@@ -268,7 +268,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-03</span><h3>Dev-bypass login</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-03</span><h3>Dev-bypass login</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 4, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> <code>AUTH_DEV_BYPASS=true</code> in <code>.env</code>, the server
@@ -286,7 +286,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-04</span><h3>Real Microsoft login</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-04</span><h3>Real Microsoft login</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, Send)</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> <code>AUTH_DEV_BYPASS=false</code>, <code>.env</code> pointed at a real
@@ -347,7 +347,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 <h2 class="section" id="section-multitenant">Multi-tenant isolation</h2>
 
 <details class="tc">
-  <summary><span class="id">TC-05</span><h3>First login auto-creates a tenant and user</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-05</span><h3>First login auto-creates a tenant and user</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 5, 2026</span><span><b>Tool:</b> pgAdmin 4</span></div>
     <p><b>Preconditions:</b> a login has already happened (dev-bypass or real) since the database
@@ -392,7 +392,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </div>
 
 <details class="tc">
-  <summary><span class="id">TC-06</span><h3>Create a project</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-06</span><h3>Create a project</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, then confirmed in pgAdmin)</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> the server running (see
@@ -444,7 +444,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-07</span><h3>List and view a project</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-07</span><h3>List and view a project</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> TC-06 done, you have a real project <code>id</code> copied
@@ -497,7 +497,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-08</span><h3>Partial update doesn't wipe other fields</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-08</span><h3>Partial update doesn't wipe other fields</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman)</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> TC-06 done, and TC-07 left the real project id sitting in
@@ -537,7 +537,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-09</span><h3>Delete is soft, not gone</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-09</span><h3>Delete is soft, not gone</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (Postman, then pgAdmin)</span><span><b>Tool:</b> Postman, then pgAdmin</span></div>
     <p><b>Preconditions:</b> TC-06 done, and you still have that project's real id.</p>
@@ -596,7 +596,7 @@ uses one of three tools. If you're not sure where to start, start here.</p>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-10</span><h3>Only the owner can edit or delete a project</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-10</span><h3>Only the owner can edit or delete a project</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 6, 2026 (pgAdmin, then Postman)</span><span><b>Tool:</b> pgAdmin, then Postman</span></div>
     <p><b>Why this one needs pgAdmin first:</b> testing "someone else can't touch my project"
@@ -695,7 +695,7 @@ RETURNING id;</code></pre></li>
 </div>
 
 <details class="tc">
-  <summary><span class="id">TC-11</span><h3>Cloudflare R2: real upload, download, delete</h3><span class="badge pass">Passing (infrastructure check, nothing for you to run)</span></summary>
+  <summary><span class="id">TC-11</span><h3>Cloudflare R2: real upload, download, delete</h3><span class="badge pass">Passed (infrastructure check, nothing for you to run)</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>CloudflareR2StorageService</code>, not through the API)</span><span><b>Tool:</b> a throwaway <code>ts-node</code> script, deleted after</span></div>
     <p>This one isn't a step for you to repeat, there's no HTTP route that exercises raw storage on
@@ -708,7 +708,7 @@ RETURNING id;</code></pre></li>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-12</span><h3>Upload a real dataset, start to finish</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-12</span><h3>Upload a real dataset, start to finish</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend, real 201 with a real dataset id and "status": "validated"</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> the collection re-imported (see above), signed in for real in Postman
@@ -803,13 +803,13 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
       <p>A real file, sitting at exactly the key path <code>storage_key</code> said it would be at,
       containing your exact CSV content, byte for byte. Three independent confirmations now agree:
       the API said 201, the database has the real row, and Cloudflare has the real bytes. That's
-      what "Passing" should mean here, not just one of the three.</p>
+      what "Passed" should mean here, not just one of the three.</p>
     </div>
   </div>
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-13</span><h3>Upload validation: wrong or fake files are rejected</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-13</span><h3>Upload validation: wrong or fake files are rejected</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 12, 2026, a real Jest suite plus a direct script against the real sample dataset</span><span><b>Tool:</b> <code>src/modules/datasets/validators/validate-dataset-file.spec.ts</code> (9 real cases, all passing), and Postman for the hands-on version below</span></div>
     <p>Until now, the upload endpoint accepted any file at all, any extension, any bytes, straight
@@ -841,7 +841,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-14</span><h3>Sample dataset download, no sign-in needed</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-14</span><h3>Sample dataset download, no sign-in needed</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026, a real local server plus a real <code>curl</code> request</span><span><b>Tool:</b> a browser link, or <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code> in Postman with no Authorization needed</span></div>
     <p>Answers the "add a sample dataset to download" request: a real 16-week CSV, in the exact
@@ -868,7 +868,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 
 
 <details class="tc">
-  <summary><span class="id">TC-15</span><h3>Save Configure via Postman</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-15</span><h3>Save Configure via Postman</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> the collection re-imported (see the box above <a href="#reimport-collection">Do this first</a>,
@@ -914,7 +914,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-16</span><h3>Save Optimize via Postman</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-16</span><h3>Save Optimize via Postman</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> TC-15 done (or not, this one doesn't actually depend on Configure being
@@ -940,7 +940,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-17</span><h3>Save Calibrate via Postman</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-17</span><h3>Save Calibrate via Postman</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <ol>
@@ -959,7 +959,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-18</span><h3>Save Hyperparameterization via Postman, and watch the one real dependency</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-18</span><h3>Save Hyperparameterization via Postman, and watch the one real dependency</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> <b>TC-15 (Configure) must be done first on this same dataset</b>, this
@@ -998,7 +998,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 <h2 class="section" id="section-otp">Email code verification (OTP)</h2>
 
 <details class="tc">
-  <summary><span class="id">TC-19</span><h3>A real code, sent to a real inbox</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-19</span><h3>A real code, sent to a real inbox</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>GraphMailService</code>) and Amna, same day, through the real deployed frontend</span><span><b>Tool:</b> a throwaway script, then Amna's real Upload Data/OTP screen against the real Render backend</span></div>
     <p><b>Preconditions:</b> <code>GRAPH_MAIL_*</code> set, Farhan's admin consent for
@@ -1025,7 +1025,7 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-20</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-20</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 11, 2026, through the real deployed app</span><span><b>Tool:</b> the real Upload Data/OTP screen</span></div>
     <p><b>Preconditions:</b> a real code already requested (TC-19).</p>
@@ -1051,7 +1051,7 @@ exactly what Amna and Farhan built, in the exact order a real user hits it. No P
 nothing but your own eyes on the screen. Five steps, each one either works or it doesn't.</p>
 
 <details class="tc">
-  <summary><span class="id">TC-21</span><h3>Step 1, Sign in</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-21</span><h3>Step 1, Sign in</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
     <ol>
@@ -1068,7 +1068,7 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-22</span><h3>Step 2, Verify (the email code)</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-22</span><h3>Step 2, Verify (the email code)</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-21 done, still signed in</span></div>
     <ol>
@@ -1087,7 +1087,7 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-23</span><h3>Step 3, Projects</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-23</span><h3>Step 3, Projects</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-22 done</span></div>
     <ol>
@@ -1105,7 +1105,7 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-24</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-24</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span><span><b>Preconditions:</b> TC-23 done, a project open</span></div>
     <ol>
@@ -1129,7 +1129,7 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-25</span><h3>Step 5, Configure, now actually saves for real</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-25</span><h3>Step 5, Configure, now actually saves for real</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend, confirmed working after Amna wired it to the real endpoint</span></div>
     <ol>
@@ -1150,7 +1150,7 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
 </details>
 
 <details class="tc">
-  <summary><span class="id">TC-26</span><h3>Assemble the real job file (CMP-79), the piece built while waiting on Farhan</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-26</span><h3>Assemble the real job file (CMP-79), the piece built while waiting on Farhan</h3><span class="badge pass">Passed</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, real Postman request against the real deployed backend</span><span><b>Tool:</b> Postman</span></div>
     <p><b>Preconditions:</b> a real dataset with Configure, Optimize, Calibrate and

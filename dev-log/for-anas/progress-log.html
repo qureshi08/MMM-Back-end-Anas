@@ -186,7 +186,7 @@
       <td class="item">Projects &middot; create, view, edit, delete (CMP-41)</td>
       <td><span class="badge done">Done</span></td>
       <td class="why">Built and verified by Claude, then run for real by Anas himself,
-      <code>TC-06</code> through <code>TC-10</code>, all <b>Passing</b> in
+      <code>TC-06</code> through <code>TC-10</code>, all <b>Passed</b> in
       <code>test-cases.html</code>: create, list, view, partial update (with the fixed bug
       confirmed not to recur), soft delete, and the owner-only rule blocking a second real user
       from editing or deleting someone else's project. See <code>dev-log/raw/2026-08-06.md</code>
@@ -463,7 +463,7 @@
         taught there.</li>
         <li><b>Anas then clicked Send himself in Postman</b> and got the identical result, real
         name, real email, <code>devBypass: false</code>. Two independent confirmations, same
-        answer. <code>TC-04</code> is <b>Passing</b>, and the Auth module is genuinely done, both
+        answer. <code>TC-04</code> is <b>Passed</b>, and the Auth module is genuinely done, both
         modes, not just claimed.</li>
       </ul>
       </div>
@@ -490,7 +490,7 @@
         <li>Anas then ran every one of <code>TC-06</code> through <code>TC-10</code> himself,
         create, list, view, the partial-update fix confirmed for real (not just by Claude),
         soft delete, and the owner-only rule blocking a second real user, all in Postman and
-        pgAdmin, all <b>Passing</b>.</li>
+        pgAdmin, all <b>Passed</b>.</li>
         <li><b>Mid-testing, the local database got fully wiped</b>, tenants, users, and projects
         all empty. Most likely cause: pgAdmin's Query Tool runs the whole accumulated script when
         Execute is clicked with nothing highlighted, not just the last line typed, so an earlier
@@ -546,6 +546,74 @@
         <code>dev-log/raw/2026-08-10.md</code> for the full chain, and a new lesson,
         <code>Trainings/NestJS/knowledge-base/lessons/06-locked-out-by-your-own-rule.html</code>,
         written the same day so this specific trap doesn't catch anyone again.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 11, 2026</span><h4>Datasets module built and live, OTP built and confirmed, a real deploy bug caught the same day</h4></summary>
+      <div class="body">
+      <ul>
+        <li>The Datasets module (<code>CMP-38</code>) built end to end: entity, migration, storage
+        abstraction, service, controller. Real upload, real storage in Cloudflare R2 (a real account
+        and bucket set up the same day), real database rows on the shared Render database.</li>
+        <li>A real email one-time-code second factor (OTP) built from scratch after discovering
+        Microsoft Entra's own Security Defaults MFA is effectively invisible to test. Real mail sent
+        through Microsoft Graph, a dedicated app registration separate from the sign-in app, a
+        6-digit code, SHA-256 hashed, never stored plaintext, 10-minute expiry, 5-attempt lockout.
+        Confirmed working by Amna through the real screen, then by Anas himself: a wrong code and an
+        expired code both correctly rejected.</li>
+        <li><b>A real deploy-branch bug, found the same day it mattered:</b> every push all session
+        had gone to the working branch, <code>backend/anas</code>, never merged into <code>main</code>,
+        which is what Render actually deploys from. The live service was running old code with
+        neither Datasets nor OTP in it, that's why Amna's first real test 404'd. Fixed by merging
+        into <code>main</code> and pushing, confirmed in Render's own deploy log. Standing rule from
+        here on: the working branch alone never reaches Render.</li>
+        <li>"Model selection" corrected the same day: Hammad's real handover confirmed there's one
+        real modeling engine (Google Meridian), not several to pick between. The dropdown stays,
+        deliberately built to scale to more models later, but the tunnel sequence changed to
+        Upload Data then Configure (column mapping), not a separate model-selection screen.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 12, 2026</span><h4>The whole model-configuration flow built, confirmed end to end, and the real assembly step (CMP-79)</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Real upload validation added: extension plus real byte-signature checks (a renamed file
+        can't fake its way past this anymore), and real column-name suggestions (date, target,
+        media, control columns guessed from the file's real headers, the same idea as Cassandra's
+        pre-filled Configure screen, confirmed by Anas after he asked for it directly).</li>
+        <li>Configure, Optimize, Calibrate and Hyperparameterization all built as real endpoints,
+        each with real validation (Hyperparameterization specifically checks its channel list
+        exactly matches Configure's saved media columns). Confirmed working end to end by Anas
+        himself, one continuous real session: Postman first, then the real deployed frontend after
+        Amna wired Configure's Save button the same day it was flagged as broken.</li>
+        <li>Talked to Hammad directly. Real answers: <code>job_id</code> is generated by our side,
+        not his. Colab/ngrok is genuinely temporary, he doesn't actively manage or track it. He
+        looked at the real frontend and said data "feels missing," checked directly against his own
+        API Contracts document, and he was right: <code>geo_columns</code> and
+        <code>revenue_per_kpi_value</code> were both real, required fields Configure never
+        collected. Both built, migrated to the real database, confirmed by Anas on the real
+        frontend.</li>
+        <li>The real assembly step (<code>CMP-79</code>) built: <code>POST /datasets/:id/assemble</code>
+        downloads the real uploaded file, parses real rows, filters them to Optimize's saved date
+        range (Hammad's contract has no separate date-range field, so the range's real job is
+        deciding which rows make it into the job file at all), and builds the one real JSON matching
+        his exact contract shape, channels as an object keyed by channel name, not the array our own
+        column stores internally. Generates a real <code>job_id</code>, saves the file to R2.
+        Deliberately does not send it anywhere, there's still nowhere stable to send it, that's a
+        real decision waiting on Farhan (a shared API key, and whether to build against Colab/ngrok
+        at all given how unstable it is), not backend work.</li>
+        <li>Real UX problems found by actually using the app, not just building it: Configure asked
+        for exact column names with nothing to check them against ("the user does not even know
+        what to do," Anas's words, and he was right), the app had no way out of a model's build
+        screens once inside one, and models were listed by their raw uploaded filename instead of a
+        real chosen name. All fixed: a real column picker sourced from the file's real headers, a
+        persistent nav on every screen, and real model names.</li>
+        <li>All 26 cases in <code>test-cases.html</code> confirmed Passed by Anas himself, the first
+        time every case in that file has been personally proven, not just built.</li>
       </ul>
       </div>
     </details>

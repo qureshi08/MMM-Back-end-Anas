@@ -14,7 +14,7 @@ state it's in. Two audiences, two formats:
   2026-08-05, after `progress-log.html` had accumulated three separate
   one-off hands-on walkthroughs that nobody was ever going to re-run. Every
   real, clickable check lives here instead: preconditions, exact steps,
-  expected result, and a status that only flips to `Passing` once Anas has
+  expected result, and a status that only flips to `Passed` once Anas has
   personally run it. This is what stands in for an automated end-to-end
   suite until one exists, re-run it after anything that plausibly touches
   it, not just once and forgotten.
