@@ -514,7 +514,7 @@ one box from this picture.</p>
 <h2 class="section" id="db"><span class="num">04</span>The database, column by column</h2>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 906" role="img" aria-label="Five real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, then datasets linked to projects by a project_id foreign key and otp_codes linked to users by a user_id foreign key. Every table also carries its own tenant_id foreign key back to tenants, omitted from the arrows here for clarity but present in every one.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1006" role="img" aria-label="Five real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, then datasets linked to projects by a project_id foreign key and otp_codes linked to users by a user_id foreign key. Every table also carries its own tenant_id foreign key back to tenants, omitted from the arrows here for clarity but present in every one.">
 <rect x="300.0" y="30" width="340" height="162" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="300.0" y="30" width="340" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="300.0" y="52" width="340" height="10" fill="#E6F5ED"/>
@@ -524,6 +524,7 @@ one box from this picture.</p>
 <text x="600.0" y="77" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
 <text x="314.0" y="97" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
 <text x="472.0" y="97" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="600.0" y="97" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="314.0" y="117" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
 <text x="472.0" y="117" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="600.0" y="117" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
@@ -532,8 +533,10 @@ one box from this picture.</p>
 <text x="600.0" y="137" font-size="9.5" font-weight="400" fill="#6B7280">unique</text>
 <text x="314.0" y="157" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
 <text x="472.0" y="157" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="600.0" y="157" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="314.0" y="177" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
 <text x="472.0" y="177" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="600.0" y="177" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <rect x="40" y="262" width="420" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="40" y="262" width="420" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="40" y="284" width="420" height="10" fill="#E6F5ED"/>
@@ -549,15 +552,19 @@ one box from this picture.</p>
 <text x="340" y="349" font-size="9.5" font-weight="400" fill="#6B7280">unique per tenant</text>
 <text x="54" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">first_name</text>
 <text x="212" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="369" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">last_name</text>
 <text x="212" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="389" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">global_role</text>
 <text x="212" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="340" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 4 values</text>
 <text x="54" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
 <text x="212" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="429" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
 <text x="212" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="449" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
 <text x="212" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
@@ -573,6 +580,7 @@ one box from this picture.</p>
 <text x="780" y="329" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="494" y="349" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
 <text x="652" y="349" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="780" y="349" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="494" y="369" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">description</text>
 <text x="652" y="369" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="780" y="369" font-size="9.5" font-weight="400" fill="#6B7280">nullable</text>
@@ -584,12 +592,14 @@ one box from this picture.</p>
 <text x="780" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
 <text x="494" y="429" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
 <text x="652" y="429" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="780" y="429" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="494" y="449" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
 <text x="652" y="449" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="780" y="449" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="494" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
 <text x="652" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="780" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
-<rect x="40" y="554" width="460" height="322" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="40" y="554" width="460" height="422" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="40" y="554" width="460" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="40" y="576" width="460" height="10" fill="#E6F5ED"/>
 <text x="270.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">DATASETS</text>
@@ -604,6 +614,7 @@ one box from this picture.</p>
 <text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; projects, CASCADE</text>
 <text x="54" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
 <text x="212" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="661" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">model_type</text>
 <text x="212" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="340" y="681" font-size="9.5" font-weight="400" fill="#6B7280">check, 1 value today</text>
@@ -615,20 +626,40 @@ one box from this picture.</p>
 <text x="340" y="721" font-size="9.5" font-weight="400" fill="#6B7280">pointer, not the file</text>
 <text x="54" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_name</text>
 <text x="212" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="741" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_size_bytes</text>
 <text x="212" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">bigint</text>
+<text x="340" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="781" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">mime_type</text>
 <text x="212" y="781" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="781" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="54" y="801" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
 <text x="212" y="801" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="340" y="801" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
-<text x="54" y="821" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="212" y="821" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="54" y="841" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="212" y="841" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="54" y="861" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
-<text x="212" y="861" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="340" y="861" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
+<text x="54" y="821" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">column_mapping</text>
+<text x="212" y="821" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="340" y="821" font-size="9.5" font-weight="400" fill="#6B7280">field names by role</text>
+<text x="54" y="841" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">kpi_type</text>
+<text x="212" y="841" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="841" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
+<text x="54" y="861" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">date_range</text>
+<text x="212" y="861" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="340" y="861" font-size="9.5" font-weight="400" fill="#6B7280">training window</text>
+<text x="54" y="881" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">calibration</text>
+<text x="212" y="881" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="340" y="881" font-size="9.5" font-weight="400" fill="#6B7280">two real percentages</text>
+<text x="54" y="901" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">channel_hyperparameters</text>
+<text x="212" y="901" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="340" y="901" font-size="9.5" font-weight="400" fill="#6B7280">carryover, saturation</text>
+<text x="54" y="921" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="212" y="921" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="921" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="54" y="941" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="212" y="941" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="941" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="54" y="961" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="212" y="961" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="961" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
 <rect x="520" y="554" width="380" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="520" y="554" width="380" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="520" y="576" width="380" height="10" fill="#E6F5ED"/>
@@ -656,16 +687,18 @@ one box from this picture.</p>
 <text x="820" y="721" font-size="9.5" font-weight="400" fill="#6B7280">blocks replay</text>
 <text x="534" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
 <text x="692" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="820" y="741" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <text x="534" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
 <text x="692" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="820" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
 <line x1="360.0" y1="192" x2="220" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
 <text x="260.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
 <line x1="580.0" y1="192" x2="660" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
 <text x="590.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
 <line x1="250.0" y1="484" x2="710.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
-<text x="455.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">user_id FK</text>
+<text x="500.0" y="507.0" font-size="9.5" font-weight="400" fill="#6B7280">user_id FK</text>
 <line x1="690.0" y1="484" x2="270.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
-<text x="450.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">project_id FK</text>
+<text x="390.0" y="531.0" font-size="9.5" font-weight="400" fill="#6B7280">project_id FK</text>
 <defs><marker id="erdarrow5" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
 </svg>
 </div>
