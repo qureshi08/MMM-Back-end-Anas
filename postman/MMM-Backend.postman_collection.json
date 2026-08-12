@@ -425,10 +425,10 @@
                 "configuration"
               ]
             },
-            "description": "Saves column_mapping + kpiType, matching Hammad's real contract. kpiType must be exactly 'revenue' or 'non_revenue'. mediaColumns needs at least one entry. Rejects (400) if any column name is reused across date/target/media/control/organic.",
+            "description": "Saves column_mapping + kpiType + revenuePerKpiValue, matching Hammad's real contract (MMM API Contracts v6). kpiType must be exactly 'revenue' or 'non_revenue'. revenuePerKpiValue is required when kpiType is 'non_revenue' (the real dollar value of one unit of the KPI), and must be left out when kpiType is 'revenue'. mediaColumns needs at least one entry. geoColumns and organicColumns are optional. Rejects (400) if any column name is reused across date/target/media/control/organic/geo.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"dateColumn\": \"Date\",\n  \"targetColumn\": \"Accounts Subscriptions\",\n  \"kpiType\": \"revenue\",\n  \"mediaColumns\": [\n    \"TV Cost\",\n    \"Meta Cost\",\n    \"Google Display Cost\"\n  ],\n  \"controlColumns\": [\n    \"Dates_School_Holidays\",\n    \"Promotion\"\n  ],\n  \"organicColumns\": []\n}",
+              "raw": "{\n  \"dateColumn\": \"Date\",\n  \"targetColumn\": \"Accounts Subscriptions\",\n  \"kpiType\": \"non_revenue\",\n  \"revenuePerKpiValue\": 50,\n  \"mediaColumns\": [\n    \"TV Cost\",\n    \"Meta Cost\",\n    \"Google Display Cost\"\n  ],\n  \"controlColumns\": [\n    \"Dates_School_Holidays\",\n    \"Promotion\"\n  ],\n  \"organicColumns\": [],\n  \"geoColumns\": []\n}",
               "options": {
                 "raw": {
                   "language": "json"
