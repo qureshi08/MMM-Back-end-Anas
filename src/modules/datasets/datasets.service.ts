@@ -17,6 +17,7 @@ import {
   assertValidDateRange,
 } from './validators/validate-configuration';
 import { extractCsvHeaders } from './validators/extract-csv-headers';
+import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-column-roles';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -110,7 +111,7 @@ export class DatasetsService {
    * them from memory. CSV only for now — XLSX and Parquet need real binary
    * parsing this doesn't do yet, they get a clear error instead of a guess.
    */
-  async getColumns(id: string): Promise<string[]> {
+  async getColumns(id: string): Promise<{ columns: string[]; suggestions: ColumnRoleSuggestions }> {
     const dataset = await this.findOne(id);
     if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
       throw new BadRequestException(
@@ -119,7 +120,8 @@ export class DatasetsService {
       );
     }
     const prefix = await this.storage.downloadPrefix(dataset.storageKey, HEADER_PREVIEW_BYTES);
-    return extractCsvHeaders(prefix);
+    const columns = extractCsvHeaders(prefix);
+    return { columns, suggestions: suggestColumnRoles(columns) };
   }
 
   /**

@@ -61,8 +61,8 @@ export class DatasetsController {
   }
 
   @Get('datasets/:id/columns')
-  async getColumns(@Param('id', ParseUUIDPipe) id: string): Promise<{ columns: string[] }> {
-    return { columns: await this.datasets.getColumns(id) };
+  getColumns(@Param('id', ParseUUIDPipe) id: string) {
+    return this.datasets.getColumns(id);
   }
 
   @Delete('datasets/:id')
