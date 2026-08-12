@@ -13,5 +13,13 @@ export interface StorageService {
   /** A time-limited URL the caller can download the file from directly. */
   getDownloadUrl(key: string, expiresInSeconds?: number): Promise<string>;
 
+  /**
+   * The first `maxBytes` of the file, not the whole thing. For a file that
+   * could be up to 200 MB, reading a column header row never needs more
+   * than a few KB — this lets the caller ask for just that without paying
+   * for a full download.
+   */
+  downloadPrefix(key: string, maxBytes: number): Promise<Buffer>;
+
   delete(key: string): Promise<void>;
 }

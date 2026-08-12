@@ -66,6 +66,15 @@ export class CloudflareR2StorageService implements StorageService {
     return getSignedUrl(client, command, { expiresIn: expiresInSeconds });
   }
 
+  async downloadPrefix(key: string, maxBytes: number): Promise<Buffer> {
+    const { client, bucket } = this.requireClient();
+    const response = await client.send(
+      new GetObjectCommand({ Bucket: bucket, Key: key, Range: `bytes=0-${maxBytes - 1}` }),
+    );
+    const bytes = await response.Body?.transformToByteArray();
+    return Buffer.from(bytes ?? []);
+  }
+
   async delete(key: string): Promise<void> {
     const { client, bucket } = this.requireClient();
     await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));

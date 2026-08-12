@@ -60,6 +60,11 @@ export class DatasetsController {
     return { url: await this.datasets.getDownloadUrl(id) };
   }
 
+  @Get('datasets/:id/columns')
+  async getColumns(@Param('id', ParseUUIDPipe) id: string): Promise<{ columns: string[] }> {
+    return { columns: await this.datasets.getColumns(id) };
+  }
+
   @Delete('datasets/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(

@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "MMM Backend \u00b7 Dev",
+    "name": "MMM Backend · Dev",
     "description": "Health check and Auth smoke test for the MMM Platform backend. Import the matching environment file alongside this collection and fill in your Entra ID app registration values there. Nothing needs editing in the collection itself.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
@@ -377,6 +377,28 @@
               ]
             },
             "description": "A single dataset row, including any configuration already saved (columnMapping, kpiType, dateRange, calibration, channelHyperparameters), all null until each step is actually saved. datasetId is a collection variable, paste it in from the upload response above."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /datasets/:id/columns, real column names from the file",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/columns",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "columns"
+              ]
+            },
+            "description": "The real header row from the uploaded file, CSV only for now. Meant to back a dropdown/pick-list on Configure instead of asking the user to retype column names from memory. Returns { columns: string[] }."
           },
           "response": []
         },

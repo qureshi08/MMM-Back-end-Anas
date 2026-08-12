@@ -16,6 +16,10 @@ import {
   assertNoDuplicateColumns,
   assertValidDateRange,
 } from './validators/validate-configuration';
+import { extractCsvHeaders } from './validators/extract-csv-headers';
+
+/** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
+const HEADER_PREVIEW_BYTES = 65536;
 
 /**
  * `datasets` has Row-Level Security, same reasoning as `ProjectsService`:
@@ -98,6 +102,24 @@ export class DatasetsService {
   async getDownloadUrl(id: string): Promise<string> {
     const dataset = await this.findOne(id);
     return this.storage.getDownloadUrl(dataset.storageKey);
+  }
+
+  /**
+   * The real column names in the file someone already uploaded, for
+   * Configure to show as a pick-list instead of asking the user to retype
+   * them from memory. CSV only for now — XLSX and Parquet need real binary
+   * parsing this doesn't do yet, they get a clear error instead of a guess.
+   */
+  async getColumns(id: string): Promise<string[]> {
+    const dataset = await this.findOne(id);
+    if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
+      throw new BadRequestException(
+        'Reading column names is only supported for .csv files today. This dataset is ' +
+          `"${dataset.fileName}" — enter its column names manually in Configure for now.`,
+      );
+    }
+    const prefix = await this.storage.downloadPrefix(dataset.storageKey, HEADER_PREVIEW_BYTES);
+    return extractCsvHeaders(prefix);
   }
 
   /**
