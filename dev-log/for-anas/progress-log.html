@@ -277,12 +277,13 @@
     </tr>
     <tr>
       <td class="item">Assembly step (CMP-79): dataset + Configure answers &rarr; one real job</td>
-      <td><span class="badge wait">Not started</span></td>
-      <td class="why">The one real piece of backend work left before a model can actually train.
-      Genuinely blocked, not just unscheduled: there's nowhere stable to send a real job yet, see
-      "What's actually blocking progress" below. <code>Train Model</code> exists on the real
-      frontend now, correctly disabled with a "Coming soon" label rather than silently doing
-      nothing.</td>
+      <td><span class="badge wait">Built, one real piece left</span></td>
+      <td class="why"><code>POST /datasets/:id/assemble</code> builds the real job file, matching
+      Hammad's exact contract shape, and generates a real <code>job_id</code>, confirmed by Claude,
+      not yet run by Anas. What's still missing is only the last step, actually sending it to
+      Hammad's worker, deliberately not built: there's nowhere stable to send it yet, see "What's
+      actually blocking progress" below. <code>Train Model</code> on the real frontend stays
+      correctly disabled with a "Coming soon" label until that exists.</td>
     </tr>
     <tr>
       <td class="item">Email code second factor (OTP)</td>
