@@ -128,7 +128,8 @@
 
 <div class="summary">
   <div class="stat pass"><div class="n">25</div><div class="l">Passing</div></div>
-  <div class="stat"><div class="n">25</div><div class="l">Total cases</div></div>
+  <div class="stat wait"><div class="n">1</div><div class="l">Waiting on you</div></div>
+  <div class="stat"><div class="n">26</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -1145,6 +1146,38 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
       dead end flagged on 2026-08-12, now closed. Still open: whether Save also moves the screen
       forward to Optimize afterward, or just confirms and stays put, worth a quick look next time
       through, not blocking.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-26</span><h3>Assemble the real job file (CMP-79), the piece built while waiting on Farhan</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> a real dataset with Configure, Optimize, Calibrate and
+    Hyperparameterization all saved, for example the one from TC-15 through TC-18.</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>POST /datasets/:id/assemble, build the real job
+      file (CMP-79)</b>.</li>
+      <li>No body needed, the URL already uses your saved <code>datasetId</code>.</li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>201</code>. The response body is
+      <code>{ jobId, datasetReference, payload }</code>: a real generated <code>jobId</code>, a real
+      storage key under <code>datasetReference</code>, and <code>payload</code> is the actual JSON
+      file that would be sent to Hammad's worker, matching his contract exactly, <code>df</code>
+      (the real rows, filtered to your Optimize date range), <code>column_mapping</code>,
+      <code>kpi_type</code>, <code>revenue_per_kpi_value</code>, and
+      <code>model_configuration</code> (channels as an object keyed by channel name, plus
+      calibration). Nothing gets sent anywhere, this only builds and saves the file, there's
+      nowhere stable to send it to yet.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch it catch a real missing step</span>
+      <p>Try it against a dataset that hasn't had Calibrate saved yet. Expect <code>400</code>,
+      <code>"Save these steps first: Calibrate."</code>, naming exactly what's missing.</p>
     </div>
   </div>
 </details>
