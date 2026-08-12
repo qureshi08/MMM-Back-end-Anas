@@ -89,6 +89,18 @@
   .protocol ol{padding-left:22px;margin:0}
   .protocol li{margin:8px 0;max-width:72ch}
 
+  .paths{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:0 0 44px}
+  @media (max-width:820px){.paths{grid-template-columns:1fr}}
+  .pathcard{background:var(--cbt-surface);border:1px solid var(--cbt-border);border-radius:var(--cbt-radius-lg);
+    padding:22px 22px 20px;display:flex;flex-direction:column}
+  .pathcard .n{font-family:var(--cbt-font-mono);font-size:11px;font-weight:700;color:var(--cbt-primary-dark);
+    letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .pathcard h4{font-family:var(--cbt-font-heading);font-size:1.15rem;font-weight:700;margin:0 0 8px;color:var(--cbt-heading)}
+  .pathcard p{font-size:13.5px;color:var(--cbt-muted);margin:0 0 16px;flex:1}
+  .pathcard a.go{display:inline-block;background:var(--cbt-primary);color:#fff;font-size:12.5px;font-weight:600;
+    padding:8px 14px;border-radius:999px;text-decoration:none;align-self:flex-start}
+  .pathcard a.go:hover{background:var(--cbt-primary-dark)}
+
   footer{background:var(--cbt-surface);border-radius:var(--cbt-radius-lg);padding:26px 30px;
     margin-top:8px;color:var(--cbt-muted);font-size:13.5px}
   .footer-logo{height:24px;width:auto;display:block;margin-bottom:12px;opacity:.75}
@@ -108,14 +120,16 @@
   <p class="sub">Every real, hands-on check that exists for this backend, kept in one place instead
   of buried inside a status page. Re-run these after anything that could plausibly break them, not
   just the one time they were written.</p>
-  <p class="updated">Last updated <b>August 11, 2026</b>. Four new cases for Datasets (CMP-38) and
-  the email OTP second factor, two of them still genuinely waiting on someone to run them for real.</p>
+  <p class="updated">Last updated <b>August 12, 2026</b>. Reorganized after Anas said this file had
+  become hard to follow: cases renumbered into the order you'd actually hit them, a "three ways to
+  test this" section added up front, and four new cases for the real Configure/Optimize/Calibrate/
+  Hyperparameterization endpoints built today.</p>
 </header>
 
 <div class="summary">
   <div class="stat pass"><div class="n">16</div><div class="l">Passing</div></div>
-  <div class="stat wait"><div class="n">5</div><div class="l">Waiting on you</div></div>
-  <div class="stat"><div class="n">21</div><div class="l">Total cases</div></div>
+  <div class="stat wait"><div class="n">9</div><div class="l">Waiting on you</div></div>
+  <div class="stat"><div class="n">25</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -174,7 +188,40 @@ npm run start:dev</code></pre>
   close it, that's your live server for every case below.</p>
 </div>
 
-<h2 class="section">Database</h2>
+<h2 class="section">Three ways to test this, pick one</h2>
+<p style="margin:0 0 20px;max-width:72ch">Everything below is organized by feature (Auth, Projects,
+Datasets, ...), not by tool, because that's how the backend is organized. But almost every case
+uses one of three tools. If you're not sure where to start, start here.</p>
+
+<div class="paths">
+  <div class="pathcard">
+    <div class="n">Path A &middot; Postman</div>
+    <h4>Test the API directly</h4>
+    <p>Real HTTP requests against the real deployed backend. No local server, no code. This is
+    where most cases live: sign-in, projects, datasets, the whole model-configuration flow, OTP.
+    Set up once (below), then every case is just open a request, click Send, read the response.</p>
+    <a class="go" href="#postman-web">Set up Postman Web &rarr;</a>
+  </div>
+  <div class="pathcard">
+    <div class="n">Path B &middot; pgAdmin</div>
+    <h4>Check the real database</h4>
+    <p>A handful of cases need to confirm something landed in Postgres itself, not just that the API
+    said 200. TC-01 (a plain round trip), TC-05 (auto-created tenant/user), and steps inside TC-09,
+    TC-10 and TC-12 that specifically say "in pgAdmin." You already have this connection set up from
+    earlier sessions.</p>
+    <a class="go" href="#section-database">Start at TC-01 &rarr;</a>
+  </div>
+  <div class="pathcard">
+    <div class="n">Path C &middot; The real app</div>
+    <h4>Click through the deployed frontend</h4>
+    <p>No Postman, no pgAdmin, just the real app in a browser: sign in, verify, projects, upload
+    data, configure. This is "does it actually work as a user," separate from "does the API work,"
+    since those can and have disagreed (see TC-25).</p>
+    <a class="go" href="#section-frontend">Start at TC-21 &rarr;</a>
+  </div>
+</div>
+
+<h2 class="section" id="section-database">Database</h2>
 
 <details class="tc">
   <summary><span class="id">TC-01</span><h3>Database round trip, in pgAdmin</h3><span class="badge pass">Passing</span></summary>
@@ -200,7 +247,7 @@ npm run start:dev</code></pre>
   </div>
 </details>
 
-<h2 class="section">Auth</h2>
+<h2 class="section" id="section-auth">Auth</h2>
 
 <details class="tc">
   <summary><span class="id">TC-02</span><h3>Health check reaches the database</h3><span class="badge pass">Passing</span></summary>
@@ -298,7 +345,7 @@ npm run start:dev</code></pre>
   </div>
 </details>
 
-<h2 class="section">Multi-tenant isolation</h2>
+<h2 class="section" id="section-multitenant">Multi-tenant isolation</h2>
 
 <details class="tc">
   <summary><span class="id">TC-05</span><h3>First login auto-creates a tenant and user</h3><span class="badge pass">Passing</span></summary>
@@ -322,7 +369,7 @@ npm run start:dev</code></pre>
   </div>
 </details>
 
-<h2 class="section">Projects (CMP-41)</h2>
+<h2 class="section" id="section-projects">Projects (CMP-41)</h2>
 
 <div class="watch" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted);border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:0 0 24px">
   <span class="lbl" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cbt-warning-dark);display:block;margin-bottom:6px">Do this first, once, before TC-06</span>
@@ -624,22 +671,27 @@ RETURNING id;</code></pre></li>
   </div>
 </details>
 
-<h2 class="section">Datasets (CMP-38)</h2>
+<h2 class="section" id="section-datasets">Datasets (CMP-38)</h2>
 
 <div class="protocol" id="reimport-collection">
   <h3>Do this first: re-import the Postman collection</h3>
-  <p style="margin:0 0 12px;max-width:72ch">Two new folders were just added to the collection file
-  itself, <b>Datasets (CMP-38)</b> and <b>Auth OTP</b>, real, ready-to-click requests, not something
-  to build from scratch. Postman doesn't see file changes on its own, it has to be told to
-  re-import.</p>
+  <p style="margin:0 0 12px;max-width:72ch">The collection file on disk keeps changing as the
+  backend grows, most recently 2026-08-12: five new requests in <b>Datasets (CMP-38)</b> (view one,
+  Configure, Optimize, Calibrate, Hyperparameterization) and a new <b>Samples</b> folder. Postman
+  never sees file changes on its own, it has to be told to re-import, every time, not just once.</p>
   <ol style="margin:0 0 12px;max-width:72ch">
     <li>In Postman, top left, <b>Import</b>.</li>
     <li>Choose the file <code>Backend/postman/MMM-Backend.postman_collection.json</code> again.</li>
     <li>Postman shows a <b>Replace</b> option since a collection with this name already exists,
     choose that, not "Import as a copy." Your existing environment (with the real Render
     <code>baseUrl</code> already set) is untouched, only the collection's requests update.</li>
-    <li>Confirm you now see <b>Datasets (CMP-38)</b> and <b>Auth OTP</b> as two new folders in the
-    left sidebar, alongside <b>Projects (CMP-41)</b>.</li>
+    <li>Confirm the left sidebar now shows six folders: <b>Health</b>, <b>Auth</b>,
+    <b>Projects (CMP-41)</b>, <b>Datasets (CMP-38)</b>, <b>Auth OTP</b>, <b>Samples</b>. If you see
+    fewer, the import didn't take, try again.</li>
+    <li>One more one-time setup: right-click the collection name <b>MMM Backend</b>, <b>Edit</b>,
+    <b>Variables</b> tab. Confirm you now see a <code>datasetId</code> row alongside
+    <code>projectId</code>, both empty for now, you'll fill them in as you go (TC-12 gives you
+    <code>projectId</code>, TC-12's response gives you <code>datasetId</code>).</li>
   </ol>
 </div>
 
@@ -757,189 +809,8 @@ SELECT * FROM datasets WHERE id = '&lt;the id from Step 4's response&gt;';</code
   </div>
 </details>
 
-<h2 class="section">Email code verification (OTP)</h2>
-
 <details class="tc">
-  <summary><span class="id">TC-13</span><h3>A real code, sent to a real inbox</h3><span class="badge pass">Passing</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>GraphMailService</code>) and Amna, same day, through the real deployed frontend</span><span><b>Tool:</b> a throwaway script, then Amna's real Upload Data/OTP screen against the real Render backend</span></div>
-    <p><b>Preconditions:</b> <code>GRAPH_MAIL_*</code> set, Farhan's admin consent for
-    <code>Mail.Send</code> granted, the app deployed to <code>main</code> (not just the working
-    branch, see <code>dev-log/raw/2026-08-11.md</code> for the real deploy-branch bug this caught).</p>
-    <ol>
-      <li>Sign in for real.</li>
-      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/request</code> (or trigger it from the real
-      screen).</li>
-      <li>Check the inbox for <code>GRAPH_MAIL_SENDER</code>, a real email with a 6-digit code
-      arrives within a minute or two.</li>
-      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/verify</code> with that code.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p><code>202</code> on request, a real email lands, <code>204</code> on verify with the
-      correct code. Confirmed both ways: Claude's script sent a real test email directly, and
-      separately Amna went through the real screen and confirmed it herself, in her own words,
-      "Working!" then "Two factor authentication is done." Not run by Anas personally yet, worth a
-      quick self-check whenever convenient, not because there's doubt it works, just to keep the
-      "Anas ran it" rule honest.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-14</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge pass">Passing</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Last run:</b> Anas, August 11, 2026, through the real deployed app</span><span><b>Tool:</b> the real Upload Data/OTP screen</span></div>
-    <p><b>Preconditions:</b> a real code already requested (TC-13).</p>
-    <ol>
-      <li>Enter a wrong 6-digit code on the real code-entry screen.</li>
-      <li>Also confirmed: an expired code is rejected the same way.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>A visible <code>Incorrect code.</code> error on the real screen for a wrong code, and the
-      same rejection for an expired one, both confirmed by Anas himself, not just Claude or Amna.
-      The 5-attempt lockout (<code>401 Too many incorrect attempts</code>) is still worth a
-      deliberate repeat-6-times check if anyone wants to see that specific branch fire, but the two
-      real paths that matter day to day, wrong code and expired code, are both proven now.</p>
-    </div>
-  </div>
-</details>
-
-<h2 class="section">Sample dataset download (CMP-38)</h2>
-
-<details class="tc">
-  <summary><span class="id">TC-15</span><h3>Sample dataset download, no sign-in needed</h3><span class="badge pass">Passing</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026, a real local server plus a real <code>curl</code> request</span><span><b>Tool:</b> a browser link, or <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code> in Postman with no Authorization needed</span></div>
-    <p>Answers the "add a sample dataset to download" request: a real 16-week CSV, in the exact
-    column shape Hammad's model expects (<code>Date</code>, one KPI column, then the media and
-    control columns) sits in the repo at <code>Backend/samples/sample-dataset.csv</code> and is
-    served back byte for byte, no authentication required, since there's nothing tenant-specific or
-    sensitive in an example file.</p>
-    <ol>
-      <li>In a browser, or a new tab, go to
-      <code>https://mmm-back-end-anas.onrender.com/api/v1/samples/dataset.csv</code>.</li>
-      <li>Or in Postman: a new request, <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code>, no
-      auth tab needed, <b>Send</b>.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>The file downloads (browser) or the response body shows the real CSV (Postman), status
-      <code>200</code>, header <code>Content-Disposition: attachment; filename="sample-dataset.csv"</code>.
-      Verified locally: correct headers, correct <code>Content-Type: text/csv</code>, and the body
-      matches the file on disk exactly. This is what Amna's "Download sample dataset" link on the
-      Upload Data screen should point at.</p>
-    </div>
-  </div>
-</details>
-
-<h2 class="section">The whole frontend, start to finish</h2>
-<p style="margin:0 0 20px;max-width:72ch">Everything above tests the backend directly, through Postman.
-This section is different: it's <b>only the real deployed app in a browser</b>, clicking through
-exactly what Amna and Farhan built, in the exact order a real user hits it. No Postman, no pgAdmin,
-nothing but your own eyes on the screen. Five steps, each one either works or it doesn't.</p>
-
-<details class="tc">
-  <summary><span class="id">TC-16</span><h3>Step 1, Sign in</h3><span class="badge wait">Needs Anas to run this</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Last run:</b> not run end to end by Anas as one continuous pass yet</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
-    <ol>
-      <li>Open the real frontend URL (ask Farhan for the current Vercel link if you don't have it
-      pinned already).</li>
-      <li>Click sign in, pick your Microsoft account.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>Microsoft's own real sign-in screen appears, you approve it, and you land back inside the
-      app, no error page, no blank screen.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-17</span><h3>Step 2, Verify (the email code)</h3><span class="badge wait">Needs Anas to run this</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-16 done, still signed in</span></div>
-    <ol>
-      <li>The app should show a code-entry screen right after sign-in.</li>
-      <li>Check your inbox (the one tied to the Microsoft account you signed in with) for a real
-      6-digit code from <code>muhammad.anas.quershi@convergentbt.com</code>.</li>
-      <li>Type the 6 digits in, submit.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>The email arrives within a minute or two, the correct code is accepted and the app moves
-      you forward. You already proved the reverse of this in TC-14 (a wrong code gets rejected with
-      "Incorrect code."), this step just confirms the correct path.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-18</span><h3>Step 3, Projects</h3><span class="badge wait">Needs Anas to run this</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-17 done</span></div>
-    <ol>
-      <li>You should land on a project list, and nothing else in the navigation, no sidebar of
-      other sections. That's deliberate, see the tunnel diagram in <code>ARCHITECTURE.html</code>.</li>
-      <li>Create a new project, or open an existing one.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>A real project is created or opened, and you're taken to the Upload Data screen for it.
-      If you create one, check it's really there afterward with <b>GET /projects, list</b> in
-      Postman, same as TC-06 through TC-10 already prove for the API side.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-19</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge wait">Needs Anas to run this</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Preconditions:</b> TC-18 done, a project open</span></div>
-    <ol>
-      <li>On the Upload Data screen, look for the <b>Download sample dataset</b> link (see the note
-      to Amna about wiring this to TC-15's endpoint, below).</li>
-      <li>Click it, confirm a real CSV downloads.</li>
-      <li>Pick a model from the dropdown (only <code>Meridian</code> exists today, that's expected,
-      see the Cassandra note in <code>modeling-engine-explained.html</code> Section 04).</li>
-      <li>Drop or browse to a real file, either the sample you just downloaded or your own, click
-      <b>Continue</b>.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result</span>
-      <p>The sample downloads correctly (TC-15's endpoint). The upload succeeds and the screen
-      moves you forward. This is the exact same real operation TC-12 already proved works at the
-      API, database and storage layers, this step just confirms the real screen calls it correctly
-      too. If it fails here but TC-12 passed in Postman, the bug is in the frontend's request, not
-      the backend, tell Amna that distinction directly.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-20</span><h3>Step 5, Configure, expected to dead-end at Save</h3><span class="badge wait">Confirmed dead end, backend piece missing</span></summary>
-  <div class="body">
-    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend</span></div>
-    <ol>
-      <li>After TC-19's upload, you land on the real Configure screen: Date column, Target/KPI
-      column, Revenue/Non-revenue toggle, Media columns, Control columns, Organic columns.</li>
-      <li>Fill in real values (see the tunnel diagram's amber Configure box, or the walkthrough
-      below, for what each field means) and click <b>Save configuration</b>.</li>
-    </ol>
-    <div class="expect">
-      <span class="lbl">Expected result, today</span>
-      <p>The screen says <code>Configuration saved.</code>, but nothing moves forward, confirmed by
-      Anas. That's expected right now, not a bug in Amna's screen: there is no backend endpoint yet
-      to actually receive and store the column mapping, see <code>dev-log/raw/2026-08-11.md</code>.
-      Once that endpoint exists, this case gets rewritten to expect real forward movement.</p>
-    </div>
-  </div>
-</details>
-
-<details class="tc">
-  <summary><span class="id">TC-21</span><h3>Upload validation: wrong or fake files are rejected</h3><span class="badge pass">Passing</span></summary>
+  <summary><span class="id">TC-13</span><h3>Upload validation: wrong or fake files are rejected</h3><span class="badge pass">Passing</span></summary>
   <div class="body">
     <div class="meta"><span><b>Last run:</b> Claude, August 12, 2026, a real Jest suite plus a direct script against the real sample dataset</span><span><b>Tool:</b> <code>src/modules/datasets/validators/validate-dataset-file.spec.ts</code> (9 real cases, all passing), and Postman for the hands-on version below</span></div>
     <p>Until now, the upload endpoint accepted any file at all, any extension, any bytes, straight
@@ -966,6 +837,317 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
       Try again with a real CSV (TC-12's file) and it succeeds normally, status
       <code>"validated"</code> on the returned row instead of the old default
       <code>"uploaded"</code>, since it's now actually been checked, not just accepted.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-14</span><h3>Sample dataset download, no sign-in needed</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026, a real local server plus a real <code>curl</code> request</span><span><b>Tool:</b> a browser link, or <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code> in Postman with no Authorization needed</span></div>
+    <p>Answers the "add a sample dataset to download" request: a real 16-week CSV, in the exact
+    column shape Hammad's model expects (<code>Date</code>, one KPI column, then the media and
+    control columns) sits in the repo at <code>Backend/samples/sample-dataset.csv</code> and is
+    served back byte for byte, no authentication required, since there's nothing tenant-specific or
+    sensitive in an example file.</p>
+    <ol>
+      <li>In a browser, or a new tab, go to
+      <code>https://mmm-back-end-anas.onrender.com/api/v1/samples/dataset.csv</code>.</li>
+      <li>Or in Postman: a new request, <code>GET {{baseUrl}}/api/v1/samples/dataset.csv</code>, no
+      auth tab needed, <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The file downloads (browser) or the response body shows the real CSV (Postman), status
+      <code>200</code>, header <code>Content-Disposition: attachment; filename="sample-dataset.csv"</code>.
+      Verified locally: correct headers, correct <code>Content-Type: text/csv</code>, and the body
+      matches the file on disk exactly. This is what Amna's "Download sample dataset" link on the
+      Upload Data screen should point at.</p>
+    </div>
+  </div>
+</details>
+
+
+<details class="tc">
+  <summary><span class="id">TC-15</span><h3>Save Configure via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> the collection re-imported (see the box above <a href="#reimport-collection">Do this first</a>,
+    re-import again now, this session added five new requests to the <b>Datasets (CMP-38)</b>
+    folder), TC-12 done so you have a real dataset <code>id</code>.</p>
+    <ol>
+      <li>Save that dataset id the same way you saved <code>projectId</code> in TC-12: right-click
+      the collection name <b>MMM Backend</b>, top of the sidebar, <b>Edit</b>, <b>Variables</b> tab,
+      find the row <code>datasetId</code>, paste the id into both <b>Initial value</b> and
+      <b>Current value</b>, <b>Save</b>.</li>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>PATCH /datasets/:id/configuration, Configure
+      step</b>.</li>
+      <li>Click <b>Body</b>. You'll see this already filled in, matching the real sample dataset's
+      real columns, leave it as is:
+      <pre><code>{
+  "dateColumn": "Date",
+  "targetColumn": "Accounts Subscriptions",
+  "kpiType": "revenue",
+  "mediaColumns": ["TV Cost", "Meta Cost", "Google Display Cost"],
+  "controlColumns": ["Dates_School_Holidays", "Promotion"],
+  "organicColumns": []
+}</code></pre></li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>. The response body is the full dataset row again, now with
+      <code>columnMapping</code> filled in exactly matching what you sent, and
+      <code>"kpiType": "revenue"</code>. This is the piece that was missing on 2026-08-12, "Save
+      configuration" on the real screen had nothing to call, this is the endpoint it now calls once
+      Amna wires it in.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch it reject a real mistake</span>
+      <p>Change <code>"targetColumn": "Accounts Subscriptions"</code> to
+      <code>"targetColumn": "TV Cost"</code> (now the same name appears in both
+      <code>targetColumn</code> and <code>mediaColumns</code>) and Send again. Expect
+      <code>400</code>, a real message about a column name being reused. Put it back to
+      <code>"Accounts Subscriptions"</code> before moving on, TC-18 below needs Configure saved
+      correctly.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-16</span><h3>Save Optimize via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> TC-15 done (or not, this one doesn't actually depend on Configure being
+    saved first, only Hyperparameterization does).</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>PATCH /datasets/:id/optimize, Optimize step</b>.</li>
+      <li><b>Body</b> tab, already filled in:
+      <pre><code>{ "startDate": "2025-01-06", "endDate": "2025-07-21" }</code></pre></li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>, the response body now includes
+      <code>"dateRange": {"startDate": "2025-01-06", "endDate": "2025-07-21"}</code>.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch it reject a backwards range</span>
+      <p>Swap the two dates so <code>startDate</code> is after <code>endDate</code> and Send again.
+      Expect <code>400</code>, "The start date must be before the end date." Put the real values
+      back before moving on.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-17</span><h3>Save Calibrate via Postman</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>PATCH /datasets/:id/calibration, Calibrate
+      step</b>.</li>
+      <li><b>Body</b> tab, already filled in:
+      <pre><code>{ "contributionBeliefPercent": 30, "confidencePercent": 80 }</code></pre></li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>, the response body now includes
+      <code>"calibration": {"contributionBeliefPercent": 30, "confidencePercent": 80}</code>.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-18</span><h3>Save Hyperparameterization via Postman, and watch the one real dependency</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> <b>TC-15 (Configure) must be done first on this same dataset</b>, this
+    is the one endpoint of the four that actually checks another step already happened.</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>PATCH /datasets/:id/hyperparameters,
+      Hyperparameterization step</b>.</li>
+      <li><b>Body</b> tab, already filled in, the channel names match TC-15's
+      <code>mediaColumns</code> exactly:
+      <pre><code>{
+  "channels": [
+    { "channel": "TV Cost", "carryover": 0.85, "saturation": 1.5 },
+    { "channel": "Meta Cost", "carryover": 0.4, "saturation": 1.1 },
+    { "channel": "Google Display Cost", "carryover": 0.3, "saturation": 0.9 }
+  ]
+}</code></pre></li>
+      <li>Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>, the response body now includes
+      <code>channelHyperparameters</code> with all three channels.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch the real dependency check fire, two ways</span>
+      <p>Delete the <code>"Google Display Cost"</code> entry from the <code>channels</code> array
+      and Send: expect <code>400</code>, a message naming it as missing. Put it back, then instead
+      change <code>"TV Cost"</code> to <code>"Radio Cost"</code> (a channel Configure never
+      mentioned) and Send: expect <code>400</code> again, a different message, this one saying
+      <code>Radio Cost</code> isn't a real media column. This is the backend enforcing that
+      Hyperparameterization can't drift out of sync with whatever Configure actually saved.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section" id="section-otp">Email code verification (OTP)</h2>
+
+<details class="tc">
+  <summary><span class="id">TC-19</span><h3>A real code, sent to a real inbox</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Claude, August 11, 2026 (a direct script against <code>GraphMailService</code>) and Amna, same day, through the real deployed frontend</span><span><b>Tool:</b> a throwaway script, then Amna's real Upload Data/OTP screen against the real Render backend</span></div>
+    <p><b>Preconditions:</b> <code>GRAPH_MAIL_*</code> set, Farhan's admin consent for
+    <code>Mail.Send</code> granted, the app deployed to <code>main</code> (not just the working
+    branch, see <code>dev-log/raw/2026-08-11.md</code> for the real deploy-branch bug this caught).</p>
+    <ol>
+      <li>Sign in for real.</li>
+      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/request</code> (or trigger it from the real
+      screen).</li>
+      <li>Check the inbox for <code>GRAPH_MAIL_SENDER</code>, a real email with a 6-digit code
+      arrives within a minute or two.</li>
+      <li>Request <code>POST {{baseUrl}}/api/v1/auth/otp/verify</code> with that code.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p><code>202</code> on request, a real email lands, <code>204</code> on verify with the
+      correct code. Confirmed both ways: Claude's script sent a real test email directly, and
+      separately Amna went through the real screen and confirmed it herself, in her own words,
+      "Working!" then "Two factor authentication is done." Not run by Anas personally yet, worth a
+      quick self-check whenever convenient, not because there's doubt it works, just to keep the
+      "Anas ran it" rule honest.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-20</span><h3>Wrong or expired codes are actually rejected</h3><span class="badge pass">Passing</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 11, 2026, through the real deployed app</span><span><b>Tool:</b> the real Upload Data/OTP screen</span></div>
+    <p><b>Preconditions:</b> a real code already requested (TC-19).</p>
+    <ol>
+      <li>Enter a wrong 6-digit code on the real code-entry screen.</li>
+      <li>Also confirmed: an expired code is rejected the same way.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>A visible <code>Incorrect code.</code> error on the real screen for a wrong code, and the
+      same rejection for an expired one, both confirmed by Anas himself, not just Claude or Amna.
+      The 5-attempt lockout (<code>401 Too many incorrect attempts</code>) is still worth a
+      deliberate repeat-6-times check if anyone wants to see that specific branch fire, but the two
+      real paths that matter day to day, wrong code and expired code, are both proven now.</p>
+    </div>
+  </div>
+</details>
+
+<h2 class="section" id="section-frontend">The whole frontend, start to finish</h2>
+<p style="margin:0 0 20px;max-width:72ch">Everything above tests the backend directly, through Postman.
+This section is different: it's <b>only the real deployed app in a browser</b>, clicking through
+exactly what Amna and Farhan built, in the exact order a real user hits it. No Postman, no pgAdmin,
+nothing but your own eyes on the screen. Five steps, each one either works or it doesn't.</p>
+
+<details class="tc">
+  <summary><span class="id">TC-21</span><h3>Step 1, Sign in</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> not run end to end by Anas as one continuous pass yet</span><span><b>Tool:</b> the real deployed frontend, in a normal browser tab</span></div>
+    <ol>
+      <li>Open the real frontend URL (ask Farhan for the current Vercel link if you don't have it
+      pinned already).</li>
+      <li>Click sign in, pick your Microsoft account.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Microsoft's own real sign-in screen appears, you approve it, and you land back inside the
+      app, no error page, no blank screen.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-22</span><h3>Step 2, Verify (the email code)</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-21 done, still signed in</span></div>
+    <ol>
+      <li>The app should show a code-entry screen right after sign-in.</li>
+      <li>Check your inbox (the one tied to the Microsoft account you signed in with) for a real
+      6-digit code from <code>muhammad.anas.quershi@convergentbt.com</code>.</li>
+      <li>Type the 6 digits in, submit.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The email arrives within a minute or two, the correct code is accepted and the app moves
+      you forward. You already proved the reverse of this in TC-20 (a wrong code gets rejected with
+      "Incorrect code."), this step just confirms the correct path.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-23</span><h3>Step 3, Projects</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-22 done</span></div>
+    <ol>
+      <li>You should land on a project list, and nothing else in the navigation, no sidebar of
+      other sections. That's deliberate, see the tunnel diagram in <code>ARCHITECTURE.html</code>.</li>
+      <li>Create a new project, or open an existing one.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>A real project is created or opened, and you're taken to the Upload Data screen for it.
+      If you create one, check it's really there afterward with <b>GET /projects, list</b> in
+      Postman, same as TC-06 through TC-10 already prove for the API side.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-24</span><h3>Step 4, Upload Data, including the sample download</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Preconditions:</b> TC-23 done, a project open</span></div>
+    <ol>
+      <li>On the Upload Data screen, look for the <b>Download sample dataset</b> link (see the note
+      to Amna about wiring this to TC-14's endpoint, below).</li>
+      <li>Click it, confirm a real CSV downloads.</li>
+      <li>Pick a model from the dropdown (only <code>Meridian</code> exists today, that's expected,
+      see the Cassandra note in <code>modeling-engine-explained.html</code> Section 04).</li>
+      <li>Drop or browse to a real file, either the sample you just downloaded or your own, click
+      <b>Continue</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The sample downloads correctly (TC-14's endpoint). The upload succeeds and the screen
+      moves you forward. This is the exact same real operation TC-12 already proved works at the
+      API, database and storage layers, this step just confirms the real screen calls it correctly
+      too. If it fails here but TC-12 passed in Postman, the bug is in the frontend's request, not
+      the backend, tell Amna that distinction directly.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-25</span><h3>Step 5, Configure, still dead-ends at Save for a different reason now</h3><span class="badge wait">Backend ready, frontend not wired yet</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> Anas, August 12, 2026, through the real deployed frontend (before the backend endpoint existed)</span></div>
+    <ol>
+      <li>After TC-24's upload, you land on the real Configure screen: Date column, Target/KPI
+      column, Revenue/Non-revenue toggle, Media columns, Control columns, Organic columns.</li>
+      <li>Fill in real values (see the tunnel diagram's amber Configure box, or TC-15 above for what
+      each field means and a real worked example) and click <b>Save configuration</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result, today</span>
+      <p>Still just <code>Configuration saved.</code> with nothing moving forward. But the reason
+      changed on 2026-08-12: the backend endpoint this button needs
+      (<code>PATCH /datasets/:id/configuration</code>, proven working in TC-15 above) is real and
+      live now. What's missing is only that Amna's screen doesn't call it yet, see
+      <code>dev-log/for-anas/prompt-for-amna-claude.md</code>, already handed to her. Once she wires
+      it in, re-run this exact case and expect real forward movement, that's the signal this one is
+      finally fixed.</p>
     </div>
   </div>
 </details>

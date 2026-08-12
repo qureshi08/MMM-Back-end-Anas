@@ -1,438 +1,633 @@
 {
-	"info": {
-		"name": "MMM Backend · Dev",
-		"description": "Health check and Auth smoke test for the MMM Platform backend. Import the matching environment file alongside this collection and fill in your Entra ID app registration values there. Nothing needs editing in the collection itself.",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"auth": {
-		"type": "oauth2",
-		"oauth2": [
-			{
-				"key": "grant_type",
-				"value": "authorization_code_with_pkce",
-				"type": "string"
-			},
-			{
-				"key": "authUrl",
-				"value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/authorize",
-				"type": "string"
-			},
-			{
-				"key": "accessTokenUrl",
-				"value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token",
-				"type": "string"
-			},
-			{
-				"key": "clientId",
-				"value": "{{clientId}}",
-				"type": "string"
-			},
-			{
-				"key": "scope",
-				"value": "{{scope}}",
-				"type": "string"
-			},
-			{
-				"key": "redirectUri",
-				"value": "https://oauth.pstmn.io/v1/callback",
-				"type": "string"
-			},
-			{
-				"key": "useBrowser",
-				"value": true,
-				"type": "boolean"
-			},
-			{
-				"key": "tokenName",
-				"value": "mmm-dev-token",
-				"type": "string"
-			},
-			{
-				"key": "addTokenTo",
-				"value": "header",
-				"type": "string"
-			},
-			{
-				"key": "client_authentication",
-				"value": "header",
-				"type": "string"
-			}
-		]
-	},
-	"item": [
-		{
-			"name": "Health",
-			"item": [
-				{
-					"name": "GET /health, app + database reachable",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/health",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"health"
-							]
-						},
-						"auth": {
-							"type": "noauth"
-						},
-						"description": "Public, no token needed. 200 with database:\"connected\" means the app booted and Postgres (local Docker today, Azure Flexible Server later) is reachable."
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Auth",
-			"item": [
-				{
-					"name": "GET /auth/me, verify a real Entra token",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
-						},
-						"description": "Protected by EntraAuthGuard. With AUTH_DEV_BYPASS=true in the API's .env, this works with no token at all and returns a fake dev user, use that first to prove the route is wired. Once you have a real Entra app registration, click Send, then \"Get New Access Token\" on the collection's Authorization tab (Authorization Code + PKCE, opens a Microsoft sign-in popup), and this returns the real verified claims instead."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /auth/me, no token (expect 401 once bypass is off)",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/me",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"me"
-							]
-						},
-						"auth": {
-							"type": "noauth"
-						},
-						"description": "Deliberately sends no Authorization header. With AUTH_DEV_BYPASS=false this must come back 401, that's the guard doing its job, not a bug."
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Projects (CMP-41)",
-			"item": [
-				{
-					"name": "POST /projects, create",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects"
-							]
-						},
-						"description": "Creates a project owned by the signed-in user, in their own tenant. name is required, description is optional. Copy the id from the response, the other requests in this folder need it.",
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Q4 Brand Campaign\",\n  \"description\": \"First real project\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET /projects, list",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects"
-							]
-						},
-						"description": "Lists every project in the signed-in user's tenant. Row-Level Security restricts this to that tenant alone, there's no explicit filter in the code that could get it wrong."
-					},
-					"response": []
-				},
-				{
-					"name": "GET /projects/:id, view one",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects/:id",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
-								}
-							]
-						},
-						"description": "Replace the id path variable (click the request, Params tab, Path Variables section) with a real id from the create request. A malformed id returns 400. A well-formed but nonexistent id returns 404."
-					},
-					"response": []
-				},
-				{
-					"name": "PATCH /projects/:id, partial update",
-					"request": {
-						"method": "PATCH",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects/:id",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
-								}
-							]
-						},
-						"description": "Sends only name on purpose, this is TC-08: a real bug meant a partial update like this used to silently erase description too. It's fixed, this is what proves it stays fixed, description should come back exactly as it was set on create. Only the project's owner can do this, anyone else gets 403.",
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"name\": \"Q4 Brand Campaign (renamed)\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "DELETE /projects/:id, soft delete",
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects/:id",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects",
-								":id"
-							],
-							"variable": [
-								{
-									"key": "id",
-									"value": "REPLACE-WITH-A-REAL-PROJECT-ID"
-								}
-							]
-						},
-						"description": "204 on success. The row isn't actually removed from Postgres, it's marked deleted (see deleted_at in pgAdmin), and stops showing up in list/view from here on. Only the project's owner can do this, anyone else gets 403."
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Datasets (CMP-38)",
-			"item": [
-				{
-					"name": "POST /projects/:projectId/datasets, upload a real file",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects",
-								"{{projectId}}",
-								"datasets"
-							]
-						},
-						"description": "Uploads a real file, stored in Cloudflare R2, with a real database row created for it. projectId is a Postman collection variable, set it once (right-click the collection, Edit, Variables tab) to a real project id from 'GET /projects, list' below, or from any project you already created. modelType must be exactly 'meridian', the only real value today, even though it's a real dropdown built to support more later.",
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "name",
-									"value": "Real Test Dataset",
-									"type": "text"
-								},
-								{
-									"key": "modelType",
-									"value": "meridian",
-									"type": "text"
-								},
-								{
-									"key": "file",
-									"type": "file",
-									"src": []
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET /projects/:projectId/datasets, list",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"projects",
-								"{{projectId}}",
-								"datasets"
-							]
-						},
-						"description": "Every dataset uploaded for this project, most recent first."
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Auth OTP (email second factor)",
-			"item": [
-				{
-					"name": "POST /auth/otp/request, send a real code",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/otp/request",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"otp",
-								"request"
-							]
-						},
-						"description": "No body needed. Sends a real 6-digit code to the signed-in user's own email, expires in 10 minutes. Check that inbox after sending this."
-					},
-					"response": []
-				},
-				{
-					"name": "POST /auth/otp/verify, check the code",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/otp/verify",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"otp",
-								"verify"
-							]
-						},
-						"description": "Replace the code below with the real 6 digits from the email the request above sent you.",
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"code\": \"123456\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						}
-					},
-					"response": []
-				}
-			]
-		}
-	],
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:3000"
-		},
-		{
-			"key": "projectId",
-			"value": ""
-		}
-	]
+  "info": {
+    "name": "MMM Backend \u00b7 Dev",
+    "description": "Health check and Auth smoke test for the MMM Platform backend. Import the matching environment file alongside this collection and fill in your Entra ID app registration values there. Nothing needs editing in the collection itself.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "grant_type",
+        "value": "authorization_code_with_pkce",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/authorize",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{clientId}}",
+        "type": "string"
+      },
+      {
+        "key": "scope",
+        "value": "{{scope}}",
+        "type": "string"
+      },
+      {
+        "key": "redirectUri",
+        "value": "https://oauth.pstmn.io/v1/callback",
+        "type": "string"
+      },
+      {
+        "key": "useBrowser",
+        "value": true,
+        "type": "boolean"
+      },
+      {
+        "key": "tokenName",
+        "value": "mmm-dev-token",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      },
+      {
+        "key": "client_authentication",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health, app + database reachable",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Public, no token needed. 200 with database:\"connected\" means the app booted and Postgres (local Docker today, Azure Flexible Server later) is reachable."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "GET /auth/me, verify a real Entra token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "Protected by EntraAuthGuard. With AUTH_DEV_BYPASS=true in the API's .env, this works with no token at all and returns a fake dev user, use that first to prove the route is wired. Once you have a real Entra app registration, click Send, then \"Get New Access Token\" on the collection's Authorization tab (Authorization Code + PKCE, opens a Microsoft sign-in popup), and this returns the real verified claims instead."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /auth/me, no token (expect 401 once bypass is off)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Deliberately sends no Authorization header. With AUTH_DEV_BYPASS=false this must come back 401, that's the guard doing its job, not a bug."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Projects (CMP-41)",
+      "item": [
+        {
+          "name": "POST /projects, create",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            },
+            "description": "Creates a project owned by the signed-in user, in their own tenant. name is required, description is optional. Copy the id from the response, the other requests in this folder need it.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q4 Brand Campaign\",\n  \"description\": \"First real project\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /projects, list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects"
+              ]
+            },
+            "description": "Lists every project in the signed-in user's tenant. Row-Level Security restricts this to that tenant alone, there's no explicit filter in the code that could get it wrong."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /projects/:id, view one",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+                }
+              ]
+            },
+            "description": "Replace the id path variable (click the request, Params tab, Path Variables section) with a real id from the create request. A malformed id returns 400. A well-formed but nonexistent id returns 404."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /projects/:id, partial update",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+                }
+              ]
+            },
+            "description": "Sends only name on purpose, this is TC-08: a real bug meant a partial update like this used to silently erase description too. It's fixed, this is what proves it stays fixed, description should come back exactly as it was set on create. Only the project's owner can do this, anyone else gets 403.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Q4 Brand Campaign (renamed)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /projects/:id, soft delete",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPLACE-WITH-A-REAL-PROJECT-ID"
+                }
+              ]
+            },
+            "description": "204 on success. The row isn't actually removed from Postgres, it's marked deleted (see deleted_at in pgAdmin), and stops showing up in list/view from here on. Only the project's owner can do this, anyone else gets 403."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Datasets (CMP-38)",
+      "item": [
+        {
+          "name": "POST /projects/:projectId/datasets, upload a real file",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "{{projectId}}",
+                "datasets"
+              ]
+            },
+            "description": "Uploads a real file, stored in Cloudflare R2, with a real database row created for it. projectId is a Postman collection variable, set it once (right-click the collection, Edit, Variables tab) to a real project id from 'GET /projects, list' below, or from any project you already created. modelType must be exactly 'meridian', the only real value today, even though it's a real dropdown built to support more later.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Real Test Dataset",
+                  "type": "text"
+                },
+                {
+                  "key": "modelType",
+                  "value": "meridian",
+                  "type": "text"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /projects/:projectId/datasets, list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/projects/{{projectId}}/datasets",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "projects",
+                "{{projectId}}",
+                "datasets"
+              ]
+            },
+            "description": "Every dataset uploaded for this project, most recent first."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /datasets/:id, view one",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}"
+              ]
+            },
+            "description": "A single dataset row, including any configuration already saved (columnMapping, kpiType, dateRange, calibration, channelHyperparameters), all null until each step is actually saved. datasetId is a collection variable, paste it in from the upload response above."
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /datasets/:id/configuration, Configure step",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/configuration",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "configuration"
+              ]
+            },
+            "description": "Saves column_mapping + kpiType, matching Hammad's real contract. kpiType must be exactly 'revenue' or 'non_revenue'. mediaColumns needs at least one entry. Rejects (400) if any column name is reused across date/target/media/control/organic.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dateColumn\": \"Date\",\n  \"targetColumn\": \"Accounts Subscriptions\",\n  \"kpiType\": \"revenue\",\n  \"mediaColumns\": [\n    \"TV Cost\",\n    \"Meta Cost\",\n    \"Google Display Cost\"\n  ],\n  \"controlColumns\": [\n    \"Dates_School_Holidays\",\n    \"Promotion\"\n  ],\n  \"organicColumns\": []\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /datasets/:id/optimize, Optimize step",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/optimize",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "optimize"
+              ]
+            },
+            "description": "Saves the date range the training run actually uses. Both real ISO dates (YYYY-MM-DD). Rejects (400) if startDate is not before endDate.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2025-01-06\",\n  \"endDate\": \"2025-07-21\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /datasets/:id/calibration, Calibrate step",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/calibration",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "calibration"
+              ]
+            },
+            "description": "Saves model_configuration.calibration. Both numbers, 0 to 100 inclusive.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contributionBeliefPercent\": 30,\n  \"confidencePercent\": 80\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /datasets/:id/hyperparameters, Hyperparameterization step",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/hyperparameters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "hyperparameters"
+              ]
+            },
+            "description": "Saves model_configuration.channels. Requires Configure to already be saved on this dataset, and requires channels to exactly match Configure's mediaColumns, no more, no fewer, any order. carryover is 0 to 1, saturation is 0 or above with no fixed upper bound.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"channels\": [\n    {\n      \"channel\": \"TV Cost\",\n      \"carryover\": 0.85,\n      \"saturation\": 1.5\n    },\n    {\n      \"channel\": \"Meta Cost\",\n      \"carryover\": 0.4,\n      \"saturation\": 1.1\n    },\n    {\n      \"channel\": \"Google Display Cost\",\n      \"carryover\": 0.3,\n      \"saturation\": 0.9\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth OTP (email second factor)",
+      "item": [
+        {
+          "name": "POST /auth/otp/request, send a real code",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/otp/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "otp",
+                "request"
+              ]
+            },
+            "description": "No body needed. Sends a real 6-digit code to the signed-in user's own email, expires in 10 minutes. Check that inbox after sending this."
+          },
+          "response": []
+        },
+        {
+          "name": "POST /auth/otp/verify, check the code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/otp/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "otp",
+                "verify"
+              ]
+            },
+            "description": "Replace the code below with the real 6 digits from the email the request above sent you.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Samples",
+      "item": [
+        {
+          "name": "GET /samples/dataset.csv, download the real sample dataset",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/samples/dataset.csv",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "samples",
+                "dataset.csv"
+              ]
+            },
+            "description": "Public, no Authorization needed. Downloads a real 16-week CSV in the exact column shape Hammad's model expects."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "projectId",
+      "value": ""
+    },
+    {
+      "key": "datasetId",
+      "value": ""
+    }
+  ]
 }
