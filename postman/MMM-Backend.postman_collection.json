@@ -398,7 +398,7 @@
                 "columns"
               ]
             },
-            "description": "The real header row from the uploaded file, CSV only for now. Meant to back a dropdown/pick-list on Configure instead of asking the user to retype column names from memory. Returns { columns: string[] }."
+            "description": "The real header row from the uploaded file, CSV only for now, plus a plain name-pattern guess at each column's role (date/target/media/control/organic), same spirit as Cassandra's pre-filled Configure fields. Returns { columns: string[], suggestions: { dateColumn, targetColumn, mediaColumns[], controlColumns[], organicColumns[] } }. Suggestions are a starting point, never applied automatically, the real Configure save still requires the user's own confirmed values."
           },
           "response": []
         },
