@@ -312,44 +312,69 @@ one box from this picture.</p>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 210" role="img" aria-label="The navigation tunnel, updated 2026-08-12: sign in, then a real email code verification step, then a project list, then Upload Data, then Configure, all real and confirmed working end to end by Anas himself. Past Configure, Optimize, Calibrate and Hyperparameterization are also real and live, both backend and real screens, ending in a Setup Complete screen with a Train Model button that is deliberately disabled with a coming-soon label, since there is still nowhere for the backend to send a real training job. All six steps shown are built and live.">
-<text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">THE TUNNEL: WHAT A SIGNED-IN USER CAN REACH, IN ORDER, NOTHING ELSE</text>
-
-<rect x="20" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="34" y="86" font-size="11.5" font-weight="700" fill="#007A3D">SIGN IN</text>
-<text x="34" y="106" font-size="10.5" font-weight="400" fill="#374151">Microsoft account,</text>
-<text x="34" y="122" font-size="10.5" font-weight="400" fill="#374151">MFA via Entra tenant</text>
-<line x1="160" y1="115" x2="166" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-<rect x="170" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="184" y="86" font-size="11.5" font-weight="700" fill="#007A3D">VERIFY</text>
-<text x="184" y="106" font-size="10.5" font-weight="400" fill="#374151">Email code, real,</text>
-<text x="184" y="122" font-size="10.5" font-weight="400" fill="#374151">confirmed by Amna</text>
-<line x1="310" y1="115" x2="316" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-<rect x="320" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="334" y="86" font-size="11.5" font-weight="700" fill="#007A3D">PROJECTS</text>
-<text x="334" y="106" font-size="10.5" font-weight="400" fill="#374151">Only nav item shown.</text>
-<text x="334" y="122" font-size="10.5" font-weight="400" fill="#374151">Create or pick one</text>
-<line x1="460" y1="115" x2="466" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-<rect x="470" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="484" y="86" font-size="11.5" font-weight="700" fill="#007A3D">UPLOAD DATA</text>
-<text x="484" y="106" font-size="10.5" font-weight="400" fill="#374151">Model + file, real</text>
-<text x="484" y="122" font-size="10.5" font-weight="400" fill="#374151">screen, built by Amna</text>
-<line x1="610" y1="115" x2="616" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-<rect x="620" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="634" y="86" font-size="11.5" font-weight="700" fill="#007A3D">CONFIGURE</text>
-<text x="634" y="106" font-size="10.5" font-weight="400" fill="#374151">Real screen, saves</text>
-<text x="634" y="122" font-size="10.5" font-weight="400" fill="#374151">for real, confirmed</text>
-<line x1="760" y1="115" x2="766" y2="115" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tunarrow)"/>
-<rect x="770" y="60" width="140" height="110" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
-<text x="784" y="86" font-size="11.5" font-weight="700" fill="#007A3D">NEXT STEP</text>
-<text x="784" y="106" font-size="10.5" font-weight="400" fill="#374151">Optimize, Calibrate,</text>
-<text x="784" y="122" font-size="10.5" font-weight="400" fill="#374151">Hyperparams: live</text>
-<text x="784" y="138" font-size="10.5" font-weight="400" fill="#374151">Train Model: soon</text>
-
-<defs>
-<marker id="tunarrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker>
-<marker id="tunarrowgrey" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker>
-</defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 435" role="img" aria-label="The real navigation hierarchy, not a flat sequence. Sign in, verify and Projects are global, the only things reachable before a project is picked. Once inside one project, a persistent nav (Models list, Back to Projects, Sign out) is always present, and the Models list is that project's own real dashboard. Starting or continuing a model opens a separate nested flow, Upload Data through Configure, Optimize, Calibrate, Hyperparameterization, ending in a disabled Train Model button, which has its own nav only visible while inside that one model, and always leads back to the Models list, never a dead end.">
+<text x="470" y="24" font-size="11" font-weight="700" fill="#6B7280" text-anchor="middle">GLOBAL: BEFORE ANY PROJECT IS PICKED</text>
+<rect x="20" y="40" width="150" height="90" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="32" y="62" font-size="11" font-weight="700" fill="#007A3D">SIGN IN</text>
+<text x="32" y="80" font-size="9.5" font-weight="400" fill="#374151">Microsoft account,</text>
+<text x="32" y="95" font-size="9.5" font-weight="400" fill="#374151">MFA via Entra tenant</text>
+<line x1="170" y1="85.0" x2="180" y2="85.0" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tharrow)"/>
+<rect x="186" y="40" width="150" height="90" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="198" y="62" font-size="11" font-weight="700" fill="#007A3D">VERIFY</text>
+<text x="198" y="80" font-size="9.5" font-weight="400" fill="#374151">Email code, real,</text>
+<text x="198" y="95" font-size="9.5" font-weight="400" fill="#374151">confirmed by Amna</text>
+<line x1="336" y1="85.0" x2="346" y2="85.0" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tharrow)"/>
+<rect x="352" y="40" width="150" height="90" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="364" y="62" font-size="11" font-weight="700" fill="#007A3D">PROJECTS</text>
+<text x="364" y="80" font-size="9.5" font-weight="400" fill="#374151">Pick one, or create.</text>
+<text x="364" y="95" font-size="9.5" font-weight="400" fill="#374151">The only global list.</text>
+<line x1="427.0" y1="130" x2="427.0" y2="164" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tharrow)"/>
+<text x="437.0" y="154.0" font-size="9.5" font-weight="400" fill="#6B7280">pick a project</text>
+<rect x="20" y="170" width="900" height="250" rx="12" fill="#FAFBFA" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="7 5"/>
+<text x="36" y="192" font-size="10.5" font-weight="700" fill="#6B7280">INSIDE ONE PROJECT — this nav is always here: Models list, Back to Projects, Sign out</text>
+<rect x="40" y="210" width="190" height="160" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="52" y="232" font-size="11" font-weight="700" fill="#007A3D">MODELS LIST</text>
+<text x="52" y="250" font-size="9.5" font-weight="400" fill="#374151">This project's real</text>
+<text x="52" y="265" font-size="9.5" font-weight="400" fill="#374151">dashboard. Progress bar</text>
+<text x="52" y="280" font-size="9.5" font-weight="400" fill="#374151">+ status per model.</text>
+<text x="52" y="295" font-size="9.5" font-weight="400" fill="#374151">"+ New model" starts</text>
+<text x="52" y="310" font-size="9.5" font-weight="400" fill="#374151">the flow on the right.</text>
+<line x1="230" y1="290.0" x2="254" y2="290.0" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tharrow)"/>
+<text x="234" y="282.0" font-size="9" font-weight="400" fill="#6B7280">+ New model /</text>
+<text x="234" y="305.0" font-size="9" font-weight="400" fill="#6B7280">Continue Setup</text>
+<rect x="260" y="200" width="640" height="180" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.4" stroke-dasharray="4 3"/>
+<text x="274" y="218" font-size="9.5" font-weight="700" fill="#007A3D">ONE MODEL'S OWN FLOW — its own nav, not global, only visible while building this one model</text>
+<rect x="272" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
+<text x="280" y="248" font-size="9" font-weight="700" fill="#007A3D">UPLOAD DATA</text>
+<text x="280" y="262" font-size="8.3" font-weight="400" fill="#374151">Real, live</text>
+<line x1="368" y1="300.0" x2="374" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
+<rect x="376.0" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
+<text x="384.0" y="248" font-size="9" font-weight="700" fill="#007A3D">CONFIGURE</text>
+<text x="384.0" y="262" font-size="8.3" font-weight="400" fill="#374151">Real, saves</text>
+<line x1="472" y1="300.0" x2="478" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
+<rect x="480.0" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
+<text x="488.0" y="248" font-size="9" font-weight="700" fill="#007A3D">OPTIMIZE</text>
+<text x="488.0" y="262" font-size="8.3" font-weight="400" fill="#374151">Real, live</text>
+<line x1="576" y1="300.0" x2="582" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
+<rect x="584.0" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
+<text x="592.0" y="248" font-size="9" font-weight="700" fill="#007A3D">CALIBRATE</text>
+<text x="592.0" y="262" font-size="8.3" font-weight="400" fill="#374151">Real, live</text>
+<line x1="680" y1="300.0" x2="686" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
+<rect x="688.0" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
+<text x="696.0" y="248" font-size="9" font-weight="700" fill="#007A3D">HYPER-</text>
+<text x="696.0" y="260" font-size="9" font-weight="700" fill="#007A3D">PARAMS</text>
+<text x="696.0" y="274" font-size="8.3" font-weight="400" fill="#374151">Real, live</text>
+<line x1="784" y1="300.0" x2="790" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
+<rect x="792.0" y="232" width="96" height="136" rx="7" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
+<text x="800.0" y="248" font-size="9" font-weight="700" fill="#4B5563">TRAIN</text>
+<text x="800.0" y="260" font-size="9" font-weight="700" fill="#4B5563">MODEL</text>
+<text x="800.0" y="274" font-size="8.3" font-weight="400" fill="#6B7280">Disabled,</text>
+<text x="800.0" y="285" font-size="8.3" font-weight="400" fill="#6B7280">soon</text>
+<line x1="580" y1="380" x2="580" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
+<line x1="580" y1="390" x2="135" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
+<line x1="135" y1="390" x2="135" y2="372" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#tharrowgrey)"/>
+<text x="357.5" y="403" font-size="9" font-weight="400" fill="#6B7280" text-anchor="middle">any screen in the flow can exit back to Models List</text>
+<defs><marker id="tharrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker><marker id="tharrowgrey" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#9CA3AF"/></marker></defs>
 </svg>
 </div>
 
@@ -598,106 +623,106 @@ one box from this picture.</p>
 <text x="494" y="469" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
 <text x="652" y="469" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="780" y="469" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
-<rect x="40" y="554" width="460" height="422" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
-<rect x="40" y="554" width="460" height="32" rx="10" fill="#E6F5ED"/>
-<rect x="40" y="576" width="460" height="10" fill="#E6F5ED"/>
-<text x="270.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">DATASETS</text>
+<rect x="40" y="554" width="380" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="40" y="554" width="380" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="40" y="576" width="380" height="10" fill="#E6F5ED"/>
+<text x="230.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">OTP_CODES</text>
 <text x="54" y="601" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
 <text x="212" y="601" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
 <text x="340" y="601" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
 <text x="54" y="621" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
 <text x="212" y="621" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
 <text x="340" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
-<text x="54" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">project_id</text>
+<text x="54" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">user_id</text>
 <text x="212" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; projects, CASCADE</text>
-<text x="54" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
+<text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
+<text x="54" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">code_hash</text>
 <text x="212" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="661" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">model_type</text>
-<text x="212" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="681" font-size="9.5" font-weight="400" fill="#6B7280">check, 1 value today</text>
-<text x="54" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_provider</text>
-<text x="212" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="701" font-size="9.5" font-weight="400" fill="#6B7280">check, default r2</text>
-<text x="54" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_key</text>
-<text x="212" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="721" font-size="9.5" font-weight="400" fill="#6B7280">pointer, not the file</text>
-<text x="54" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_name</text>
-<text x="212" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="340" y="661" font-size="9.5" font-weight="400" fill="#6B7280">sha256, never the code</text>
+<text x="54" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">expires_at</text>
+<text x="212" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="681" font-size="9.5" font-weight="400" fill="#6B7280">10 min TTL</text>
+<text x="54" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">attempts</text>
+<text x="212" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">int</text>
+<text x="340" y="701" font-size="9.5" font-weight="400" fill="#6B7280">default 0, max 5</text>
+<text x="54" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">consumed_at</text>
+<text x="212" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="340" y="721" font-size="9.5" font-weight="400" fill="#6B7280">blocks replay</text>
+<text x="54" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="212" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="741" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_size_bytes</text>
-<text x="212" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">bigint</text>
+<text x="54" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="212" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="781" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">mime_type</text>
-<text x="212" y="781" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="781" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="801" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
-<text x="212" y="801" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="801" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
-<text x="54" y="821" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">column_mapping</text>
-<text x="212" y="821" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
-<text x="340" y="821" font-size="9.5" font-weight="400" fill="#6B7280">field names by role</text>
-<text x="54" y="841" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">kpi_type</text>
-<text x="212" y="841" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="841" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
-<text x="54" y="861" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">date_range</text>
-<text x="212" y="861" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
-<text x="340" y="861" font-size="9.5" font-weight="400" fill="#6B7280">training window</text>
-<text x="54" y="881" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">calibration</text>
-<text x="212" y="881" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
-<text x="340" y="881" font-size="9.5" font-weight="400" fill="#6B7280">two real percentages</text>
-<text x="54" y="901" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">channel_hyperparameters</text>
-<text x="212" y="901" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
-<text x="340" y="901" font-size="9.5" font-weight="400" fill="#6B7280">carryover, saturation</text>
-<text x="54" y="921" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="212" y="921" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="340" y="921" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="941" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="212" y="941" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="340" y="941" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="54" y="961" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
-<text x="212" y="961" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="340" y="961" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
-<rect x="520" y="554" width="380" height="222" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
-<rect x="520" y="554" width="380" height="32" rx="10" fill="#E6F5ED"/>
-<rect x="520" y="576" width="380" height="10" fill="#E6F5ED"/>
-<text x="710.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">OTP_CODES</text>
-<text x="534" y="601" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
-<text x="692" y="601" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="820" y="601" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
-<text x="534" y="621" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
-<text x="692" y="621" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="820" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
-<text x="534" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">user_id</text>
-<text x="692" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="820" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
-<text x="534" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">code_hash</text>
-<text x="692" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="820" y="661" font-size="9.5" font-weight="400" fill="#6B7280">sha256, never the code</text>
-<text x="534" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">expires_at</text>
-<text x="692" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="820" y="681" font-size="9.5" font-weight="400" fill="#6B7280">10 min TTL</text>
-<text x="534" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">attempts</text>
-<text x="692" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">int</text>
-<text x="820" y="701" font-size="9.5" font-weight="400" fill="#6B7280">default 0, max 5</text>
-<text x="534" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">consumed_at</text>
-<text x="692" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="820" y="721" font-size="9.5" font-weight="400" fill="#6B7280">blocks replay</text>
-<text x="534" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="692" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="820" y="741" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="534" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="692" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="820" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<rect x="440" y="554" width="460" height="422" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="440" y="554" width="460" height="32" rx="10" fill="#E6F5ED"/>
+<rect x="440" y="576" width="460" height="10" fill="#E6F5ED"/>
+<text x="670.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">DATASETS</text>
+<text x="454" y="601" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">id</text>
+<text x="612" y="601" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="740" y="601" font-size="9.5" font-weight="400" fill="#6B7280">PK</text>
+<text x="454" y="621" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">tenant_id</text>
+<text x="612" y="621" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="740" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
+<text x="454" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">project_id</text>
+<text x="612" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
+<text x="740" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; projects, CASCADE</text>
+<text x="454" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
+<text x="612" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="661" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">model_type</text>
+<text x="612" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="681" font-size="9.5" font-weight="400" fill="#6B7280">check, 1 value today</text>
+<text x="454" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_provider</text>
+<text x="612" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="701" font-size="9.5" font-weight="400" fill="#6B7280">check, default r2</text>
+<text x="454" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">storage_key</text>
+<text x="612" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="721" font-size="9.5" font-weight="400" fill="#6B7280">pointer, not the file</text>
+<text x="454" y="741" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_name</text>
+<text x="612" y="741" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="741" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">file_size_bytes</text>
+<text x="612" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">bigint</text>
+<text x="740" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="781" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">mime_type</text>
+<text x="612" y="781" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="781" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="801" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
+<text x="612" y="801" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="801" font-size="9.5" font-weight="400" fill="#6B7280">check, 3 values</text>
+<text x="454" y="821" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">column_mapping</text>
+<text x="612" y="821" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="740" y="821" font-size="9.5" font-weight="400" fill="#6B7280">field names by role</text>
+<text x="454" y="841" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">kpi_type</text>
+<text x="612" y="841" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="841" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
+<text x="454" y="861" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">date_range</text>
+<text x="612" y="861" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="740" y="861" font-size="9.5" font-weight="400" fill="#6B7280">training window</text>
+<text x="454" y="881" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">calibration</text>
+<text x="612" y="881" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="740" y="881" font-size="9.5" font-weight="400" fill="#6B7280">two real percentages</text>
+<text x="454" y="901" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">channel_hyperparameters</text>
+<text x="612" y="901" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="740" y="901" font-size="9.5" font-weight="400" fill="#6B7280">carryover, saturation</text>
+<text x="454" y="921" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="612" y="921" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="921" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="941" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="612" y="941" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="941" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="961" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="612" y="961" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="961" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
 <line x1="360.0" y1="192" x2="220" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
 <text x="260.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
 <line x1="580.0" y1="192" x2="660" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
 <text x="590.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
-<line x1="250.0" y1="484" x2="710.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
-<text x="500.0" y="507.0" font-size="9.5" font-weight="400" fill="#6B7280">user_id FK</text>
-<line x1="690.0" y1="484" x2="270.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
-<text x="390.0" y="531.0" font-size="9.5" font-weight="400" fill="#6B7280">project_id FK</text>
+<line x1="250.0" y1="484" x2="230.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="210.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">user_id FK</text>
+<line x1="690.0" y1="484" x2="670.0" y2="554" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
+<text x="640.0" y="515.0" font-size="9.5" font-weight="400" fill="#6B7280">project_id FK</text>
 <defs><marker id="erdarrow5" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
 </svg>
 </div>
