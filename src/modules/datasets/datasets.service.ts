@@ -2,10 +2,11 @@ import { ForbiddenException, Inject, Injectable, NotFoundException } from '@nest
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { Project } from '../projects/entities/project.entity';
-import { Dataset } from './entities/dataset.entity';
+import { Dataset, DatasetStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
+import { validateDatasetFile } from './validators/validate-dataset-file';
 
 /**
  * `datasets` has Row-Level Security, same reasoning as `ProjectsService`:
@@ -52,6 +53,7 @@ export class DatasetsService {
   ): Promise<Dataset> {
     const project = await this.findProjectOrThrow(projectId);
     this.assertProjectOwner(project, requesterId);
+    validateDatasetFile(file);
 
     const storageKey = `tenants/${tenantId}/projects/${projectId}/datasets/${randomUUID()}-${file.originalname}`;
     await this.storage.upload(storageKey, file.buffer, file.mimetype);
@@ -66,6 +68,7 @@ export class DatasetsService {
         fileName: file.originalname,
         fileSizeBytes: file.size,
         mimeType: file.mimetype,
+        status: DatasetStatus.VALIDATED,
       }),
     );
   }
