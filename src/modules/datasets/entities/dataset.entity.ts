@@ -63,6 +63,84 @@ export interface ChannelHyperparameter {
 }
 
 /**
+ * 2026-08-12: real training against Hammad's worker is on hold, blocked on decisions still with
+ * Farhan (see `dev-log/raw/2026-08-11.md`). Decided with Anas: build a mock training run instead,
+ * using this exact real shape — copied field for field from Hammad's own real sample output,
+ * `Resources/Handover MMM - Hammad/Model Integration Original/final_results.json` — so that
+ * swapping the mock for a real trained result later is a data-source change, not a rebuild.
+ */
+export enum TrainingStatus {
+  NOT_STARTED = 'not_started',
+  RUNNING = 'running',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+}
+
+export interface TrainingResults {
+  data_used: {
+    date_column: string;
+    target_column: string;
+    media_columns: string[];
+    control_columns: string[];
+    organic_columns: string[];
+    geo_columns: string[];
+    first_date: string;
+    last_date: string;
+    row_count: number;
+  };
+  model_confidence: {
+    overall_accuracy_percent: number;
+    overall_accuracy_formula: string;
+    average_error_percent: number;
+    weighted_average_error_percent: number;
+    r_squared: number;
+    adjusted_r_squared: number;
+  };
+  channel_contribution: Array<{
+    channel: string;
+    spend: number;
+    pct_of_spend: number;
+    incremental_outcome: number;
+    pct_of_contribution: number;
+  }>;
+  channel_efficiency: Array<{
+    channel: string;
+    roi: number;
+    marginal_roi: number;
+    effectiveness: number;
+    cost_per_incremental_result: number;
+  }>;
+  data_quality_flags: Array<{ message: string; columns_involved: string[] }>;
+  budget_recommendation: Array<{
+    channel: string;
+    current_spend: number;
+    current_pct_of_budget: number;
+    optimized_spend: number;
+    optimized_pct_of_budget: number;
+    spend_change_dollars: number;
+    spend_change_percent: number;
+    current_roi: number;
+    optimized_roi: number;
+  }>;
+  saturation_status: Array<{ channel: string; carryover_label: string; saturation_label: string }>;
+  adstock_decay_curves: Array<{
+    channel: string;
+    curve: Array<{ weeks_since_spend: number; effect_remaining_percent: number }>;
+  }>;
+  saturation_curves: Array<{
+    channel: string;
+    curve: Array<{ spend_level: number; effect: number }>;
+    historical_spend_distribution: Array<{
+      spend_range_start: number;
+      spend_range_end: number;
+      relative_frequency_percent: number;
+    }>;
+  }>;
+  status: 'completed';
+  mock: true;
+}
+
+/**
  * `StorageProvider` exists so a dataset's row always says which backend its
  * file actually lives in, not just which one is configured today. Dev runs
  * on Cloudflare R2 (2026-08-11 decision, storage abstracted behind
@@ -145,6 +223,24 @@ export class Dataset extends BaseEntity {
 
   @Column({ name: 'channel_hyperparameters', type: 'jsonb', nullable: true })
   channelHyperparameters: ChannelHyperparameter[] | null;
+
+  /** Set by POST /datasets/:id/assemble. The real job_id and pointer, kept even though nothing is sent anywhere yet. */
+  @Column({ name: 'job_id', type: 'text', nullable: true })
+  jobId: string | null;
+
+  @Column({ name: 'dataset_reference', type: 'text', nullable: true })
+  datasetReference: string | null;
+
+  @Column({ name: 'training_status', type: 'text', enum: TrainingStatus, default: TrainingStatus.NOT_STARTED })
+  trainingStatus: TrainingStatus;
+
+  /** When POST /datasets/:id/train was called. GET /status computes a fake "running" window from this, purely for a real-feeling UI, no background job involved. */
+  @Column({ name: 'training_started_at', type: 'timestamptz', nullable: true })
+  trainingStartedAt: Date | null;
+
+  /** Real shape, mock content, see TrainingResults' own comment. */
+  @Column({ type: 'jsonb', nullable: true })
+  results: TrainingResults | null;
 
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at' })
   deletedAt: Date | null;

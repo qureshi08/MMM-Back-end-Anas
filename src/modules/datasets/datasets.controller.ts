@@ -118,4 +118,23 @@ export class DatasetsController {
   assemble(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.datasets.assemble(id, user.userId!);
   }
+
+  /**
+   * "Train Model." Real training is on hold, this runs a mock instead — see DatasetsService.train's
+   * own comment. Real shape, mock content, always flagged (results.mock === true).
+   */
+  @Post('datasets/:id/train')
+  train(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {
+    return this.datasets.train(id, user.userId!);
+  }
+
+  @Get('datasets/:id/status')
+  getTrainingStatus(@Param('id', ParseUUIDPipe) id: string) {
+    return this.datasets.getTrainingStatus(id);
+  }
+
+  @Get('datasets/:id/results')
+  getResults(@Param('id', ParseUUIDPipe) id: string) {
+    return this.datasets.getResults(id);
+  }
 }

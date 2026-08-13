@@ -2,7 +2,7 @@ import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundEx
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { Project } from '../projects/entities/project.entity';
-import { Dataset, DatasetStatus } from './entities/dataset.entity';
+import { Dataset, DatasetStatus, TrainingStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
 import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
@@ -22,6 +22,8 @@ import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-
 import { parseCsvRows } from './assembly/parse-csv-rows';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
+import { generateMockResults } from './assembly/generate-mock-results';
+import { computeTrainingProgress } from './assembly/compute-training-progress';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -266,7 +268,50 @@ export class DatasetsService {
     const jobId = randomUUID();
     const datasetReference = `tenants/${dataset.tenantId}/projects/${dataset.projectId}/datasets/${dataset.id}/jobs/${jobId}.json`;
     await this.storage.upload(datasetReference, Buffer.from(JSON.stringify(payload, null, 2)), 'application/json');
+    await this.repo().update(id, { jobId, datasetReference });
 
     return { jobId, datasetReference, payload };
+  }
+
+  /**
+   * "Train Model," but real training against Hammad's worker is on hold (2026-08-12, see
+   * dev-log/raw/2026-08-11.md). Assembles the real job file (same as `assemble()`, calling it
+   * directly if not already done), then generates a mock result in the exact real shape and starts
+   * the fake "running" clock `computeTrainingProgress` reads from. No queue, no worker, no network
+   * call anywhere in this method — entirely local, entirely honest about being a mock (`results.mock`
+   * is always `true`).
+   */
+  async train(id: string, requesterId: string): Promise<Dataset> {
+    const { payload } = await this.assemble(id, requesterId);
+    const results = generateMockResults(payload as Parameters<typeof generateMockResults>[0]);
+
+    await this.repo().update(id, {
+      trainingStatus: TrainingStatus.RUNNING,
+      trainingStartedAt: new Date(),
+      results,
+    });
+    return this.findOne(id);
+  }
+
+  /** No background job updates this, status is computed fresh from elapsed time, see computeTrainingProgress's own comment. */
+  async getTrainingStatus(id: string): Promise<{ status: string; progress: number; jobId: string | null }> {
+    const dataset = await this.findOne(id);
+    if (!dataset.trainingStartedAt) {
+      return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
+    }
+    const { status, progress } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
+    return { status, progress, jobId: dataset.jobId };
+  }
+
+  async getResults(id: string) {
+    const dataset = await this.findOne(id);
+    if (!dataset.trainingStartedAt) {
+      throw new BadRequestException('Training has not started for this dataset yet.');
+    }
+    const { status } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
+    if (status !== 'completed') {
+      throw new BadRequestException('Training is still running, results are not ready yet.');
+    }
+    return dataset.results;
   }
 }

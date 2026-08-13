@@ -567,6 +567,72 @@
             "description": "Builds the real job JSON matching Hammad's exact contract (df, column_mapping, kpi_type, revenue_per_kpi_value, model_configuration), saves it to R2, generates a real job_id, and returns { jobId, datasetReference, payload }. Requires Configure, Optimize, Calibrate and Hyperparameterization all saved first, or returns 400 naming which step is missing. Does NOT send anything to Hammad's worker, there is nowhere stable to send it yet."
           },
           "response": []
+        },
+        {
+          "name": "POST /datasets/:id/train, mock Train Model",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/train",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "train"
+              ]
+            },
+            "description": "Real training against Hammad's worker is on hold (2026-08-12). This runs a mock instead: assembles the real job file, then generates a result in Hammad's exact real output shape (copied from his own sample file), filled with numbers computed from your real data and real carryover/saturation values. Always flagged results.mock === true. Starts an 8-second fake 'running' window, poll GET /datasets/:id/status to watch it complete."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /datasets/:id/status, poll the mock training run",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "status"
+              ]
+            },
+            "description": "Returns { status, progress, jobId }. status is 'running' for about 8 seconds after POST /train, then 'completed'. No real worker involved, purely computed from elapsed time."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /datasets/:id/results, the mock results",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/datasets/{{datasetId}}/results",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "datasets",
+                "{{datasetId}}",
+                "results"
+              ]
+            },
+            "description": "The full mock result: model_confidence, channel_contribution, channel_efficiency, budget_recommendation, saturation curves, adstock decay curves, same real shape as Hammad's own sample output. 400 if training hasn't completed yet."
+          },
+          "response": []
         }
       ]
     },
