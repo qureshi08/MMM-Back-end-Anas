@@ -312,7 +312,7 @@ one box from this picture.</p>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 435" role="img" aria-label="The real navigation hierarchy, not a flat sequence. Sign in, verify and Projects are global, the only things reachable before a project is picked. Once inside one project, a persistent nav (Models list, Back to Projects, Sign out) is always present, and the Models list is that project's own real dashboard. Starting or continuing a model opens a separate nested flow, Upload Data through Configure, Optimize, Calibrate, Hyperparameterization, ending in a disabled Train Model button, which has its own nav only visible while inside that one model, and always leads back to the Models list, never a dead end.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 435" role="img" aria-label="The real navigation hierarchy, not a flat sequence. Sign in, verify and Projects are global, the only things reachable before a project is picked. Once inside one project, a persistent nav (Models list, Back to Projects, Sign out) is always present, and the Models list is that project's own real dashboard. Starting or continuing a model opens a separate nested flow, Upload Data through Configure, Optimize, Calibrate, Hyperparameterization, ending in Train Model, a real endpoint that runs a mock training pass and returns simulated results in the exact real shape a trained model would, since real training against the modeling team's worker is on hold. This nested flow has its own nav only visible while inside that one model, and always leads back to the Models list, never a dead end.">
 <text x="470" y="24" font-size="11" font-weight="700" fill="#6B7280" text-anchor="middle">GLOBAL: BEFORE ANY PROJECT IS PICKED</text>
 <rect x="20" y="40" width="150" height="90" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="32" y="62" font-size="11" font-weight="700" fill="#007A3D">SIGN IN</text>
@@ -365,11 +365,11 @@ one box from this picture.</p>
 <text x="696.0" y="260" font-size="9" font-weight="700" fill="#007A3D">PARAMS</text>
 <text x="696.0" y="274" font-size="8.3" font-weight="400" fill="#374151">Real, live</text>
 <line x1="784" y1="300.0" x2="790" y2="300.0" stroke="#6B7280" stroke-width="1.3" marker-end="url(#tharrow)"/>
-<rect x="792.0" y="232" width="96" height="136" rx="7" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
-<text x="800.0" y="248" font-size="9" font-weight="700" fill="#4B5563">TRAIN</text>
-<text x="800.0" y="260" font-size="9" font-weight="700" fill="#4B5563">MODEL</text>
-<text x="800.0" y="274" font-size="8.3" font-weight="400" fill="#6B7280">Disabled,</text>
-<text x="800.0" y="285" font-size="8.3" font-weight="400" fill="#6B7280">soon</text>
+<rect x="792.0" y="232" width="96" height="136" rx="7" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.4"/>
+<text x="800.0" y="248" font-size="9" font-weight="700" fill="#8A5A06">TRAIN</text>
+<text x="800.0" y="260" font-size="9" font-weight="700" fill="#8A5A06">MODEL</text>
+<text x="800.0" y="274" font-size="8.3" font-weight="400" fill="#374151">Real, but</text>
+<text x="800.0" y="285" font-size="8.3" font-weight="400" fill="#374151">mock data</text>
 <line x1="580" y1="380" x2="580" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
 <line x1="580" y1="390" x2="135" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
 <line x1="135" y1="390" x2="135" y2="372" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#tharrowgrey)"/>
@@ -538,7 +538,7 @@ one box from this picture.</p>
 <h2 class="section" id="db"><span class="num">04</span>The database, column by column</h2>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1006" role="img" aria-label="Five real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, then datasets linked to projects by a project_id foreign key and otp_codes linked to users by a user_id foreign key. Every table also carries its own tenant_id foreign key back to tenants, omitted from the arrows here for clarity but present in every one.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 1106" role="img" aria-label="Five real database tables drawn with every column: tenants at the top, users and projects below it each linked by a tenant_id foreign key, then datasets linked to projects by a project_id foreign key and otp_codes linked to users by a user_id foreign key. Every table also carries its own tenant_id foreign key back to tenants, omitted from the arrows here for clarity but present in every one.">
 <rect x="300.0" y="30" width="340" height="162" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="300.0" y="30" width="340" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="300.0" y="52" width="340" height="10" fill="#E6F5ED"/>
@@ -654,7 +654,7 @@ one box from this picture.</p>
 <text x="54" y="761" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
 <text x="212" y="761" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="761" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<rect x="440" y="554" width="460" height="422" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
+<rect x="440" y="554" width="460" height="522" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.8"/>
 <rect x="440" y="554" width="460" height="32" rx="10" fill="#E6F5ED"/>
 <rect x="440" y="576" width="460" height="10" fill="#E6F5ED"/>
 <text x="670.0" y="575" font-size="12.5" font-weight="700" fill="#007A3D" text-anchor="middle">DATASETS</text>
@@ -706,15 +706,30 @@ one box from this picture.</p>
 <text x="454" y="901" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">channel_hyperparameters</text>
 <text x="612" y="901" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
 <text x="740" y="901" font-size="9.5" font-weight="400" fill="#6B7280">carryover, saturation</text>
-<text x="454" y="921" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
-<text x="612" y="921" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="740" y="921" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="454" y="941" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
-<text x="612" y="941" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="740" y="941" font-size="9.5" font-weight="400" fill="#6B7280"></text>
-<text x="454" y="961" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
-<text x="612" y="961" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
-<text x="740" y="961" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
+<text x="454" y="921" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">job_id</text>
+<text x="612" y="921" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="921" font-size="9.5" font-weight="400" fill="#6B7280">set by /assemble</text>
+<text x="454" y="941" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">dataset_reference</text>
+<text x="612" y="941" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="941" font-size="9.5" font-weight="400" fill="#6B7280">R2 key, the job file</text>
+<text x="454" y="961" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">training_status</text>
+<text x="612" y="961" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
+<text x="740" y="961" font-size="9.5" font-weight="400" fill="#6B7280">check, 4 values</text>
+<text x="454" y="981" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">training_started_at</text>
+<text x="612" y="981" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="981" font-size="9.5" font-weight="400" fill="#6B7280">drives mock progress</text>
+<text x="454" y="1001" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">results</text>
+<text x="612" y="1001" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">jsonb</text>
+<text x="740" y="1001" font-size="9.5" font-weight="400" fill="#6B7280">mock, real shape</text>
+<text x="454" y="1021" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">created_at</text>
+<text x="612" y="1021" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="1021" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="1041" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">updated_at</text>
+<text x="612" y="1041" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="1041" font-size="9.5" font-weight="400" fill="#6B7280"></text>
+<text x="454" y="1061" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">deleted_at</text>
+<text x="612" y="1061" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
+<text x="740" y="1061" font-size="9.5" font-weight="400" fill="#6B7280">soft delete</text>
 <line x1="360.0" y1="192" x2="220" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
 <text x="260.0" y="223.0" font-size="9.5" font-weight="400" fill="#6B7280">tenant_id FK</text>
 <line x1="580.0" y1="192" x2="660" y2="262" stroke="#6B7280" stroke-width="1.6" marker-end="url(#erdarrow5)"/>
