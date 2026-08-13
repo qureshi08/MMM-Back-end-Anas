@@ -122,8 +122,9 @@
   built and deployed, not what's planned. Where something isn't built yet, it says so directly
   instead of being left out.</p>
   <p class="updated">Last updated <b>August 12, 2026</b>. Datasets and the whole model-configuration
-  flow (Section 09) are real and live now, including the assembly step. Live backend, the only one
-  that matters: <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
+  flow (Section 09) are real and live, including the assembly step and a real Train Model that runs
+  a mock while the connection to Hammad's worker is on hold. Live backend, the only one that
+  matters: <code>https://mmm-back-end-anas.onrender.com/api/v1</code>.</p>
 </header>
 
 <nav class="toc">
@@ -535,6 +536,44 @@ there's nowhere stable to send it yet, see Section 11.</p>
 <p class="endpoint-desc"><code>@Public()</code>, no auth needed. A real 16-week sample CSV, in the
 exact column shape Hammad's model expects, for the "Download sample dataset" link.</p>
 
+<div class="watch">
+  <span class="lbl">Train Model: mock, real shape, decided 2026-08-12</span>
+  <p>Real training against Hammad's worker is on hold, blocked on decisions still with Farhan (auth,
+  and what to build against given Colab/ngrok's real instability). Rather than leave Train Model
+  disabled, it runs a real mock: same real endpoints below, same real result shape as Hammad's own
+  sample output (<code>Resources/Handover MMM - Hammad/Model Integration Original/final_results.json</code>),
+  computed from the real uploaded data and real hyperparameters, not random numbers. Every result
+  carries <code>results.mock: true</code> and its own data-quality flag saying so. Swapping this for
+  a real trained result later is a data-source change, not a rebuild.</p>
+</div>
+
+<h3 class="endpoint"><span class="method post">POST</span>/datasets/:id/train</h3>
+<p class="endpoint-desc">Requires the same four steps as <code>/assemble</code> (Configure through
+Hyperparameterization). Assembles the real job file, then generates a mock result and starts an
+8-second fake "running" window. No queue, no worker, nothing sent anywhere.</p>
+<div class="card">
+  <p><b>Response, 200</b>, the dataset row, note <code>trainingStatus</code> and
+  <code>trainingStartedAt</code>:</p>
+  <pre class="block"><code>{ "id": "...", "trainingStatus": "running", "trainingStartedAt": "2026-08-12T10:00:00.000Z",
+  "jobId": "...", "results": { "...": "the full mock result, see GET /results below" } }</code></pre>
+</div>
+
+<h3 class="endpoint"><span class="method get">GET</span>/datasets/:id/status</h3>
+<p class="endpoint-desc">Polls the mock run. <code>status</code> is <code>"running"</code> for about
+8 seconds after <code>POST /train</code>, computed fresh from elapsed time on every call, not a
+stored value, then <code>"completed"</code>.</p>
+<div class="card">
+  <pre class="block"><code>{ "status": "running", "progress": 0.42, "jobId": "3f2a1c9e-..." }</code></pre>
+</div>
+
+<h3 class="endpoint"><span class="method get">GET</span>/datasets/:id/results</h3>
+<p class="endpoint-desc">400 if training hasn't started or is still running. Once
+<code>"completed"</code>, the full real-shaped mock result: <code>data_used</code>,
+<code>model_confidence</code>, <code>channel_contribution</code>, <code>channel_efficiency</code>,
+<code>data_quality_flags</code>, <code>budget_recommendation</code>, <code>saturation_status</code>,
+<code>adstock_decay_curves</code>, <code>saturation_curves</code>, exactly the shape and field names
+of Hammad's own sample output.</p>
+
 <h2 class="section" id="otp"><span class="num">10</span>Email code second factor (OTP)</h2>
 <p class="section-why">A real second factor, not Entra's own MFA (see
 <code>dev-log/for-anas/modeling-engine-explained.html</code>'s sibling docs for why). A 6-digit
@@ -579,14 +618,13 @@ they're simply unfinished.</p>
 <div class="not-built">
   <h4>Real, on the roadmap, not live</h4>
   <ul>
-    <li><b>Sending an assembled job to Hammad's worker.</b> <code>POST /datasets/:id/assemble</code>
-    (Section 09) builds the real file and stops there, deliberately. There's nowhere stable to send
-    it yet, Hammad's worker only exists behind a Colab/ngrok bridge he doesn't actively manage.
-    Blocked on two real decisions still with Farhan: auth to reach it, and whether to build against
-    Colab/ngrok at all given how unstable it is.</li>
-    <li><b>Job status / results polling</b> (<code>GET /status/:jobId</code>, <code>GET /results/:jobId</code>)
-    &middot; the interface that would let the frontend show real training progress. Waits on the
-    same decision above, there's nothing to poll until a job can actually be sent.</li>
+    <li><b>Sending an assembled job to a real modeling worker.</b> <code>POST /datasets/:id/assemble</code>
+    (Section 09) builds the real file and stops there, deliberately.
+    <code>POST /datasets/:id/train</code>/<code>GET /status</code>/<code>GET /results</code> exist
+    and work, but run a mock, not Hammad's real worker, there's nowhere stable to send a real job
+    yet, his worker only exists behind a Colab/ngrok bridge he doesn't actively manage. Blocked on
+    two real decisions still with Farhan: auth to reach it, and whether to build against Colab/ngrok
+    at all given how unstable it is.</li>
     <li><b>Experiments</b> (<code>/experiments</code>) &middot; <code>CMP-39</code>/<code>CMP-43</code>
     &middot; run, results, logs</li>
     <li><b>Notifications</b> &middot; not started</li>
