@@ -240,13 +240,13 @@ the model configuration into one file, "is not this scope's responsibility." It'
 <line x1="775" y1="160" x2="470" y2="205" stroke="#6B7280" stroke-width="1.6"/>
 <circle cx="470" cy="205" r="4" fill="#6B7280"/>
 <line x1="470" y1="205" x2="470" y2="231" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
-<rect x="220" y="235" width="500" height="60" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="234" y="261" font-size="11.5" font-weight="700" fill="#4B5563">ASSEMBLY, THIS IS OUR BACKEND'S JOB, NOT HAMMAD'S</text>
-<text x="234" y="279" font-size="10" font-weight="400" fill="#6B7280">Not built yet. Combines the three inputs above into one structured file.</text>
+<rect x="220" y="235" width="500" height="60" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="234" y="261" font-size="11.5" font-weight="700" fill="#007A3D">ASSEMBLY, THIS IS OUR BACKEND'S JOB, NOT HAMMAD'S</text>
+<text x="234" y="279" font-size="10" font-weight="400" fill="#374151">Built and live 2026-08-12. Combines the three inputs above into one structured file.</text>
 <line x1="470" y1="295" x2="470" y2="321" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
-<rect x="320" y="325" width="300" height="55" rx="10" fill="#FFFFFF" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="334" y="351" font-size="11.5" font-weight="700" fill="#4B5563">ONE JSON FILE, SAVED TO BLOB</text>
-<text x="334" y="369" font-size="10" font-weight="400" fill="#6B7280">Cloudflare R2 for now, Azure Blob Storage later</text>
+<rect x="320" y="325" width="300" height="55" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="334" y="351" font-size="11.5" font-weight="700" fill="#007A3D">ONE JSON FILE, SAVED TO BLOB</text>
+<text x="334" y="369" font-size="10" font-weight="400" fill="#374151">Cloudflare R2 for now, Azure Blob Storage later</text>
 <line x1="470" y1="380" x2="470" y2="406" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
 <text x="470" y="415" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">a small pointer, "dataset_reference", is the only</text>
 <text x="470" y="430" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">thing that actually reaches Hammad's queue</text>
@@ -256,7 +256,9 @@ the model configuration into one file, "is not this scope's responsibility." It'
 <p class="figcap">Hammad's code never touches the raw file, and never queries more than one file.
 It reads exactly the one JSON at <code>dataset_reference</code>. Building that JSON is the real
 shape of <code>CMP-79</code>, which every earlier doc on this project listed as "not yet defined."
-It is defined now, by this handover.</p>
+It is defined now, by this handover, and built now too, <code>POST /datasets/:id/assemble</code>,
+2026-08-12. What still doesn't exist is the arrow after this diagram, the file reaching Hammad's
+real queue, see Section 08.</p>
 
 <h2 class="section"><span class="num">04</span>Where "model selection" came from, and the final answer</h2>
 <p class="section-why">Farhan's screenshot showed Cassandra letting a user pick between Sibyl,
@@ -346,7 +348,42 @@ that changes what the real deployed system looks like.</p>
   </div>
 </div>
 
-<h2 class="section"><span class="num">07</span>What's next</h2>
+<h2 class="section"><span class="num">08</span>Train Model runs a mock, on purpose, in Hammad's exact real shape</h2>
+<p class="section-why">Decided with Anas, 2026-08-12: real training stays on hold (see Section 06's
+open decisions), but the app shouldn't just sit there with a disabled button. So Train Model runs a
+real mock instead of nothing.</p>
+
+<div class="figwrap">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 260" role="img" aria-label="The real uploaded data and the real carryover and saturation values a user set flow into a mock result generator, deterministic, not random, which produces one result in the exact same shape as Hammad's own real sample output file, final_results.json, labeled mock true throughout. This stands in for the real trained model until the connection to Hammad's worker exists.">
+<rect x="20" y="30" width="260" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="34" y="56" font-size="11.5" font-weight="700" fill="#007A3D">REAL INPUTS</text>
+<text x="34" y="74" font-size="10" font-weight="400" fill="#374151">The real uploaded data, real</text>
+<text x="34" y="89" font-size="10" font-weight="400" fill="#374151">carryover/saturation values</text>
+<line x1="280" y1="75" x2="316" y2="75" stroke="#6B7280" stroke-width="1.6" marker-end="url(#mmockarrow)"/>
+<rect x="320" y="30" width="260" height="90" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6"/>
+<text x="334" y="56" font-size="11.5" font-weight="700" fill="#8A5A06">MOCK GENERATOR</text>
+<text x="334" y="74" font-size="10" font-weight="400" fill="#374151">Deterministic, not random.</text>
+<text x="334" y="89" font-size="10" font-weight="400" fill="#374151">Same input, same output, always.</text>
+<line x1="580" y1="75" x2="616" y2="75" stroke="#6B7280" stroke-width="1.6" marker-end="url(#mmockarrow)"/>
+<rect x="620" y="30" width="300" height="90" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
+<text x="634" y="56" font-size="11.5" font-weight="700" fill="#007A3D">HAMMAD'S REAL RESULT SHAPE</text>
+<text x="634" y="74" font-size="10" font-weight="400" fill="#374151">Copied field for field from his own</text>
+<text x="634" y="89" font-size="10" font-weight="400" fill="#374151">final_results.json, not guessed at</text>
+<line x1="470" y1="120" x2="470" y2="156" stroke="#6B7280" stroke-width="1.6" marker-end="url(#mmockarrow)"/>
+<rect x="220" y="160" width="500" height="70" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6"/>
+<text x="234" y="186" font-size="11.5" font-weight="700" fill="#8A5A06">EVERY RESULT: "mock": true</text>
+<text x="234" y="204" font-size="10" font-weight="400" fill="#374151">Plus its own data-quality flag saying so in plain words.</text>
+<text x="234" y="219" font-size="10" font-weight="400" fill="#374151">Nobody should ever mistake this for a real trained model.</text>
+<defs><marker id="mmockarrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
+</svg>
+</div>
+<p class="figcap">The numbers react to real inputs (a channel with a higher real carryover value
+gets a slower real decay curve, real spend totals come straight from the real uploaded file), so
+this isn't pure noise, but it was never trained on anything. When the connection to Hammad's real
+worker exists, this whole box gets replaced, the shape around it (the three endpoints, the result
+fields) doesn't have to change at all.</p>
+
+<h2 class="section"><span class="num">09</span>What's next</h2>
 <div class="checklist">
   <div class="col proven">
     <h4>Settled, no longer open questions</h4>
@@ -357,6 +394,10 @@ that changes what the real deployed system looks like.</p>
       (<code>meridian</code>), built to scale, confirmed with Farhan</li>
       <li>The tunnel is settled: Sign in &rarr; Projects &rarr; Upload Data &rarr; Configure, Upload
       Data carries both the model dropdown and the file on one screen</li>
+      <li>The assembly step is built and live, <code>POST /datasets/:id/assemble</code>, confirmed
+      2026-08-12</li>
+      <li>Train Model runs a real, deterministic mock in Hammad's exact result shape, Section 08,
+      confirmed 2026-08-12</li>
     </ul>
   </div>
   <div class="col gap">
@@ -364,9 +405,9 @@ that changes what the real deployed system looks like.</p>
     <ul>
       <li>Read the four documents in order: Handover Overview, Codebase Reference, Execution Guide,
       then API Contracts, <code>Results_Field_Glossary_v2.docx</code> later, as a reference</li>
-      <li>Build the assembly step (Section 03): dataset + Configure answers &rarr; one JSON &rarr;
-      Blob &rarr; the queue message, this is what actually makes <code>CMP-79</code> work, not just
-      be documented</li>
+      <li>The real send: getting the assembled job file to Hammad's actual worker. Blocked on two
+      decisions still with Farhan (auth, and what to build against given Colab/ngrok's real
+      instability), not backend work.</li>
     </ul>
   </div>
 </div>
