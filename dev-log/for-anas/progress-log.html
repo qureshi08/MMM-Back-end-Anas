@@ -118,12 +118,12 @@
   <h1>What's actually <span class="italic-accent">done</span></h1>
   <p class="sub">A plain-language record of what's been built in the backend, what's verified, and
   what's still waiting on something. Read this instead of asking. It's kept current.</p>
-  <p class="updated">Last updated <b>August 12, 2026</b>. Everything buildable before the
-  send-to-Hammad step is done and confirmed, not just claimed: the whole model-configuration flow,
-  real navigation and a real per-project Models list (Amna), the two contract fields Hammad flagged
-  missing, and the real job-assembly step (CMP-79). All 26 cases in <code>test-cases.html</code> are
-  passing. The only thing left that isn't backend or frontend code: two decisions with Farhan, see
-  "What's actually blocking progress" below.</p>
+  <p class="updated">Last updated <b>August 12, 2026</b>. Everything buildable before the real
+  send-to-Hammad step exists now, including <code>Train Model</code> itself: real training is on
+  hold, so it runs a real, deterministic mock in Hammad's exact result shape instead of sitting
+  disabled. All 26 cases in <code>test-cases.html</code> are Passed. The only thing left that isn't
+  backend or frontend code: two decisions with Farhan, see "What's actually blocking progress"
+  below.</p>
 </header>
 
 <section class="tint">
@@ -276,14 +276,21 @@
     </tr>
     <tr>
       <td class="item">Assembly step (CMP-79): dataset + Configure answers &rarr; one real job</td>
-      <td><span class="badge wait">Built and confirmed, one real piece left</span></td>
+      <td><span class="badge done">Done</span></td>
       <td class="why"><code>POST /datasets/:id/assemble</code> builds the real job file, matching
       Hammad's exact contract shape, and generates a real <code>job_id</code>. Confirmed by Anas
-      himself, August 12, <code>TC-26</code> in <code>test-cases.html</code>. What's still missing
-      is only the last step, actually sending it to Hammad's worker, deliberately not built: there's
-      nowhere stable to send it yet, see "What's
-      actually blocking progress" below. <code>Train Model</code> on the real frontend stays
-      correctly disabled with a "Coming soon" label until that exists.</td>
+      himself, August 12, <code>TC-26</code> in <code>test-cases.html</code>.</td>
+    </tr>
+    <tr>
+      <td class="item">Train Model: real endpoint, mock results, Hammad's exact real shape</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Real training against Hammad's worker stays on hold, decided with Anas
+      August 12: rather than leave <code>Train Model</code> disabled, it runs a real, deterministic
+      mock instead, in the exact real result shape copied from Hammad's own sample output
+      (<code>Model Integration Original/final_results.json</code>), computed from real uploaded
+      data and real hyperparameters, always flagged <code>results.mock: true</code>. Swapping in a
+      real trained result later is a data-source change, not a rebuild. See
+      <code>dev-log/for-anas/modeling-engine-explained.html</code> Section 08.</td>
     </tr>
     <tr>
       <td class="item">Email code second factor (OTP)</td>
@@ -614,6 +621,14 @@
         persistent nav on every screen, and real model names.</li>
         <li>All 26 cases in <code>test-cases.html</code> confirmed Passed by Anas himself, the first
         time every case in that file has been personally proven, not just built.</li>
+        <li>Real training against Hammad's worker confirmed still on hold (Farhan unavailable, wrote
+        him a status update covering the two open decisions instead). Decided with Anas: rather than
+        leave <code>Train Model</code> disabled, it runs a real mock, same exact result shape as
+        Hammad's own real sample output. <code>POST /datasets/:id/train</code>,
+        <code>GET /datasets/:id/status</code>, <code>GET /datasets/:id/results</code> all built,
+        deterministic (real uploaded data and real hyperparameters drive the numbers, not random
+        noise), every result flagged <code>mock: true</code>. New migration run against the real
+        Render database.</li>
       </ul>
       </div>
     </details>
