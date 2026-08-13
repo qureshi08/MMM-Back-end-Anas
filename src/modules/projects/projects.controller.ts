@@ -10,7 +10,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ProjectsService } from './projects.service';
+import { ProjectsService, ProjectWithCounts } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -27,12 +27,12 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(): Promise<Project[]> {
+  findAll(): Promise<ProjectWithCounts[]> {
     return this.projects.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Project> {
+  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ProjectWithCounts> {
     return this.projects.findOne(id);
   }
 
