@@ -128,7 +128,8 @@
 
 <div class="summary">
   <div class="stat pass"><div class="n">26</div><div class="l">Passed</div></div>
-  <div class="stat"><div class="n">26</div><div class="l">Total cases</div></div>
+  <div class="stat wait"><div class="n">3</div><div class="l">Waiting on you</div></div>
+  <div class="stat"><div class="n">29</div><div class="l">Total cases</div></div>
 </div>
 
 <div class="protocol">
@@ -1177,6 +1178,74 @@ nothing but your own eyes on the screen. Five steps, each one either works or it
       <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch it catch a real missing step</span>
       <p>Try it against a dataset that hasn't had Calibrate saved yet. Expect <code>400</code>,
       <code>"Save these steps first: Calibrate."</code>, naming exactly what's missing.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-27</span><h3>Train Model, the real mock, in Hammad's exact result shape</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> same as TC-26, a real dataset with all four steps saved.</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>POST /datasets/:id/train, mock Train Model</b>.</li>
+      <li>No body needed. Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>, the dataset row with <code>trainingStatus: "running"</code> and a
+      real <code>trainingStartedAt</code> timestamp. This is real, not a real trained model, just a
+      real endpoint: it assembled the job file the same as TC-26, then generated a mock result and
+      started an 8-second fake "running" clock, no queue or worker involved anywhere.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-28</span><h3>Watch the mock training run from "running" to "completed"</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> TC-27 done, within the last 8 seconds.</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>GET /datasets/:id/status, poll the mock training
+      run</b>. Click <b>Send</b> right away.</li>
+      <li>Expect <code>{"status": "running", "progress": &lt;some number under 1&gt;}</code>.</li>
+      <li>Wait about 10 seconds, click <b>Send</b> again.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>The second call returns <code>{"status": "completed", "progress": 1}</code>. Nothing in the
+      database changed between the two calls, this status is computed fresh from elapsed time on
+      every request, not a stored value ticking up in the background.</p>
+    </div>
+  </div>
+</details>
+
+<details class="tc">
+  <summary><span class="id">TC-29</span><h3>The real mock results, in Hammad's exact shape</h3><span class="badge wait">Needs Anas to run this</span></summary>
+  <div class="body">
+    <div class="meta"><span><b>Last run:</b> never, waiting on you</span><span><b>Tool:</b> Postman</span></div>
+    <p><b>Preconditions:</b> TC-28 shows <code>"completed"</code>.</p>
+    <ol>
+      <li>Open <b>Datasets (CMP-38)</b> &rarr; <b>GET /datasets/:id/results, the mock results</b>.
+      Click <b>Send</b>.</li>
+    </ol>
+    <div class="expect">
+      <span class="lbl">Expected result</span>
+      <p>Status <code>200</code>, a full result matching Hammad's own real sample output field for
+      field: <code>data_used</code> (your real column names and real date range),
+      <code>model_confidence</code>, one entry per real media channel in
+      <code>channel_contribution</code> and <code>channel_efficiency</code> (real spend totals from
+      your real file), <code>budget_recommendation</code>, <code>saturation_status</code>,
+      <code>adstock_decay_curves</code> and <code>saturation_curves</code>. Check
+      <code>"mock": true</code> is present at the top level, and <code>data_quality_flags</code>
+      includes a real message saying this is simulated. Real Postman request, but not a real
+      trained model, both true at once, that's the whole point.</p>
+    </div>
+    <div class="expect" style="border-left-color:var(--cbt-warning);background:var(--cbt-warning-muted)">
+      <span class="lbl" style="color:var(--cbt-warning-dark)">Optional: watch it reject an early request</span>
+      <p>Run this on a dataset that's never had <b>Train Model</b> called. Expect <code>400</code>,
+      <code>"Training has not started for this dataset yet."</code></p>
     </div>
   </div>
 </details>
