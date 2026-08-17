@@ -316,6 +316,32 @@
       <code>OtpModule</code> and <code>DatasetsModule</code> shown initializing, status Live. Worth
       remembering for every future push: <b>the working branch alone never reaches Render.</b></td>
     </tr>
+    <tr>
+      <td class="item">Optimize's real charts: row data, correlation, spend-share, combine columns</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed by Anas himself, August 17, on the real deployed frontend and via
+      the browser Network tab: <code>GET /datasets/:id/rows</code> and
+      <code>POST /datasets/:id/combine-columns</code> replaced Optimize's hardcoded "Example data,"
+      correlation percentages and spend-share bars now compute from a real uploaded file, and
+      combining two channels produces a real summed series (verified against the raw file's actual
+      numbers). A real bug was found and fixed along the way: quoted CSV headers were parsed
+      differently by the columns endpoint than by the rows endpoint, now sharing one parser.</td>
+    </tr>
+    <tr>
+      <td class="item">Real date-range suggestion on Optimize</td>
+      <td><span class="badge done">Done</span></td>
+      <td class="why">Confirmed by Anas himself, August 17: opening a dataset with Configure saved
+      but Optimize untouched shows the real earliest/latest date from the uploaded file, exact match
+      against the raw data, with a clear banner explaining where it came from. Answers the original
+      ask from August 12: no more guessing a date range blind.</td>
+    </tr>
+    <tr>
+      <td class="item">"View Models" navigation and Edit's exit trap</td>
+      <td><span class="badge done">Fixed</span></td>
+      <td class="why">Both flagged real bugs from August 12/13 (project detail's model button did
+      nothing; Edit had no way out before finishing setup). Both confirmed fixed by Anas himself,
+      August 17, on the real deployed frontend.</td>
+    </tr>
   </table>
   <div class="legend">
     <span><span class="badge done">Done</span> built, and you personally checked it worked, not just Claude</span>
@@ -632,6 +658,35 @@
         deterministic (real uploaded data and real hyperparameters drive the numbers, not random
         noise), every result flagged <code>mock: true</code>. New migration run against the real
         Render database.</li>
+      </ul>
+      </div>
+    </details>
+
+    <details class="entry">
+      <summary><span class="date">AUGUST 17, 2026</span><h4>Real charts on Optimize, a real date suggestion, two old bugs closed, and the Hammad integration plan</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Amna flagged five real frontend gaps. Checked each against Hammad's own real contract
+        before building anything: row-level data and combining columns don't touch what he receives,
+        safe to build; automatic hyperparameter tuning needed a label, not a rebuild, since real
+        tuning is his engine's own job; per-channel calibration storage would have actively
+        misaligned with reality, his contract only ever takes one overall belief/confidence pair, so
+        that got simplified instead of built out.</li>
+        <li>Built and confirmed: <code>GET /datasets/:id/rows</code> and
+        <code>POST /datasets/:id/combine-columns</code>, both reusing the same CSV parser Assembly
+        already relies on. Found and fixed a real bug while at it: the columns endpoint parsed quoted
+        headers differently than the rows endpoint, so any quoted header would never match its own
+        row data. Both now share one parser.</li>
+        <li>The <code>date-range</code> endpoint from earlier finally got wired into Optimize.
+        Confirmed by Anas: a fresh dataset shows the exact real min/max date from the file, no more
+        guessing.</li>
+        <li>Two bugs open since August 12/13 confirmed fixed: the project detail "View Models" button
+        actually navigates now, and Edit no longer traps a user before setup is finished.</li>
+        <li>Full plan for connecting Hammad's real modeling engine written up for the discussion with
+        Farhan: reuse his existing Colab/ngrok bridge as-is rather than build new infrastructure, one
+        small code change on his side (reading a real link instead of only a local file), no Azure
+        work until the team is actually ready for it. See
+        <code>dev-log/for-anas/hammad-integration-plan.html</code>.</li>
       </ul>
       </div>
     </details>
