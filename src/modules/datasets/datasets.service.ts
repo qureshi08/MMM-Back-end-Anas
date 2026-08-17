@@ -8,6 +8,7 @@ import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
 import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
 import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
 import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
+import { CombineColumnsDto } from './dto/combine-columns.dto';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
@@ -19,11 +20,12 @@ import {
 } from './validators/validate-configuration';
 import { extractCsvHeaders } from './validators/extract-csv-headers';
 import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-column-roles';
-import { parseCsvRows } from './assembly/parse-csv-rows';
+import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { generateMockResults } from './assembly/generate-mock-results';
 import { computeTrainingProgress } from './assembly/compute-training-progress';
+import { findDateRange } from './assembly/find-date-range';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -128,6 +130,62 @@ export class DatasetsService {
     const prefix = await this.storage.downloadPrefix(dataset.storageKey, HEADER_PREVIEW_BYTES);
     const columns = extractCsvHeaders(prefix);
     return { columns, suggestions: suggestColumnRoles(columns) };
+  }
+
+  /**
+   * The real min/max date actually in the file, for Optimize to suggest instead of asking the user
+   * to guess a date range blind — the exact gap Anas hit: he picked today's real calendar dates,
+   * which don't exist anywhere in a real historical marketing dataset.
+   */
+  async getDateRange(id: string): Promise<{ minDate: string; maxDate: string }> {
+    const dataset = await this.findOne(id);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, the date column has to be known before its real range can be read.');
+    }
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+    return findDateRange(rows, dataset.columnMapping.dateColumn);
+  }
+
+  /**
+   * The real row values, not just column names — what Upload Data's preview and Optimize's
+   * timeframe chart, correlation table, and spend-share bars were all missing, showing hardcoded
+   * "Example data" instead. CSV only, same limit as getColumns, this reads the whole file rather
+   * than a header-only prefix.
+   */
+  async getRows(id: string): Promise<{ rows: CsvRow[] }> {
+    const dataset = await this.findOne(id);
+    if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
+      throw new BadRequestException(
+        'Reading row data is only supported for .csv files today. This dataset is ' +
+          `"${dataset.fileName}".`,
+      );
+    }
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    return { rows: parseCsvRows(fileBuffer) };
+  }
+
+  /**
+   * Optimize's "combine similar channels" chart, done for real instead of summing fake numbers
+   * client-side. Sums the named columns per real row, paired with the real date each row belongs
+   * to. Requires Configure to already know which column is the date column.
+   */
+  async combineColumns(id: string, dto: CombineColumnsDto): Promise<{ dateColumn: string; series: { date: string; value: number }[] }> {
+    const dataset = await this.findOne(id);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, the date column has to be known before columns can be combined.');
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+    const dateColumn = dataset.columnMapping.dateColumn;
+
+    const series = rows.map((row) => ({
+      date: String(row[dateColumn]),
+      value: dto.columns.reduce((sum, column) => sum + (typeof row[column] === 'number' ? (row[column] as number) : 0), 0),
+    }));
+
+    return { dateColumn, series };
   }
 
   /**

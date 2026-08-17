@@ -22,6 +22,7 @@ import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
 import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
 import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
 import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
+import { CombineColumnsDto } from './dto/combine-columns.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { Dataset } from './entities/dataset.entity';
@@ -63,6 +64,21 @@ export class DatasetsController {
   @Get('datasets/:id/columns')
   getColumns(@Param('id', ParseUUIDPipe) id: string) {
     return this.datasets.getColumns(id);
+  }
+
+  @Get('datasets/:id/date-range')
+  getDateRange(@Param('id', ParseUUIDPipe) id: string) {
+    return this.datasets.getDateRange(id);
+  }
+
+  @Get('datasets/:id/rows')
+  getRows(@Param('id', ParseUUIDPipe) id: string) {
+    return this.datasets.getRows(id);
+  }
+
+  @Post('datasets/:id/combine-columns')
+  combineColumns(@Param('id', ParseUUIDPipe) id: string, @Body() dto: CombineColumnsDto) {
+    return this.datasets.combineColumns(id, dto);
   }
 
   @Delete('datasets/:id')
