@@ -15,7 +15,7 @@ function coerce(value: string): string | number {
 }
 
 /** A single line of real CSV, respecting double-quoted fields that may contain a comma. */
-function splitCsvLine(line: string): string[] {
+export function splitCsvLine(line: string): string[] {
   const fields: string[] = [];
   let current = '';
   let inQuotes = false;
