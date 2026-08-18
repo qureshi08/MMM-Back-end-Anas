@@ -332,40 +332,96 @@ export class DatasetsService {
   }
 
   /**
-   * "Train Model," but real training against Hammad's worker is on hold (2026-08-12, see
-   * dev-log/raw/2026-08-11.md). Assembles the real job file (same as `assemble()`, calling it
-   * directly if not already done), then generates a mock result in the exact real shape and starts
-   * the fake "running" clock `computeTrainingProgress` reads from. No queue, no worker, no network
-   * call anywhere in this method — entirely local, entirely honest about being a mock (`results.mock`
-   * is always `true`).
+   * Triggers Meridian model training. If `MODEL_ENGINE_URL` is set, calls the live
+   * Colab FastAPI endpoint over ngrok (`POST /train`), passing the assembled dataset R2 reference.
+   * Otherwise falls back gracefully to mock results.
    */
   async train(id: string, requesterId: string): Promise<Dataset> {
-    const { payload } = await this.assemble(id, requesterId);
+    const { jobId, datasetReference, payload } = await this.assemble(id, requesterId);
+
+    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    let isLiveCallSuccess = false;
+
+    if (modelEngineUrl) {
+      try {
+        const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
+        const res = await fetch(`${modelEngineUrl}/train`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
+        });
+        if (res.ok) {
+          isLiveCallSuccess = true;
+        }
+      } catch (err) {
+        console.error('Failed to reach MODEL_ENGINE_URL:', err);
+      }
+    }
+
     const results = generateMockResults(payload as Parameters<typeof generateMockResults>[0]);
 
     await this.repo().update(id, {
       trainingStatus: TrainingStatus.RUNNING,
       trainingStartedAt: new Date(),
-      results,
+      results: isLiveCallSuccess ? { liveEngine: true, jobId } : results,
     });
     return this.findOne(id);
   }
 
-  /** No background job updates this, status is computed fresh from elapsed time, see computeTrainingProgress's own comment. */
+  /**
+   * Queries status of a training job. If `MODEL_ENGINE_URL` is configured, queries Colab's `/status/:jobId`.
+   * Otherwise computes status fresh from elapsed time.
+   */
   async getTrainingStatus(id: string): Promise<{ status: string; progress: number; jobId: string | null }> {
     const dataset = await this.findOne(id);
     if (!dataset.trainingStartedAt) {
       return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
     }
+
+    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    if (modelEngineUrl && dataset.jobId) {
+      try {
+        const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`);
+        if (res.ok) {
+          const data = (await res.json()) as { status: string; progress: number };
+          const status = data.status === 'completed' ? TrainingStatus.COMPLETED : TrainingStatus.RUNNING;
+          return { status, progress: data.progress ?? 0, jobId: dataset.jobId };
+        }
+      } catch (err) {
+        console.error('Failed to query MODEL_ENGINE_URL status:', err);
+      }
+    }
+
     const { status, progress } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
     return { status, progress, jobId: dataset.jobId };
   }
 
+  /**
+   * Fetches results of a completed model run. If `MODEL_ENGINE_URL` is configured, queries Colab's `/results/:jobId`.
+   */
   async getResults(id: string) {
     const dataset = await this.findOne(id);
     if (!dataset.trainingStartedAt) {
       throw new BadRequestException('Training has not started for this dataset yet.');
     }
+
+    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    if (modelEngineUrl && dataset.jobId) {
+      try {
+        const res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`);
+        if (res.ok) {
+          const liveResults = await res.json();
+          await this.repo().update(id, {
+            trainingStatus: TrainingStatus.COMPLETED,
+            results: liveResults,
+          });
+          return liveResults;
+        }
+      } catch (err) {
+        console.error('Failed to fetch results from MODEL_ENGINE_URL:', err);
+      }
+    }
+
     const { status } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
     if (status !== 'completed') {
       throw new BadRequestException('Training is still running, results are not ready yet.');
