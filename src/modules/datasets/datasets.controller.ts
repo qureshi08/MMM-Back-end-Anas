@@ -127,8 +127,9 @@ export class DatasetsController {
   }
 
   /**
-   * Builds and saves the real job file, generates a real job_id. Does not send anything to
-   * Hammad's worker, there's nowhere stable to send it yet — see the service method's own comment.
+   * Builds and saves the real job file, generates a real job_id. Doesn't call the model engine
+   * itself, `train()` does that — this only produces the artifact, see the service method's own
+   * comment.
    */
   @Post('datasets/:id/assemble')
   assemble(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
@@ -136,8 +137,9 @@ export class DatasetsController {
   }
 
   /**
-   * "Train Model." Real training is on hold, this runs a mock instead — see DatasetsService.train's
-   * own comment. Real shape, mock content, always flagged (results.mock === true).
+   * "Train Model." Calls the real Meridian engine over ngrok when `MODEL_ENGINE_URL` is configured,
+   * falls back to a mock in the exact real result shape otherwise — see DatasetsService.train's own
+   * comment. Mock results are always flagged (results.mock === true), never presented as real.
    */
   @Post('datasets/:id/train')
   train(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {

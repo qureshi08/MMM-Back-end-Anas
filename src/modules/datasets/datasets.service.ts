@@ -31,6 +31,21 @@ import { findDateRange } from './assembly/find-date-range';
 const HEADER_PREVIEW_BYTES = 65536;
 
 /**
+ * Headers sent on every call to the real model engine (Colab, over ngrok). `ngrok-skip-browser-warning`
+ * skips ngrok's one-time interstitial page for non-browser callers. `X-Internal-Secret` only gets sent
+ * if `MODEL_ENGINE_SECRET` is actually set — without it, anyone who obtains the ngrok URL could call
+ * /train, /status, /results directly, this is the one thing standing in the way of that.
+ */
+function modelEngineHeaders(extra?: Record<string, string>): Record<string, string> {
+  const secret = process.env.MODEL_ENGINE_SECRET;
+  return {
+    'ngrok-skip-browser-warning': 'true',
+    ...(secret ? { 'X-Internal-Secret': secret } : {}),
+    ...extra,
+  };
+}
+
+/**
  * `datasets` has Row-Level Security, same reasoning as `ProjectsService`:
  * every query goes through the per-request tenant-scoped `QueryRunner`, no
  * `@InjectRepository`.
@@ -332,9 +347,15 @@ export class DatasetsService {
   }
 
   /**
-   * Triggers Meridian model training. If `MODEL_ENGINE_URL` is set, calls the live
-   * Colab FastAPI endpoint over ngrok (`POST /train`), passing the assembled dataset R2 reference.
-   * Otherwise falls back gracefully to mock results.
+   * Triggers Meridian model training. If `MODEL_ENGINE_URL` is set, calls the live Colab FastAPI
+   * endpoint over ngrok (`POST /train`), passing a real downloadable R2 link, not our internal
+   * storage key — his engine fetches over HTTP, it has no access to our bucket directly. Colab's
+   * `/train` returns immediately (`{"status": "accepted"}`, training runs in a background task on
+   * his side), so this call is fast either way, not a wait for training to finish.
+   *
+   * Only falls back to mock results when the live call was never attempted or didn't succeed —
+   * when it does succeed, `results` stays unset here so a real poll (`getTrainingStatus`/
+   * `getResults`) fills it in later, instead of a mock value briefly overwriting a real run.
    */
   async train(id: string, requesterId: string): Promise<Dataset> {
     const { jobId, datasetReference, payload } = await this.assemble(id, requesterId);
@@ -347,26 +368,22 @@ export class DatasetsService {
         const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
         const res = await fetch(`${modelEngineUrl}/train`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'ngrok-skip-browser-warning': 'true',
-          },
+          headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
         });
-        if (res.ok) {
-          isLiveCallSuccess = true;
+        isLiveCallSuccess = res.ok;
+        if (!res.ok) {
+          console.error(`MODEL_ENGINE_URL /train responded ${res.status}, falling back to mock.`);
         }
       } catch (err) {
         console.error('Failed to reach MODEL_ENGINE_URL:', err);
       }
     }
 
-    const results = generateMockResults(payload as Parameters<typeof generateMockResults>[0]);
-
     await this.repo().update(id, {
       trainingStatus: TrainingStatus.RUNNING,
       trainingStartedAt: new Date(),
-      results,
+      ...(isLiveCallSuccess ? {} : { results: generateMockResults(payload as Parameters<typeof generateMockResults>[0]) }),
     });
     return this.findOne(id);
   }
@@ -385,7 +402,7 @@ export class DatasetsService {
     if (modelEngineUrl && dataset.jobId) {
       try {
         const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`, {
-          headers: { 'ngrok-skip-browser-warning': 'true' },
+          headers: modelEngineHeaders(),
         });
         if (res.ok) {
           const data = (await res.json()) as { status: string; progress: number };
@@ -414,7 +431,7 @@ export class DatasetsService {
     if (modelEngineUrl && dataset.jobId) {
       try {
         const res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`, {
-          headers: { 'ngrok-skip-browser-warning': 'true' },
+          headers: modelEngineHeaders(),
         });
         if (res.ok) {
           const liveResults = await res.json();
