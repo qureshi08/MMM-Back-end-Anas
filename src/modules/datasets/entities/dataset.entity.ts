@@ -63,6 +63,19 @@ export interface ChannelHyperparameter {
 }
 
 /**
+ * A real, persisted "combine similar channels" decision, applied when Assembly builds the job
+ * file — not just the Optimize preview chart. Real gap found 2026-08-18: the chart-only version
+ * (`POST /datasets/:id/combine-columns`) never touched `columnMapping.mediaColumns`, so a "combined"
+ * channel still reached Meridian as two separate, highly collinear raw columns and correctly got
+ * rejected (extreme VIF). This is the fix — `sourceColumns` get summed into `newColumnName` on every
+ * real row before the job file is built, and removed from `mediaColumns`.
+ */
+export interface ChannelCombination {
+  sourceColumns: string[];
+  newColumnName: string;
+}
+
+/**
  * 2026-08-12: real training against Hammad's worker is on hold, blocked on decisions still with
  * Farhan (see `dev-log/raw/2026-08-11.md`). Decided with Anas: build a mock training run instead,
  * using this exact real shape — copied field for field from Hammad's own real sample output,
@@ -223,6 +236,9 @@ export class Dataset extends BaseEntity {
 
   @Column({ name: 'channel_hyperparameters', type: 'jsonb', nullable: true })
   channelHyperparameters: ChannelHyperparameter[] | null;
+
+  @Column({ name: 'channel_combinations', type: 'jsonb', nullable: true })
+  channelCombinations: ChannelCombination[] | null;
 
   /** Set by POST /datasets/:id/assemble. The real job_id and pointer, kept even though nothing is sent anywhere yet. */
   @Column({ name: 'job_id', type: 'text', nullable: true })

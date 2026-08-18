@@ -2,13 +2,15 @@ import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundEx
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { Project } from '../projects/entities/project.entity';
-import { Dataset, DatasetStatus, TrainingStatus } from './entities/dataset.entity';
+import { ChannelCombination, Dataset, DatasetStatus, TrainingStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
 import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
 import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
 import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
 import { CombineColumnsDto } from './dto/combine-columns.dto';
+import { CombineChannelsDto } from './dto/combine-channels.dto';
+import { applyChannelCombinations } from './assembly/apply-channel-combinations';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
@@ -204,6 +206,40 @@ export class DatasetsService {
   }
 
   /**
+   * The real "combine similar channels" decision — unlike `combineColumns` above (chart preview
+   * only), this actually changes what training sees: removes the source columns from
+   * `columnMapping.mediaColumns`, replaces them with the new combined name, and saves the
+   * combination so `assemble()` can sum it into every real row later. Clears
+   * `channelHyperparameters`, since it no longer matches the new media column list — Hammad's
+   * contract needs one carryover/saturation pair per real channel, that has to be redone.
+   */
+  async combineChannels(id: string, requesterId: string, dto: CombineChannelsDto): Promise<Dataset> {
+    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, channels can only be combined once media columns are known.');
+    }
+
+    const mediaColumns = dataset.columnMapping.mediaColumns;
+    const missing = dto.sourceColumns.filter((c) => !mediaColumns.includes(c));
+    if (missing.length > 0) {
+      throw new BadRequestException(`Not real media columns on this dataset: ${missing.join(', ')}.`);
+    }
+    if (mediaColumns.includes(dto.newColumnName) && !dto.sourceColumns.includes(dto.newColumnName)) {
+      throw new BadRequestException(`"${dto.newColumnName}" already names a different real media column.`);
+    }
+
+    const newMediaColumns = [...mediaColumns.filter((c) => !dto.sourceColumns.includes(c)), dto.newColumnName];
+    const combination: ChannelCombination = { sourceColumns: dto.sourceColumns, newColumnName: dto.newColumnName };
+
+    await this.repo().update(id, {
+      columnMapping: { ...dataset.columnMapping, mediaColumns: newMediaColumns },
+      channelCombinations: [...(dataset.channelCombinations ?? []), combination],
+      channelHyperparameters: null,
+    });
+    return this.findOne(id);
+  }
+
+  /**
    * Soft delete only, same audit-trail rationale as `ProjectsService`, the
    * row stays. The R2 object itself is left in place deliberately, not
    * removed on every dataset delete, matching that same "keep it for
@@ -330,12 +366,16 @@ export class DatasetsService {
 
     const fileBuffer = await this.storage.download(dataset.storageKey);
     const allRows = parseCsvRows(fileBuffer);
-    const rows = filterRowsByDateRange(
+    const dateFiltered = filterRowsByDateRange(
       allRows,
       dataset.columnMapping!.dateColumn,
       dataset.dateRange!.startDate,
       dataset.dateRange!.endDate,
     );
+    // Real combined channels get summed into their new column and the originals dropped here,
+    // matching columnMapping.mediaColumns (already updated by combineChannels()) — without this,
+    // a "combined" channel still reaches Meridian as separate, collinear raw columns.
+    const rows = applyChannelCombinations(dateFiltered, dataset.channelCombinations);
     const payload = buildJobPayload(dataset, rows);
 
     const jobId = randomUUID();

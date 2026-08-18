@@ -23,6 +23,7 @@ import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
 import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
 import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
 import { CombineColumnsDto } from './dto/combine-columns.dto';
+import { CombineChannelsDto } from './dto/combine-channels.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { Dataset } from './entities/dataset.entity';
@@ -79,6 +80,20 @@ export class DatasetsController {
   @Post('datasets/:id/combine-columns')
   combineColumns(@Param('id', ParseUUIDPipe) id: string, @Body() dto: CombineColumnsDto) {
     return this.datasets.combineColumns(id, dto);
+  }
+
+  /**
+   * The real version of combining channels — changes what training actually sees, not just the
+   * Optimize preview chart. Clears channelHyperparameters, Hyperparameterization needs a redo
+   * against the new combined channel list.
+   */
+  @Patch('datasets/:id/combine-channels')
+  combineChannels(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CombineChannelsDto,
+  ): Promise<Dataset> {
+    return this.datasets.combineChannels(id, user.userId!, dto);
   }
 
   @Delete('datasets/:id')
