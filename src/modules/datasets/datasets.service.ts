@@ -356,8 +356,23 @@ export class DatasetsService {
    * Only falls back to mock results when the live call was never attempted or didn't succeed —
    * when it does succeed, `results` stays unset here so a real poll (`getTrainingStatus`/
    * `getResults`) fills it in later, instead of a mock value briefly overwriting a real run.
+   *
+   * Refuses to start a second run while one is already in progress. Real bug found in testing:
+   * nothing on our side or Colab's queues jobs, so two real Meridian trainings could run
+   * concurrently on the same GPU process and crash each other — confirmed live, one job's log
+   * started sampling before the previous job had finished. This is the guard against that.
    */
   async train(id: string, requesterId: string): Promise<Dataset> {
+    const existing = await this.findOwnedDatasetOrThrow(id, requesterId);
+    if (existing.trainingStartedAt) {
+      const { status } = await this.getTrainingStatus(id);
+      if (status === TrainingStatus.RUNNING) {
+        throw new BadRequestException(
+          'Training is already running for this dataset. Wait for it to finish before starting another run.',
+        );
+      }
+    }
+
     const { jobId, datasetReference, payload } = await this.assemble(id, requesterId);
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
