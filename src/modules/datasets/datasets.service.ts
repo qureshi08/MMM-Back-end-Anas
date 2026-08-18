@@ -11,6 +11,7 @@ import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto
 import { CombineColumnsDto } from './dto/combine-columns.dto';
 import { CombineChannelsDto } from './dto/combine-channels.dto';
 import { applyChannelCombinations } from './assembly/apply-channel-combinations';
+import { nameForGroup, suggestChannelGroups } from './assembly/suggest-channel-combinations';
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
@@ -237,6 +238,48 @@ export class DatasetsService {
       channelHyperparameters: null,
     });
     return this.findOne(id);
+  }
+
+  /**
+   * "Combine what's flagged" — the one-click version. Finds every real group of media columns
+   * whose pairwise correlation is 90% or higher (the same real math the Optimize correlation table
+   * already shows, chained so A-B-C group together if A-B and B-C both qualify, not just isolated
+   * pairs), and applies a real combination to each group in one call, the same way `combineChannels`
+   * does. Doesn't guess at exact Meridian VIF thresholds, that check only exists inside his engine —
+   * this is the closest real, self-contained approximation, and would have caught the real
+   * `paid_social_spend` rejection found 2026-08-18 before Train Model ever ran.
+   */
+  async autoCombineChannels(id: string, requesterId: string): Promise<{ dataset: Dataset; combined: string[][] }> {
+    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, channels can only be combined once media columns are known.');
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+    const groups = suggestChannelGroups(rows, dataset.columnMapping.mediaColumns);
+
+    if (groups.length === 0) {
+      return { dataset, combined: [] };
+    }
+
+    const combinedSourceColumns = new Set(groups.flat());
+    const newMediaColumns = [
+      ...dataset.columnMapping.mediaColumns.filter((c) => !combinedSourceColumns.has(c)),
+      ...groups.map(nameForGroup),
+    ];
+    const newCombinations: ChannelCombination[] = groups.map((group) => ({
+      sourceColumns: group,
+      newColumnName: nameForGroup(group),
+    }));
+
+    await this.repo().update(id, {
+      columnMapping: { ...dataset.columnMapping, mediaColumns: newMediaColumns },
+      channelCombinations: [...(dataset.channelCombinations ?? []), ...newCombinations],
+      channelHyperparameters: null,
+    });
+
+    return { dataset: await this.findOne(id), combined: groups };
   }
 
   /**

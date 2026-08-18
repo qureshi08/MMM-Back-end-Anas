@@ -96,6 +96,16 @@ export class DatasetsController {
     return this.datasets.combineChannels(id, user.userId!, dto);
   }
 
+  /**
+   * "Combine what's flagged" — one click, no picking pairs by hand. Finds every real group of
+   * media columns correlated 90%+ and combines each group for real, same effect as calling
+   * combine-channels once per group.
+   */
+  @Post('datasets/:id/auto-combine-channels')
+  autoCombineChannels(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.autoCombineChannels(id, user.userId!);
+  }
+
   @Delete('datasets/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(
