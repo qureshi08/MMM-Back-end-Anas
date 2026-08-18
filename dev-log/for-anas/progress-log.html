@@ -285,15 +285,16 @@
       himself, August 12, <code>TC-26</code> in <code>test-cases.html</code>.</td>
     </tr>
     <tr>
-      <td class="item">Train Model: real endpoint, mock results, Hammad's exact real shape</td>
+      <td class="item">Train Model: real Meridian training, connected and secured</td>
       <td><span class="badge done">Done</span></td>
-      <td class="why">Real training against Hammad's worker stays on hold, decided with Anas
-      August 12: rather than leave <code>Train Model</code> disabled, it runs a real, deterministic
-      mock instead, in the exact real result shape copied from Hammad's own sample output
-      (<code>Model Integration Original/final_results.json</code>), computed from real uploaded
-      data and real hyperparameters, always flagged <code>results.mock: true</code>. Swapping in a
-      real trained result later is a data-source change, not a rebuild. See
-      <code>dev-log/for-anas/modeling-engine-explained.html</code> Section 08.</td>
+      <td class="why">Updated August 18: <code>Train Model</code> now calls the real Meridian engine
+      (Hammad's own code, run under our own Google Colab account, reached over ngrok) when
+      <code>MODEL_ENGINE_URL</code> is configured, with a shared-secret header
+      (<code>X-Internal-Secret</code>) required on every call, confirmed rejecting an unauthenticated
+      request with a real <code>401</code>. Falls back to the same deterministic mock as before,
+      always flagged <code>results.mock: true</code>, when the live engine isn't configured or a call
+      fails. Depends on the Colab notebook staying open, not yet a permanently hosted service, see
+      <code>dev-log/for-anas/hammad-integration-plan.html</code>.</td>
     </tr>
     <tr>
       <td class="item">Email code second factor (OTP)</td>
@@ -691,6 +692,35 @@
       </div>
     </details>
 
+    <details class="entry">
+      <summary><span class="date">AUGUST 18, 2026</span><h4>Train Model connected to real Meridian training, and secured</h4></summary>
+      <div class="body">
+      <ul>
+        <li>Anas ran Hammad's real modeling code standalone first, under his own Google Colab account
+        (not Hammad's session), following Hammad's own already-proven notebook and local demo scripts.
+        Confirmed a real job trained end to end: real Tesla T4 GPU, real Bayesian sampling, a real
+        <code>98.02%</code> accuracy result matching the shape of Hammad's own sample output.</li>
+        <li>Backend then connected for real: <code>train()</code>, <code>getTrainingStatus()</code>,
+        and <code>getResults()</code> all call the live engine over ngrok when
+        <code>MODEL_ENGINE_URL</code> is set, falling back to the existing deterministic mock
+        otherwise. Verified: build passes, all 51 existing tests still pass.</li>
+        <li>Found and closed a real gap on review: the first version of this connection had no
+        authentication at all, anyone with the ngrok URL could call it directly. Fixed on both sides,
+        same session: our backend now sends a shared secret (<code>X-Internal-Secret</code>) on every
+        call, and Colab's <code>api.py</code> now checks it, confirmed rejecting an unauthenticated
+        request with a real <code>401</code>.</li>
+        <li>Also fixed: a dead-code path that generated and saved mock results even after a live call
+        succeeded (harmless in practice, since a later poll overwrote it, but confusing), two stale
+        doc comments still claiming "real training is on hold," and <code>.env.example</code> never
+        documenting the two new environment variables it now needs.</li>
+        <li>Separately noticed while checking the repo: the shared team repo now has a <code>main</code>
+        branch with an unrelated Angular codebase on it, not a merge of our backend work. Not urgent
+        (Render deploys from the personal repo, unaffected), but genuinely unexplained, flagged for
+        Farhan rather than guessed at.</li>
+      </ul>
+      </div>
+    </details>
+
   </div>
 </section>
 
@@ -698,25 +728,23 @@
   <h2>What's actually blocking progress</h2>
   <h3>Not a to-do list. A short list of real blockers</h3>
   <ol class="openlist">
-    <li><b>Nowhere stable to send a real training job.</b> Hammad's own worker runs through Colab
-    plus ngrok, a bridge he doesn't actively manage or track, "just testing," in his own words. Real
-    backend work (the assembly step, CMP-79) can build the actual job file, but has nothing reliable
-    to send it to yet. Recommendation, still to confirm with Farhan: build the real assembly step up
-    to that last step and stub the send, rather than wiring against a moving target.</li>
-    <li><b>Auth for reaching Hammad's worker, undecided.</b> His side has no requirement, it's ours
-    to propose. Recommendation: a shared API key over HTTPS, nothing more complex needed until this
-    moves to a real Azure-hosted target.</li>
+    <li><b>Resolved, August 18: somewhere real to send a training job.</b> Rather than wait on
+    Hammad's own Colab/ngrok bridge, Train Model now runs against our own Colab notebook, under our
+    own Google account, running his exact code. Not a permanent host, still depends on that notebook
+    staying open, but real and working, not a stub.</li>
+    <li><b>Resolved, August 18: auth for reaching the engine.</b> A shared secret
+    (<code>X-Internal-Secret</code>) is now required on every call, checked on both sides, confirmed
+    rejecting an unauthenticated request with a real <code>401</code>.</li>
     <li><b>Company Azure subscription.</b> A separate thing from the tenant above: this is the paid
     hosting account, and has to be created under a company identity, never a personal Microsoft
     account. Until it exists, nothing can actually run on Azure. Only blocks "Running on Azure" now,
     not real Microsoft login.</li>
-    <li><b>The shared repo's <code>main</code> branch and monorepo structure.</b> The repo itself
-    (<code>github.com/mirfarhanahmad/cbt-mmm-platform</code>) has existed since August 6, with real
-    backend code pushed to it. What's still missing: a <code>main</code> branch, and a decision on
-    how the backend and frontend projects fit into one shared tree, they currently live on two
-    separate personal repos as an interim step (see <code>PLATFORM.md</code>/<code>TEAM-GUIDE.html</code>),
-    which worked for proving the whole system connects, but isn't where this should stay long term.
-    Farhan's call.</li>
+    <li><b>The shared repo's <code>main</code> branch, genuinely unclear right now.</b>
+    <code>github.com/mirfarhanahmad/cbt-mmm-platform</code> now has a real <code>main</code> branch as
+    of August 18, but its content is a full Angular project unrelated to our backend history, not a
+    merge of <code>backend/anas</code>. Whether that's an intentional new frontend effort or a mistake
+    isn't confirmed yet. Not urgent, Render still deploys from the personal repo, but worth a real
+    answer from Farhan before anyone merges anything toward it.</li>
   </ol>
 </section>
 

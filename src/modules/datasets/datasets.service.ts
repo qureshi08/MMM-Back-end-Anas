@@ -389,10 +389,14 @@ export class DatasetsService {
   }
 
   /**
-   * Queries status of a training job. If `MODEL_ENGINE_URL` is configured, queries Colab's `/status/:jobId`.
-   * Otherwise computes status fresh from elapsed time.
+   * Queries status of a training job. If `MODEL_ENGINE_URL` is configured, queries Colab's
+   * `/status/:jobId`, passing through a real "failed" status and error message — Colab's own
+   * `job_processor.py` writes exactly that when validation or training genuinely fails, real
+   * training can fail in ways the mock never does. Otherwise computes status fresh from elapsed time.
    */
-  async getTrainingStatus(id: string): Promise<{ status: string; progress: number; jobId: string | null }> {
+  async getTrainingStatus(
+    id: string,
+  ): Promise<{ status: string; progress: number; jobId: string | null; errorMessage?: string | null }> {
     const dataset = await this.findOne(id);
     if (!dataset.trainingStartedAt) {
       return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
@@ -405,9 +409,14 @@ export class DatasetsService {
           headers: modelEngineHeaders(),
         });
         if (res.ok) {
-          const data = (await res.json()) as { status: string; progress: number };
-          const status = data.status === 'completed' ? TrainingStatus.COMPLETED : TrainingStatus.RUNNING;
-          return { status, progress: data.progress ?? 0, jobId: dataset.jobId };
+          const data = (await res.json()) as { status: string; progress: number; error_message?: string | null };
+          const status =
+            data.status === 'completed'
+              ? TrainingStatus.COMPLETED
+              : data.status === 'failed'
+                ? TrainingStatus.FAILED
+                : TrainingStatus.RUNNING;
+          return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
         }
       } catch (err) {
         console.error('Failed to query MODEL_ENGINE_URL status:', err);

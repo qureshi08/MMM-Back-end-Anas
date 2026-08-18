@@ -174,7 +174,7 @@
 one box from this picture.</p>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling, the OTP email second factor, Projects, and Datasets are all built and live, Experiments and Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced, and also to Cloudflare R2, live, where dataset files actually live. One dashed, not-yet-built path branches off: Experiments and Jobs would connect to a Job Queue, which would connect to a Python Modeling Worker. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 870" role="img" aria-label="A real request traced top to bottom through the whole system. A person in a browser reaches the Angular frontend on Vercel, which signs in against Microsoft Entra ID and gets a real token. Every request after that carries that token to the NestJS backend on Render, which validates it, sets the tenant context, and routes to one of its modules: Auth and Tenant handling, the OTP email second factor, Projects, and Datasets are all built and live, Experiments and Jobs are not built yet. The live path continues down to Postgres on Render, with Row-Level Security enforced, and also to Cloudflare R2, live, where dataset files actually live. A real amber path branches off Cloudflare R2 to the Meridian modeling engine, running on Hammad's Google Colab notebook, reached over an ngrok tunnel with a shared-secret header, real when MODEL_ENGINE_URL is configured, falling back to a deterministic mock otherwise. A banner at the bottom notes this all runs on Render and Vercel today, a Dev-only stopgap, with Azure App Service, Azure Postgres, Azure Blob Storage and Container Apps as the real eventual target.">
 
 <text x="470" y="24" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">A REAL REQUEST, TOP TO BOTTOM</text>
 
@@ -249,18 +249,13 @@ one box from this picture.</p>
 <text x="572" y="566" font-size="10.5" fill="#374151">Dev stand-in for Blob,</text>
 <text x="572" y="582" font-size="10.5" fill="#374151">live: upload/download</text>
 
-<line x1="812" y1="466" x2="812" y2="516" stroke="#9CA3AF" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowgrey)"/>
-<rect x="744" y="522" width="136" height="70" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="764" y="546" font-size="11.5" font-weight="700" fill="#8A5A06">JOB QUEUE (REDIS)</text>
-<text x="764" y="566" font-size="10.5" fill="#374151">Tested Standalone</text>
-<text x="764" y="582" font-size="10.5" fill="#8A5A06" font-weight="700">DISCONNECTED</text>
-
-<line x1="812" y1="592" x2="812" y2="626" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="5 4"/>
-<line x1="812" y1="626" x2="700" y2="626" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowamber)"/>
-<rect x="560" y="632" width="280" height="70" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="580" y="656" font-size="11.5" font-weight="700" fill="#8A5A06">PYTHON MODELING WORKER</text>
-<text x="580" y="676" font-size="10.5" fill="#374151">Tested &amp; Working Standalone (Colab GPU).</text>
-<text x="580" y="692" font-size="10.5" fill="#8A5A06" font-weight="700">NOT CONNECTED to Render/Vercel Yet</text>
+<line x1="812" y1="466" x2="812" y2="516" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowamber)"/>
+<rect x="560" y="522" width="320" height="94" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="580" y="546" font-size="11.5" font-weight="700" fill="#8A5A06">MERIDIAN ENGINE &middot; COLAB, VIA NGROK</text>
+<text x="580" y="566" font-size="10.5" fill="#374151">Real HTTP call, shared-secret header, when</text>
+<text x="580" y="582" font-size="10.5" fill="#374151">MODEL_ENGINE_URL is set. No queue or worker</text>
+<text x="580" y="598" font-size="10.5" fill="#374151">runs on our own infrastructure, this is a direct call.</text>
+<text x="580" y="614" font-size="10.5" fill="#8A5A06" font-weight="700">Falls back to a mock when MODEL_ENGINE_URL is unset.</text>
 
 <rect x="40" y="726" width="860" height="120" rx="12" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.4"/>
 <text x="60" y="750" font-size="11" font-weight="700" fill="#8A5A06">DEV-ONLY STOPGAP, NOT THE REAL TARGET</text>
@@ -312,7 +307,7 @@ one box from this picture.</p>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 435" role="img" aria-label="The real navigation hierarchy, not a flat sequence. Sign in, verify and Projects are global, the only things reachable before a project is picked. Once inside one project, a persistent nav (Models list, Back to Projects, Sign out) is always present, and the Models list is that project's own real dashboard. Starting or continuing a model opens a separate nested flow, Upload Data through Configure, Optimize, Calibrate, Hyperparameterization, ending in Train Model, a real endpoint that runs a mock training pass and returns simulated results in the exact real shape a trained model would, since real training against the modeling team's worker is on hold. This nested flow has its own nav only visible while inside that one model, and always leads back to the Models list, never a dead end.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 435" role="img" aria-label="The real navigation hierarchy, not a flat sequence. Sign in, verify and Projects are global, the only things reachable before a project is picked. Once inside one project, a persistent nav (Models list, Back to Projects, Sign out) is always present, and the Models list is that project's own real dashboard. Starting or continuing a model opens a separate nested flow, Upload Data through Configure, Optimize, Calibrate, Hyperparameterization, ending in Train Model, a real endpoint that calls the real Meridian engine over ngrok when configured, falling back to a mock training pass in the exact real result shape otherwise. This nested flow has its own nav only visible while inside that one model, and always leads back to the Models list, never a dead end.">
 <text x="470" y="24" font-size="11" font-weight="700" fill="#6B7280" text-anchor="middle">GLOBAL: BEFORE ANY PROJECT IS PICKED</text>
 <rect x="20" y="40" width="150" height="90" rx="9" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="32" y="62" font-size="11" font-weight="700" fill="#007A3D">SIGN IN</text>
@@ -368,8 +363,8 @@ one box from this picture.</p>
 <rect x="792.0" y="232" width="96" height="136" rx="7" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.4"/>
 <text x="800.0" y="248" font-size="9" font-weight="700" fill="#8A5A06">TRAIN</text>
 <text x="800.0" y="260" font-size="9" font-weight="700" fill="#8A5A06">MODEL</text>
-<text x="800.0" y="274" font-size="8.3" font-weight="400" fill="#374151">Real, but</text>
-<text x="800.0" y="285" font-size="8.3" font-weight="400" fill="#374151">mock data</text>
+<text x="800.0" y="274" font-size="8.3" font-weight="400" fill="#374151">Real when</text>
+<text x="800.0" y="285" font-size="8.3" font-weight="400" fill="#374151">configured</text>
 <line x1="580" y1="380" x2="580" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
 <line x1="580" y1="390" x2="135" y2="390" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3"/>
 <line x1="135" y1="390" x2="135" y2="372" stroke="#9CA3AF" stroke-width="1.4" stroke-dasharray="5 3" marker-end="url(#tharrowgrey)"/>

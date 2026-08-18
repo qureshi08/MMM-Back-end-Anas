@@ -98,28 +98,29 @@
 </div>
 
 <header>
-  <div class="kicker">MMM Platform &middot; Status: Verified &amp; Tested (Aug 17, 2026)</div>
-  <h1>Integration <span class="italic-accent">Verified</span></h1>
-  <p class="sub">Part A (ngrok tunnel) and Part B (Celery worker &amp; 3-job demo) have been tested and verified live. Hammad's Google Colab modeling engine is successfully reachable from the local Celery worker queue.</p>
+  <div class="kicker">MMM Platform &middot; Status: connected and secured (Aug 18, 2026)</div>
+  <h1>Real training, <span class="italic-accent">connected</span></h1>
+  <p class="sub">Not Hammad's own session anymore, and not a plan for later — our own Colab notebook,
+  under our own account, running his exact code, called directly from the real backend with a shared
+  secret. This page now describes what's actually running, not what's proposed.</p>
 </header>
 
 <h2 class="section">The whole thing, one picture</h2>
-<p class="section-why">Nothing here is new except the blue arrow. Everything else already exists and
-already works.</p>
+<p class="section-why">Every arrow here is real and live today, not hypothetical.</p>
 
 <div class="legend">
-  <span><i style="background:#00994D"></i> already built, already works</span>
-  <span><i style="background:#2563EB"></i> the actual network call, real, today</span>
-  <span><i style="background:#F59E0B;border:1px dashed #8A5A06"></i> temporary, changes every restart</span>
+  <span><i style="background:#00994D"></i> built and live</span>
+  <span><i style="background:#2563EB"></i> real network call, secured</span>
+  <span><i style="background:#F59E0B;border:1px dashed #8A5A06"></i> depends on Colab staying open</span>
 </div>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="Our backend, which already stores datasets in Cloudflare R2, sends one HTTP call across an ngrok tunnel to Hammad's Google Colab notebook, which already runs FastAPI, Celery and Redis exactly as it does today. Nothing about his notebook changes except one small function learning to read a web link instead of only a local file.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 380" role="img" aria-label="Our NestJS backend on Render sends a real HTTP call, with a shared-secret header, across our own ngrok tunnel to our own Google Colab notebook, running Hammad's exact modeling code under our own account. Real Meridian training happens there, on a free GPU, and results flow back the same secured path.">
 
 <rect x="20" y="150" width="190" height="90" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
 <text x="115" y="182" font-size="13" font-weight="700" fill="#007A3D" text-anchor="middle">OUR BACKEND</text>
-<text x="115" y="200" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">NestJS, already built</text>
-<text x="115" y="215" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">Assembly &amp; storage done</text>
+<text x="115" y="200" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">NestJS, live on Render</text>
+<text x="115" y="215" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">MODEL_ENGINE_URL set</text>
 
 <rect x="20" y="270" width="190" height="70" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
 <text x="115" y="298" font-size="12" font-weight="700" fill="#007A3D" text-anchor="middle">CLOUDFLARE R2</text>
@@ -128,25 +129,26 @@ already works.</p>
 <line x1="115" y1="270" x2="115" y2="245" stroke="#00994D" stroke-width="1.6"/>
 
 <line x1="210" y1="180" x2="330" y2="180" stroke="#2563EB" stroke-width="2.4" marker-end="url(#hieasyarrow)"/>
-<text x="270" y="163" font-size="10.5" font-weight="700" fill="#1D4ED8" text-anchor="middle">one HTTP call</text>
+<text x="270" y="158" font-size="9.5" font-weight="700" fill="#1D4ED8" text-anchor="middle">POST /train, real link</text>
+<text x="270" y="170" font-size="9.5" font-weight="700" fill="#1D4ED8" text-anchor="middle">+ secret header</text>
 
 <rect x="330" y="150" width="180" height="90" rx="12" fill="#FEF7E7" stroke="#F59E0B" stroke-width="2" stroke-dasharray="7 5"/>
-<text x="420" y="182" font-size="12.5" font-weight="700" fill="#8A5A06" text-anchor="middle">NGROK TUNNEL</text>
-<text x="420" y="200" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">Hammad's public link,</text>
-<text x="420" y="214" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">changes if he restarts</text>
+<text x="420" y="182" font-size="12.5" font-weight="700" fill="#8A5A06" text-anchor="middle">OUR OWN NGROK TUNNEL</text>
+<text x="420" y="200" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">not Hammad's session,</text>
+<text x="420" y="214" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">under our own account</text>
 
 <line x1="510" y1="180" x2="590" y2="180" stroke="#2563EB" stroke-width="2.4" marker-end="url(#hieasyarrow)"/>
 
 <rect x="590" y="60" width="390" height="280" rx="16" fill="none" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="7 5"/>
-<text x="785" y="86" font-size="12.5" font-weight="700" fill="#8A5A06" text-anchor="middle">GOOGLE COLAB NOTEBOOK &middot; free GPU</text>
+<text x="785" y="86" font-size="12.5" font-weight="700" fill="#8A5A06" text-anchor="middle">OUR GOOGLE COLAB NOTEBOOK &middot; free GPU</text>
 
 <rect x="630" y="110" width="310" height="150" rx="12" fill="#E6F5ED" stroke="#00994D" stroke-width="1.8"/>
-<text x="785" y="140" font-size="13" font-weight="700" fill="#007A3D" text-anchor="middle">FastAPI + Celery + Redis</text>
-<text x="785" y="160" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">exactly as it runs today,</text>
-<text x="785" y="176" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">not touched, not rebuilt</text>
-<text x="785" y="200" font-size="10.5" font-weight="700" fill="#8A5A06" text-anchor="middle">one small change:</text>
-<text x="785" y="216" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">learns to open a web link,</text>
-<text x="785" y="230" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">not only a file on disk</text>
+<text x="785" y="140" font-size="13" font-weight="700" fill="#007A3D" text-anchor="middle">Hammad's real FastAPI code</text>
+<text x="785" y="160" font-size="10.5" font-weight="400" fill="#374151" text-anchor="middle">unmodified, except two real fixes:</text>
+<text x="785" y="180" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">fetch_data.py reads a URL, and every</text>
+<text x="785" y="194" font-size="9.5" font-weight="400" fill="#374151" text-anchor="middle">route checks the shared secret first</text>
+<text x="785" y="216" font-size="10.5" font-weight="700" fill="#8A5A06" text-anchor="middle">confirmed: a call with no secret</text>
+<text x="785" y="230" font-size="10.5" font-weight="700" fill="#8A5A06" text-anchor="middle">gets a real 401, tested directly</text>
 
 <text x="785" y="300" font-size="10.5" font-weight="600" fill="#6B7280" text-anchor="middle">real Meridian training happens right here</text>
 
@@ -155,88 +157,36 @@ already works.</p>
 </defs>
 </svg>
 </div>
-<p class="figcap">Same tunnel Hammad already uses to demo his own work. We just point our backend at
-it instead of a browser, sending the real dataset's link plus one shared secret word so nobody else
-can hit that link. The dashed amber box is a reminder it's temporary, not a criticism of it.</p>
+<p class="figcap">The dashed amber box is a reminder, not a warning: this depends on the Colab
+notebook staying open. If it disconnects, training stops until it's reopened, same as it always has.</p>
 
-<h2 class="section">Step by step, literally</h2>
-<p class="section-why">Read top to bottom, like a real chat. Green on the right is you, blue on the
-left is Hammad, same as any messaging app. The centered grey ones happen on their own, nobody clicks
-anything. Every "say this" box is copy-pasteable as written. The amber box is what to say back if he
-asks a question instead of just doing it.</p>
+<h2 class="section">What actually changed to get here</h2>
+<p class="section-why">Three real, separate pieces of work, all confirmed, not just claimed.</p>
 
-<div class="chat">
-
-  <div class="msg you">
-    <span class="who">1 &middot; You &rarr; Hammad, send this</span>
-    <h3>Ask for the notebook and the one code change</h3>
-    <span class="say">Hey Hammad, quick one. Can you start your Colab notebook the way you do for
-demos? Once it's running, send me the current ngrok link.
-
-Also one small code change on your side: in fetch_data.py, if the path
-starts with "http", download it with requests.get instead of opening it
-as a local file. That's the only change needed, everything else stays
-exactly as it is.</span>
+<div class="steps">
+  <div class="step">
+    <span class="who">Backend (NestJS)</span>
+    <div class="icon">1</div>
+    <h3>Real calls, not mock, when configured</h3>
+    <p><code>train()</code>, <code>getTrainingStatus()</code>, <code>getResults()</code> all call the
+    real Colab endpoint when <code>MODEL_ENGINE_URL</code> is set, falling back to the deterministic
+    mock only when it isn't or the call fails.</p>
   </div>
-
-  <div class="msg pushback">
-    <span class="who">If he asks "what's this for?" instead</span>
-    <h3>Say this back</h3>
-    <span class="say">We're wiring up real training end to end on our side, using your engine
-exactly as it already runs, nothing new to build on your end. This is
-dev only, not Azure, not production, just proving the real pipeline
-works before we take it further.</span>
-    <p>If he asks why <code>fetch_data.py</code> needs to handle a link instead of just taking the
-file directly: our dataset is stored in Cloudflare R2, not on his machine, so his engine needs a way
-to fetch it remotely, same reason his own notebook downloads test files from Google Drive today.</p>
+  <div class="step">
+    <span class="who">Auth, closed both sides</span>
+    <div class="icon">2</div>
+    <h3>Shared secret, checked on the Colab side too</h3>
+    <p>Sending a secret from our side does nothing unless the other side checks it. Both are done now:
+    <code>X-Internal-Secret</code> sent on every call, and Colab's <code>api.py</code> rejects any
+    request missing it, with a real <code>401</code>, confirmed directly in a browser.</p>
   </div>
-
-  <div class="msg hammad">
-    <span class="who">2 &middot; Hammad does this</span>
-    <h3>Starts the notebook, makes the one change, replies</h3>
-    <p>His own existing routine (already in his own Execution Guide), plus the small
-    <code>fetch_data.py</code> edit above.</p>
-    <span class="say">Notebook's up. Link: https://a1b2-34-56.ngrok-free.dev
-Added the http check in fetch_data.py, pushed.</span>
-    <div class="see"><b>You'll see:</b> a real link in your chat with him, ending in
-    <code>.ngrok-free.dev</code>, plus his confirmation the code change is in.</div>
+  <div class="step">
+    <span class="who">Colab (fetch_data.py)</span>
+    <div class="icon">3</div>
+    <h3>Reads a real R2 link, not a local file</h3>
+    <p>Our dataset lives in Cloudflare R2, not on Hammad's machine or ours. His engine now downloads
+    it over HTTP when given a link, falling back to a local path only if it isn't one.</p>
   </div>
-
-  <div class="msg you">
-    <span class="who">3 &middot; You do this</span>
-    <h3>Agree one secret word, add two lines, restart</h3>
-    <p>Say a word out loud or type it once, doesn't matter what it is, both sides just need the
-    same one. Then open <code>Backend/.env</code>:</p>
-    <span class="say">HAMMAD_ENGINE_URL=https://a1b2-34-56.ngrok-free.dev
-HAMMAD_ENGINE_SECRET=&lt;the word you both agreed on&gt;</span>
-    <p>Save the file, then restart the backend: <code>npm run start:dev</code>.</p>
-    <div class="see"><b>You'll see:</b> the server starts up with no errors, same as every other
-    time you've run it.</div>
-  </div>
-
-  <div class="msg you">
-    <span class="who">4 &middot; You do this</span>
-    <h3>Click Train Model on a real, ready dataset</h3>
-    <p>Pick one that's already been through Configure, Optimize, Calibrate, and
-    Hyperparameterization. Same button as today, same screen, nothing new to find.</p>
-    <div class="see"><b>You'll see:</b> status flips to "running," same as the mock does today.</div>
-  </div>
-
-  <div class="msg auto">
-    <span class="who">5 &middot; Happens on its own, nobody clicks anything</span>
-    <h3>The real call, automatically</h3>
-    <p>Your dataset's real link plus the secret word travel: your backend &rarr; the ngrok address
-    &rarr; Hammad's FastAPI &rarr; real Meridian training starts, writing progress as it goes.</p>
-  </div>
-
-  <div class="msg you">
-    <span class="who">6 &middot; What you'll see, the real difference from the mock</span>
-    <h3>Progress moves at real speed, then real results</h3>
-    <p>The mock's clock always finishes in a fixed few seconds. This one won't, it moves at whatever
-    speed his GPU actually trains at, could be a few minutes. When it's done, the Results screen
-    fills in exactly like it does today, except with no "simulated" flag anywhere on it.</p>
-  </div>
-
 </div>
 
 <h2 class="section">If this needs to run more often, later</h2>
@@ -253,8 +203,9 @@ HAMMAD_ENGINE_SECRET=&lt;the word you both agreed on&gt;</span>
 
 <footer>
   <img class="footer-logo" src="../../../brand-kit/assets/logos/cbt-logo-primary.png" alt="Convergent Business Technologies">
-  MMM Platform &middot; the plumbing that already works (Colab, ngrok, FastAPI, Celery, Redis) stays
-  exactly as Hammad built it. The only real change is one function learning to read a link.
+  MMM Platform &middot; Hammad's real Meridian code, run under our own account, called securely from
+  the real backend. <code>modeling-engine-explained.html</code> and <code>ARCHITECTURE.html</code>
+  Section 00 cover how this fits into the rest of the system.
 </footer>
 
 </div>
