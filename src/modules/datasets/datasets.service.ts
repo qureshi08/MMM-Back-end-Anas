@@ -366,7 +366,7 @@ export class DatasetsService {
     await this.repo().update(id, {
       trainingStatus: TrainingStatus.RUNNING,
       trainingStartedAt: new Date(),
-      results: isLiveCallSuccess ? { liveEngine: true, jobId } : results,
+      results,
     });
     return this.findOne(id);
   }
