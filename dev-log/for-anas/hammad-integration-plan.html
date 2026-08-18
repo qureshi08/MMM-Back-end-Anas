@@ -189,6 +189,27 @@ notebook staying open. If it disconnects, training stops until it's reopened, sa
   </div>
 </div>
 
+<h2 class="section">Confirmed end to end, with a real result</h2>
+<p class="section-why">Not a test of the mechanism in isolation, a real job, start to finish.</p>
+<div class="pull-quote" style="border-left:3px solid var(--cbt-primary);background:var(--cbt-primary-muted);
+border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:16px 0">
+<p style="margin:0;font-size:14.5px;color:var(--cbt-body)">Anas ran a real training job through the
+actual app. Colab's own log proves it: a real <code>POST /train</code>, real Bayesian MCMC sampling
+on a Tesla T4 GPU, <code>Training complete. Results saved.</code>, then a real
+<code>GET /results/...</code>. The result: <b>98.02% accuracy</b>, a real
+<code>channel_contribution</code> and <code>channel_efficiency</code> breakdown, not simulated
+numbers.</p>
+</div>
+
+<div class="callout" style="border-left:3px solid var(--cbt-warning);background:var(--cbt-warning-muted);
+border-radius:0 var(--cbt-radius-sm) var(--cbt-radius-sm) 0;padding:16px 20px;margin:16px 0">
+<p style="margin:0;font-size:14.5px"><b>One real gap left, on the frontend, not here.</b> The
+Models page still showed the old "Simulated results" banner and raw <code>[object Object]</code>
+instead of the real numbers above — the backend delivered them correctly, the frontend just hasn't
+been told to parse and display them yet. Covered in
+<code>prompt-for-amna-claude-11.md</code>, not a backend problem.</p>
+</div>
+
 <h2 class="section">If this needs to run more often, later</h2>
 <p class="section-why">Not today's problem, just so it's not a surprise later.</p>
 <div class="steps" style="grid-template-columns:1fr">
