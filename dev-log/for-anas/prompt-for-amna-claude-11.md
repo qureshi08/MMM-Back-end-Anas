@@ -4,6 +4,20 @@ Copy everything below into Amna's Claude Code session, in her frontend repo. The
 real Meridian training (Hammad's engine, on a Colab GPU) instead of only the mock, when it's
 reachable — same three endpoints as before, same shapes, nothing new to call.
 
+## 0. Confirmed broken, with real evidence, not a guess
+
+Anas ran a real job end to end just now. Colab's own log proves it completed for real:
+`POST /train 200 OK` → real Meridian sampling (`Sampling from the prior distribution...`,
+`Sampling from the posterior distribution (this is the slow step)...`) → `Training complete. Results
+saved.` → `GET /results/... 200 OK`. The Models list correctly flipped to "Trained."
+
+But the results panel on the frontend still showed:
+- **"Simulated results — not from a real trained model run yet"** — wrong, this run was real.
+- **Every field showing `[object Object]`** (`Data_used [object Object]`, `Channel_contribution
+  [object Object],[object Object]`, etc.) instead of actual numbers.
+
+Both are exactly items 1 and 2 below — this isn't hypothetical, it's what's live right now.
+
 ## 1. The mock/real flag already tells you which one you got
 
 Every result object has `results.mock`, a real boolean, always present:
