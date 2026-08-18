@@ -249,7 +249,7 @@ export class DatasetsService {
    * this is the closest real, self-contained approximation, and would have caught the real
    * `paid_social_spend` rejection found 2026-08-18 before Train Model ever ran.
    */
-  async autoCombineChannels(id: string, requesterId: string): Promise<{ dataset: Dataset; combined: string[][] }> {
+  async autoCombineChannels(id: string, requesterId: string): Promise<{ dataset: Dataset; combined: ChannelCombination[] }> {
     const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, channels can only be combined once media columns are known.');
@@ -279,7 +279,7 @@ export class DatasetsService {
       channelHyperparameters: null,
     });
 
-    return { dataset: await this.findOne(id), combined: groups };
+    return { dataset: await this.findOne(id), combined: newCombinations };
   }
 
   /**
