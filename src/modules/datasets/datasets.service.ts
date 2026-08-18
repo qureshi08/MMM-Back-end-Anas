@@ -347,7 +347,10 @@ export class DatasetsService {
         const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
         const res = await fetch(`${modelEngineUrl}/train`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'ngrok-skip-browser-warning': 'true',
+          },
           body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
         });
         if (res.ok) {
@@ -381,7 +384,9 @@ export class DatasetsService {
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
     if (modelEngineUrl && dataset.jobId) {
       try {
-        const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`);
+        const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`, {
+          headers: { 'ngrok-skip-browser-warning': 'true' },
+        });
         if (res.ok) {
           const data = (await res.json()) as { status: string; progress: number };
           const status = data.status === 'completed' ? TrainingStatus.COMPLETED : TrainingStatus.RUNNING;
@@ -408,7 +413,9 @@ export class DatasetsService {
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
     if (modelEngineUrl && dataset.jobId) {
       try {
-        const res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`);
+        const res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`, {
+          headers: { 'ngrok-skip-browser-warning': 'true' },
+        });
         if (res.ok) {
           const liveResults = await res.json();
           await this.repo().update(id, {
