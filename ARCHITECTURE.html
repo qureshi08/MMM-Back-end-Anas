@@ -249,13 +249,12 @@ one box from this picture.</p>
 <text x="572" y="566" font-size="10.5" fill="#374151">Dev stand-in for Blob,</text>
 <text x="572" y="582" font-size="10.5" fill="#374151">live: upload/download</text>
 
-<line x1="812" y1="466" x2="812" y2="516" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowamber)"/>
-<rect x="560" y="522" width="320" height="94" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 4"/>
-<text x="580" y="546" font-size="11.5" font-weight="700" fill="#8A5A06">MERIDIAN ENGINE &middot; COLAB, VIA NGROK</text>
-<text x="580" y="566" font-size="10.5" fill="#374151">Real HTTP call, shared-secret header, when</text>
-<text x="580" y="582" font-size="10.5" fill="#374151">MODEL_ENGINE_URL is set. No queue or worker</text>
-<text x="580" y="598" font-size="10.5" fill="#374151">runs on our own infrastructure, this is a direct call.</text>
-<text x="580" y="614" font-size="10.5" fill="#8A5A06" font-weight="700">Falls back to a mock when unset.</text>
+<line x1="812" y1="466" x2="812" y2="632" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowamber)"/>
+<rect x="560" y="632" width="320" height="84" rx="10" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.6" stroke-dasharray="6 4"/>
+<text x="580" y="656" font-size="11.5" font-weight="700" fill="#8A5A06">MERIDIAN ENGINE &middot; COLAB, VIA NGROK</text>
+<text x="580" y="674" font-size="10" fill="#374151">Direct HTTPS call, shared-secret header,</text>
+<text x="580" y="690" font-size="10" fill="#374151">no queue on our own side, when configured.</text>
+<text x="580" y="706" font-size="10" font-weight="700" fill="#8A5A06">Falls back to a mock when unset.</text>
 
 <rect x="40" y="726" width="860" height="120" rx="12" fill="#FEF7E7" stroke="#F59E0B" stroke-width="1.4"/>
 <text x="60" y="750" font-size="11" font-weight="700" fill="#8A5A06">DEV-ONLY STOPGAP, NOT THE REAL TARGET</text>
@@ -335,8 +334,6 @@ one box from this picture.</p>
 <text x="52" y="295" font-size="9.5" font-weight="400" fill="#374151">"+ New model" starts</text>
 <text x="52" y="310" font-size="9.5" font-weight="400" fill="#374151">the flow on the right.</text>
 <line x1="230" y1="290.0" x2="254" y2="290.0" stroke="#6B7280" stroke-width="1.6" marker-end="url(#tharrow)"/>
-<text x="234" y="282.0" font-size="9" font-weight="400" fill="#6B7280">+ New model /</text>
-<text x="234" y="305.0" font-size="9" font-weight="400" fill="#6B7280">Continue Setup</text>
 <rect x="260" y="200" width="640" height="180" rx="10" fill="#FFFFFF" stroke="#00994D" stroke-width="1.4" stroke-dasharray="4 3"/>
 <text x="274" y="218" font-size="9.5" font-weight="700" fill="#007A3D">ONE MODEL'S OWN FLOW — its own nav, not global, only visible while building this one model</text>
 <rect x="272" y="232" width="96" height="136" rx="7" fill="#E6F5ED" stroke="#00994D" stroke-width="1.4"/>
@@ -605,7 +602,7 @@ one box from this picture.</p>
 <text x="780" y="369" font-size="9.5" font-weight="400" fill="#6B7280">nullable</text>
 <text x="494" y="389" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">owner_id</text>
 <text x="652" y="389" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="780" y="389" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
+<text x="780" y="389" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="494" y="409" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">status</text>
 <text x="652" y="409" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="780" y="409" font-size="9.5" font-weight="400" fill="#6B7280">check, 2 values</text>
@@ -630,16 +627,16 @@ one box from this picture.</p>
 <text x="340" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="54" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">user_id</text>
 <text x="212" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; users, CASCADE</text>
+<text x="340" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="54" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">code_hash</text>
 <text x="212" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
-<text x="340" y="661" font-size="9.5" font-weight="400" fill="#6B7280">sha256, never the code</text>
+<text x="340" y="661" font-size="9.5" font-weight="400" fill="#6B7280">sha256 hash</text>
 <text x="54" y="681" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">expires_at</text>
 <text x="212" y="681" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="681" font-size="9.5" font-weight="400" fill="#6B7280">10 min TTL</text>
 <text x="54" y="701" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">attempts</text>
 <text x="212" y="701" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">int</text>
-<text x="340" y="701" font-size="9.5" font-weight="400" fill="#6B7280">default 0, max 5</text>
+<text x="340" y="701" font-size="9.5" font-weight="400" fill="#6B7280">def 0, max 5</text>
 <text x="54" y="721" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">consumed_at</text>
 <text x="212" y="721" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">timestamptz</text>
 <text x="340" y="721" font-size="9.5" font-weight="400" fill="#6B7280">blocks replay</text>
@@ -661,7 +658,7 @@ one box from this picture.</p>
 <text x="740" y="621" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="454" y="641" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">project_id</text>
 <text x="612" y="641" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">uuid</text>
-<text x="740" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK -&gt; projects, CASCADE</text>
+<text x="740" y="641" font-size="9.5" font-weight="400" fill="#6B7280">FK, CASCADE</text>
 <text x="454" y="661" font-size="10.5" font-weight="600" fill="#0C1A10" font-family="JetBrains Mono, monospace">name</text>
 <text x="612" y="661" font-size="10" font-weight="400" fill="#007A3D" font-family="JetBrains Mono, monospace">text</text>
 <text x="740" y="661" font-size="9.5" font-weight="400" fill="#6B7280"></text>

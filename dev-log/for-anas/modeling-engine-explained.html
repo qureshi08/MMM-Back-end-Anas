@@ -215,7 +215,7 @@ document says it directly: the pre-assembly step, joining the raw dataset, the c
 the model configuration into one file, "is not this scope's responsibility." It's ours.</p>
 
 <div class="figwrap">
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 430" role="img" aria-label="Three real inputs, the raw uploaded file, the column mapping the user chose, and the model configuration, converge into one assembly step which is our backend, not Hammad's worker. That step produces one JSON file saved to Blob storage, and only a small pointer to that file, the dataset reference, is what actually gets sent to the job queue.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 440" role="img" aria-label="Three real inputs, the raw uploaded file, the column mapping the user chose, and the model configuration, converge into one assembly step which is our backend, not Hammad's worker. That step produces one JSON file saved to Blob storage, and only a small pointer to that file, the dataset reference, is what actually gets sent to his engine, direct HTTP call, no queue on our own side.">
 <rect x="30" y="30" width="270" height="130" rx="10" fill="#E6F5ED" stroke="#00994D" stroke-width="1.6"/>
 <text x="44" y="56" font-size="11.5" font-weight="700" fill="#007A3D">RAW UPLOADED FILE</text>
 <text x="44" y="74" font-size="10" font-weight="400" fill="#374151">"Date": "2022-01-03"</text>
@@ -248,8 +248,8 @@ the model configuration into one file, "is not this scope's responsibility." It'
 <text x="334" y="351" font-size="11.5" font-weight="700" fill="#007A3D">ONE JSON FILE, SAVED TO BLOB</text>
 <text x="334" y="369" font-size="10" font-weight="400" fill="#374151">Cloudflare R2 for now, Azure Blob Storage later</text>
 <line x1="470" y1="380" x2="470" y2="406" stroke="#6B7280" stroke-width="1.6" marker-end="url(#massembly)"/>
-<text x="470" y="415" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">a small pointer, "dataset_reference", is the only</text>
-<text x="470" y="430" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">thing that actually reaches Hammad's queue</text>
+<text x="470" y="412" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">a small pointer, "dataset_reference", is the only</text>
+<text x="470" y="427" font-size="10.5" font-weight="400" fill="#6B7280" text-anchor="middle">thing that reaches his engine — direct call, no queue</text>
 <defs><marker id="massembly" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#6B7280"/></marker></defs>
 </svg>
 </div>
