@@ -258,6 +258,18 @@ export class Dataset extends BaseEntity {
   @Column({ type: 'jsonb', nullable: true })
   results: TrainingResults | null;
 
+  /** Whoever actually clicked Train Model — the real person a completion/failure email goes to. */
+  @Column({ name: 'trained_by_user_id', type: 'uuid', nullable: true })
+  trainedByUserId: string | null;
+
+  /**
+   * Null until a real completion/failure email has actually been sent for the current run — the
+   * guard against sending it again on every status poll. Reset to null every time `train()` starts
+   * a new run, so the next real terminal state gets its own real notification.
+   */
+  @Column({ name: 'notified_at', type: 'timestamptz', nullable: true })
+  notifiedAt: Date | null;
+
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at' })
   deletedAt: Date | null;
 }

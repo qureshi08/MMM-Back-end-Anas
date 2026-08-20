@@ -13,6 +13,8 @@ import { CombineChannelsDto } from './dto/combine-channels.dto';
 import { applyChannelCombinations } from './assembly/apply-channel-combinations';
 import { nameForGroup, suggestChannelGroups } from './assembly/suggest-channel-combinations';
 import { STORAGE_SERVICE } from './storage/storage.provider';
+import { NotificationService } from '../../common/mail/notification.service';
+import { UsersService } from '../users/users.service';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
 import {
@@ -55,7 +57,35 @@ function modelEngineHeaders(extra?: Record<string, string>): Record<string, stri
  */
 @Injectable()
 export class DatasetsService {
-  constructor(@Inject(STORAGE_SERVICE) private readonly storage: StorageService) {}
+  constructor(
+    @Inject(STORAGE_SERVICE) private readonly storage: StorageService,
+    private readonly notifications: NotificationService,
+    private readonly users: UsersService,
+  ) {}
+
+  /**
+   * Sends the real completion/failure email exactly once per run, to whoever actually clicked
+   * Train Model — guarded by `notifiedAt`, reset to null every time `train()` starts a new run.
+   * Called from both `getTrainingStatus` (failure) and `getResults` (completion), the two real
+   * places a terminal state is first observed.
+   */
+  private async notifyIfNeeded(id: string, status: TrainingStatus, errorMessage?: string | null): Promise<void> {
+    if (status !== TrainingStatus.COMPLETED && status !== TrainingStatus.FAILED) return;
+
+    const dataset = await this.findOne(id);
+    if (dataset.notifiedAt || !dataset.trainedByUserId) return;
+
+    await this.repo().update(id, { notifiedAt: new Date() });
+
+    const trainedBy = await this.users.findById(dataset.trainedByUserId);
+    if (!trainedBy) return;
+
+    if (status === TrainingStatus.COMPLETED && trainedBy.notificationPreferences?.runCompleted) {
+      await this.notifications.sendRunCompleted(trainedBy.email, dataset.id, dataset.name);
+    } else if (status === TrainingStatus.FAILED && trainedBy.notificationPreferences?.runFailed) {
+      await this.notifications.sendRunFailed(trainedBy.email, dataset.id, dataset.name, errorMessage ?? null);
+    }
+  }
 
   private repo() {
     return getTenantContext().queryRunner.manager.getRepository(Dataset);
@@ -481,6 +511,8 @@ export class DatasetsService {
     await this.repo().update(id, {
       trainingStatus: TrainingStatus.RUNNING,
       trainingStartedAt: new Date(),
+      trainedByUserId: requesterId,
+      notifiedAt: null,
       ...(isLiveCallSuccess ? {} : { results: generateMockResults(payload as Parameters<typeof generateMockResults>[0]) }),
     });
     return this.findOne(id);
@@ -514,6 +546,15 @@ export class DatasetsService {
               : data.status === 'failed'
                 ? TrainingStatus.FAILED
                 : TrainingStatus.RUNNING;
+
+          if (status === TrainingStatus.FAILED) {
+            // Only place a real failure is first observed — getResults() never gets called for a
+            // job that failed before producing anything, so the completion email's persist-then-
+            // notify path can't cover this case, it needs its own.
+            await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
+            await this.notifyIfNeeded(id, TrainingStatus.FAILED, data.error_message);
+          }
+
           return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
         }
       } catch (err) {
@@ -546,6 +587,7 @@ export class DatasetsService {
             trainingStatus: TrainingStatus.COMPLETED,
             results: liveResults,
           });
+          await this.notifyIfNeeded(id, TrainingStatus.COMPLETED);
           return liveResults;
         }
       } catch (err) {

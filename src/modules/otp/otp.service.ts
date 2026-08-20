@@ -4,8 +4,8 @@ import { createHash, randomInt } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
 import { OtpCode } from './entities/otp-code.entity';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
-import { GRAPH_MAIL_SERVICE } from './mail/graph-mail.provider';
-import { GraphMailService } from './mail/graph-mail.service';
+import { GRAPH_MAIL_SERVICE } from '../../common/mail/graph-mail.provider';
+import { GraphMailService } from '../../common/mail/graph-mail.service';
 
 const CODE_TTL_MINUTES = 10;
 const MAX_ATTEMPTS = 5;

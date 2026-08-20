@@ -130,6 +130,16 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   GRAPH_MAIL_SENDER?: string;
+
+  /**
+   * Real member-invite and training-notification emails link back into the app — this is the base
+   * URL to build those links against (e.g. https://mmm-frontend-amna.vercel.app). Optional: without
+   * it, those emails still send, just without a clickable link, same "degrade, don't block" pattern
+   * as every other optional integration here.
+   */
+  @IsOptional()
+  @IsString()
+  FRONTEND_URL?: string;
 }
 
 /** class-validator sees strings for everything coming out of process.env, so

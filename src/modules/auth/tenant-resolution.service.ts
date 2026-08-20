@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from 'typeorm';
+import { EntityManager, IsNull } from 'typeorm';
 import { Tenant } from '../tenants/entities/tenant.entity';
-import { GlobalRole, User } from '../users/entities/user.entity';
+import { TenantInvite } from '../tenants/entities/tenant-invite.entity';
+import { DEFAULT_NOTIFICATION_PREFERENCES, GlobalRole, User } from '../users/entities/user.entity';
 import { AuthenticatedUser } from './interfaces/authenticated-user.interface';
 
 /** Microsoft's fixed pseudo-tenant ID shared by every personal Microsoft account. */
@@ -40,6 +41,7 @@ export class TenantResolutionService {
 
     const tenants = manager.getRepository(Tenant);
     let tenant = await tenants.findOne({ where: { externalKey } });
+    const isNewTenant = !tenant;
     if (!tenant) {
       tenant = await tenants.save(tenants.create({ name: user.email ?? externalKey, externalKey }));
     }
@@ -54,17 +56,33 @@ export class TenantResolutionService {
     let platformUser = await users.findOne({ where: { tenantId: tenant.id, email } });
     if (!platformUser) {
       const [firstName, ...rest] = (user.name ?? 'Unknown User').split(' ');
+
+      // Real fix, 2026-08-19, for a gap flagged as provisional since this method was first
+      // written: every new sign-in used to become Administrator, not just the first one. Now
+      // only the first person into a genuinely brand-new tenant gets that — everyone else either
+      // takes the role a real pending invite already assigned them, or a real, sensible default
+      // that isn't full admin access.
+      const invites = manager.getRepository(TenantInvite);
+      const pendingInvite = await invites.findOne({ where: { tenantId: tenant.id, email, acceptedAt: IsNull() } });
+
+      const globalRole = isNewTenant
+        ? GlobalRole.ADMINISTRATOR
+        : (pendingInvite?.role ?? GlobalRole.MARKETING_ANALYST);
+
       platformUser = await users.save(
         users.create({
           tenantId: tenant.id,
           email,
           firstName: firstName || 'Unknown',
           lastName: rest.join(' ') || 'User',
-          // First user provisioned into a brand new tenant — provisional,
-          // same "revisit before GA" caveat as the rest of this method.
-          globalRole: GlobalRole.ADMINISTRATOR,
+          globalRole,
+          notificationPreferences: DEFAULT_NOTIFICATION_PREFERENCES,
         }),
       );
+
+      if (pendingInvite) {
+        await invites.update(pendingInvite.id, { acceptedAt: new Date() });
+      }
     }
 
     return { tenantId: tenant.id, userId: platformUser.id };

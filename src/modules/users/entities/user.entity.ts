@@ -9,6 +9,18 @@ export enum GlobalRole {
   ADMINISTRATOR = 'administrator',
 }
 
+export interface NotificationPreferences {
+  runCompleted: boolean;
+  runFailed: boolean;
+  weeklyDigest: boolean;
+}
+
+export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
+  runCompleted: true,
+  runFailed: true,
+  weeklyDigest: false,
+};
+
 /**
  * Application user. Identity is federated from Microsoft Entra ID — this
  * table never stores a password. Matches Database Schema Design v1.1
@@ -36,6 +48,10 @@ export class User extends BaseEntity {
 
   @Column({ name: 'global_role', type: 'text', enum: GlobalRole })
   globalRole: GlobalRole;
+
+  /** Real, persisted, actually checked before a notification email goes out — see MailNotificationService. */
+  @Column({ name: 'notification_preferences', type: 'jsonb' })
+  notificationPreferences: NotificationPreferences;
 
   @DeleteDateColumn({ type: 'timestamptz', name: 'deleted_at' })
   deletedAt: Date | null;

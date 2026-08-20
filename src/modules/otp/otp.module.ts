@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { OtpController } from './otp.controller';
 import { OtpService } from './otp.service';
-import { graphMailServiceProvider } from './mail/graph-mail.provider';
+import { MailModule } from '../../common/mail/mail.module';
 import { OtpVerifiedInterceptor } from './otp-verified.interceptor';
 
 /**
@@ -9,8 +9,9 @@ import { OtpVerifiedInterceptor } from './otp-verified.interceptor';
  * RLS-protected module — `OtpService` never uses `@InjectRepository`.
  */
 @Module({
+  imports: [MailModule],
   controllers: [OtpController],
-  providers: [OtpService, graphMailServiceProvider, OtpVerifiedInterceptor],
+  providers: [OtpService, OtpVerifiedInterceptor],
   exports: [OtpVerifiedInterceptor],
 })
 export class OtpModule {}
