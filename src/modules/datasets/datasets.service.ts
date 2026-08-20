@@ -557,6 +557,22 @@ export class DatasetsService {
 
           return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
         }
+
+        // Real gap found 2026-08-20: a 404 here means the engine has never heard of this
+        // job_id — always a dead job, never transient, because the only real cause is the
+        // Colab process having restarted since the job was submitted (its job registry lives
+        // only in that process's memory, nothing durable backs it). Previously this silently
+        // fell through to the elapsed-time mock fallback below, which just faked a progress
+        // bar for a job that was never coming back. Report it as a real, permanent failure
+        // instead — same path as an engine-reported failure, so notifyIfNeeded still fires.
+        if (res.status === 404) {
+          const errorMessage =
+            'This training run is no longer known to the model engine, most likely because the ' +
+            'Colab session restarted since it was submitted. Start training again.';
+          await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
+          await this.notifyIfNeeded(id, TrainingStatus.FAILED, errorMessage);
+          return { status: TrainingStatus.FAILED, progress: 0, jobId: dataset.jobId, errorMessage };
+        }
       } catch (err) {
         console.error('Failed to query MODEL_ENGINE_URL status:', err);
       }
