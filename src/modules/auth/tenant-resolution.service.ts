@@ -43,7 +43,16 @@ export class TenantResolutionService {
     let tenant = await tenants.findOne({ where: { externalKey } });
     const isNewTenant = !tenant;
     if (!tenant) {
-      tenant = await tenants.save(tenants.create({ name: user.email ?? externalKey, externalKey }));
+      // Real bug, found 2026-08-20: this used to be `user.email`, so the whole
+      // organization's tenant got permanently named after whichever single person
+      // happened to sign in first (e.g. invite emails read "added you to
+      // amna.minhas@convergentbt.com's workspace"). An org tenant's name is now
+      // its email domain instead, since that's shared by everyone in it. A
+      // personal Microsoft account has no domain to share with anyone else, so
+      // it keeps using the individual's email.
+      const domain = user.email?.split('@')[1];
+      const name = isPersonalAccount ? (user.email ?? externalKey) : (domain ?? externalKey);
+      tenant = await tenants.save(tenants.create({ name, externalKey }));
     }
 
     // Set before touching `users` — that table has Row-Level Security, this
