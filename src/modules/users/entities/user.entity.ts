@@ -34,7 +34,16 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
  * can belong to more than one customer organization.
  */
 @Entity('users')
-@Index('UQ_users_tenant_email', ['tenantId', 'email'], { unique: true })
+/**
+ * Partial index — `WHERE deleted_at IS NULL`, added 2026-08-20 (see
+ * ReplaceUsersEmailIndexWithPartialUnique migration) after a real incident: removing a member
+ * soft-deletes their row, but the index was a plain unique constraint with no `WHERE` clause, so
+ * that email could never sign back into the tenant again — TenantResolutionService's "row doesn't
+ * exist, create one" path would hit this constraint and 500 on every single request from them,
+ * forever. A soft-deleted row no longer counts toward uniqueness, matching how
+ * `tenant_invites`' own partial index already handled the same "removed, can rejoin later" shape.
+ */
+@Index('UQ_users_tenant_email', ['tenantId', 'email'], { unique: true, where: '"deleted_at" IS NULL' })
 export class User extends BaseEntity {
   @Column({ name: 'tenant_id', type: 'uuid' })
   tenantId: string;
