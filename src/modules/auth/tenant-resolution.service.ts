@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { EntityManager, IsNull } from 'typeorm';
 import { Tenant } from '../tenants/entities/tenant.entity';
 import { TenantInvite } from '../tenants/entities/tenant-invite.entity';
@@ -68,15 +68,25 @@ export class TenantResolutionService {
 
       // Real fix, 2026-08-19, for a gap flagged as provisional since this method was first
       // written: every new sign-in used to become Master, not just the first one. Now only the
-      // first person into a genuinely brand-new tenant gets that — everyone else either takes the
-      // role a real pending invite already assigned them, or the least-privilege default (Read)
-      // if they joined an existing tenant with no invite waiting for them at all.
+      // first person into a genuinely brand-new tenant gets that — everyone else takes the role
+      // a real pending invite already assigned them.
       const invites = manager.getRepository(TenantInvite);
       const pendingInvite = await invites.findOne({ where: { tenantId: tenant.id, email, acceptedAt: IsNull() } });
 
-      const globalRole = isNewTenant
-        ? GlobalRole.MASTER
-        : (pendingInvite?.role ?? GlobalRole.READ);
+      // Real incident, 2026-08-21, caught live: an existing tenant used to be open — anyone
+      // signing in got auto-created at Read, no invite needed. That silently undid "remove
+      // member": the moment a removed person's browser made another request, they walked right
+      // back in on their own, just downgraded to Read instead of actually being kept out. A
+      // removed (or never-invited) email now can't rejoin an existing tenant at all until a
+      // Master sends them a real invite — same open-signup rule stays for a genuinely brand-new
+      // tenant (isNewTenant), that part was never the problem.
+      if (!isNewTenant && !pendingInvite) {
+        throw new ForbiddenException(
+          `${email} isn't a member of this team. Ask a Master to invite you from Settings first.`,
+        );
+      }
+
+      const globalRole = isNewTenant ? GlobalRole.MASTER : pendingInvite!.role;
 
       platformUser = await users.save(
         users.create({
