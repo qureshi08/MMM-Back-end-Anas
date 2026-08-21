@@ -35,7 +35,7 @@ export class TenantResolutionService {
   async resolveOrProvision(
     user: AuthenticatedUser,
     manager: EntityManager,
-  ): Promise<{ tenantId: string; userId: string }> {
+  ): Promise<{ tenantId: string; userId: string; globalRole: GlobalRole }> {
     const isPersonalAccount = user.tid === CONSUMERS_TENANT_ID;
     const externalKey = isPersonalAccount ? `personal:${user.oid}` : `org:${user.tid}`;
 
@@ -67,16 +67,16 @@ export class TenantResolutionService {
       const [firstName, ...rest] = (user.name ?? 'Unknown User').split(' ');
 
       // Real fix, 2026-08-19, for a gap flagged as provisional since this method was first
-      // written: every new sign-in used to become Administrator, not just the first one. Now
-      // only the first person into a genuinely brand-new tenant gets that — everyone else either
-      // takes the role a real pending invite already assigned them, or a real, sensible default
-      // that isn't full admin access.
+      // written: every new sign-in used to become Master, not just the first one. Now only the
+      // first person into a genuinely brand-new tenant gets that — everyone else either takes the
+      // role a real pending invite already assigned them, or the least-privilege default (Read)
+      // if they joined an existing tenant with no invite waiting for them at all.
       const invites = manager.getRepository(TenantInvite);
       const pendingInvite = await invites.findOne({ where: { tenantId: tenant.id, email, acceptedAt: IsNull() } });
 
       const globalRole = isNewTenant
-        ? GlobalRole.ADMINISTRATOR
-        : (pendingInvite?.role ?? GlobalRole.MARKETING_ANALYST);
+        ? GlobalRole.MASTER
+        : (pendingInvite?.role ?? GlobalRole.READ);
 
       platformUser = await users.save(
         users.create({
@@ -94,6 +94,6 @@ export class TenantResolutionService {
       }
     }
 
-    return { tenantId: tenant.id, userId: platformUser.id };
+    return { tenantId: tenant.id, userId: platformUser.id, globalRole: platformUser.globalRole };
   }
 }

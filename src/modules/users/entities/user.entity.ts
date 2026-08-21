@@ -2,11 +2,17 @@ import { Column, DeleteDateColumn, Entity, Index, JoinColumn, ManyToOne } from '
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { Tenant } from '../../tenants/entities/tenant.entity';
 
+/**
+ * Replaced the 4 marketing-titled roles with 3 permission tiers, 2026-08-20 — Anas's own real
+ * spec: "Master role can delete users and do anything. Read roles: master invites them, they can
+ * only read the models. Read/write roles: master invites them, they can read and create models."
+ * Master-only: invite/remove members, change roles. Read/write and above: create, edit, train,
+ * delete projects and datasets. Read: full visibility, no mutations anywhere.
+ */
 export enum GlobalRole {
-  MARKETING_ANALYST = 'marketing_analyst',
-  MARKETING_MANAGER = 'marketing_manager',
-  DATA_SCIENTIST = 'data_scientist',
-  ADMINISTRATOR = 'administrator',
+  MASTER = 'master',
+  READ = 'read',
+  READ_WRITE = 'read_write',
 }
 
 export interface NotificationPreferences {

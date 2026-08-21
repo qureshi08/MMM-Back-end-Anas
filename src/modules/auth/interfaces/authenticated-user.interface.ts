@@ -1,11 +1,13 @@
+import { GlobalRole } from '../../users/entities/user.entity';
+
 /**
  * What `request.user` holds during a request, in two phases. EntraAuthGuard
  * sets the first five fields from the verified token (or the dev-bypass
- * fake user) — `tenantId`/`userId` are undefined at that instant.
+ * fake user) — `tenantId`/`userId`/`globalRole` are undefined at that instant.
  * TenantContextInterceptor runs immediately after and fills them in, once
  * TenantResolutionService has found or created the matching rows in our
  * own `tenants`/`users` tables (CMP-42, 2026-08-04). By the time a
- * controller sees this via @CurrentUser(), both are always set — every
+ * controller sees this via @CurrentUser(), all three are always set — every
  * non-@Public() route goes through both guard and interceptor, in that
  * order, no route can reach a handler with only the first five.
  */
@@ -24,4 +26,10 @@ export interface AuthenticatedUser {
   tenantId?: string;
   /** Our own `users.id` this login resolved to. Unset until TenantContextInterceptor runs. */
   userId?: string;
+  /**
+   * The signed-in user's real permission tier, attached here so write-access guards can check it
+   * with zero extra query — TenantResolutionService already loads/creates this row on every
+   * request. Unset until TenantContextInterceptor runs.
+   */
+  globalRole?: GlobalRole;
 }

@@ -15,6 +15,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
+import { assertWriteAccess } from '../../common/auth/permissions';
 import { Project } from './entities/project.entity';
 
 @Controller('projects')
@@ -23,6 +24,7 @@ export class ProjectsController {
 
   @Post()
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateProjectDto): Promise<Project> {
+    assertWriteAccess(user);
     return this.projects.create(user.userId!, user.tenantId!, dto);
   }
 
@@ -42,6 +44,7 @@ export class ProjectsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateProjectDto,
   ): Promise<Project> {
+    assertWriteAccess(user);
     return this.projects.update(id, user.userId!, dto);
   }
 
@@ -51,6 +54,7 @@ export class ProjectsController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
+    assertWriteAccess(user);
     return this.projects.remove(id, user.userId!);
   }
 }

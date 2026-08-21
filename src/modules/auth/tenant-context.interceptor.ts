@@ -42,11 +42,11 @@ export class TenantContextInterceptor implements NestInterceptor {
         await queryRunner.startTransaction();
 
         try {
-          const { tenantId, userId } = await this.tenantResolution.resolveOrProvision(
+          const { tenantId, userId, globalRole } = await this.tenantResolution.resolveOrProvision(
             user,
             queryRunner.manager,
           );
-          request.user = { ...user, tenantId, userId } satisfies AuthenticatedUser;
+          request.user = { ...user, tenantId, userId, globalRole } satisfies AuthenticatedUser;
 
           await runWithTenantContext(
             { tenantId, queryRunner },

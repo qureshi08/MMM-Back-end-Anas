@@ -49,10 +49,10 @@ export class UsersService {
     return this.invitesRepo().find({ where: { acceptedAt: IsNull() }, order: { invitedAt: 'DESC' } });
   }
 
-  private async requireAdmin(requesterId: string): Promise<User> {
+  private async requireMaster(requesterId: string): Promise<User> {
     const requester = await this.repo().findOne({ where: { id: requesterId } });
-    if (!requester || requester.globalRole !== GlobalRole.ADMINISTRATOR) {
-      throw new ForbiddenException('Only an administrator can do this.');
+    if (!requester || requester.globalRole !== GlobalRole.MASTER) {
+      throw new ForbiddenException('Only a Master can do this.');
     }
     return requester;
   }
@@ -63,7 +63,7 @@ export class UsersService {
    * the partial unique index (tenant_id, email WHERE accepted_at IS NULL) is what makes that safe.
    */
   async inviteMember(tenantId: string, requesterId: string, dto: InviteMemberDto): Promise<TenantInvite> {
-    const requester = await this.requireAdmin(requesterId);
+    const requester = await this.requireMaster(requesterId);
 
     const alreadyMember = await this.repo().findOne({ where: { tenantId, email: dto.email } });
     if (alreadyMember) {
@@ -94,7 +94,7 @@ export class UsersService {
   }
 
   async updateMemberRole(requesterId: string, memberId: string, dto: UpdateMemberRoleDto): Promise<User> {
-    await this.requireAdmin(requesterId);
+    await this.requireMaster(requesterId);
     const member = await this.repo().findOne({ where: { id: memberId } });
     if (!member) {
       throw new NotFoundException(`Member ${memberId} not found.`);
@@ -104,7 +104,7 @@ export class UsersService {
   }
 
   async removeMember(requesterId: string, memberId: string): Promise<void> {
-    await this.requireAdmin(requesterId);
+    await this.requireMaster(requesterId);
     if (requesterId === memberId) {
       throw new BadRequestException('You cannot remove yourself.');
     }

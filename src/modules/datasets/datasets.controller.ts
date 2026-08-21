@@ -26,6 +26,7 @@ import { CombineColumnsDto } from './dto/combine-columns.dto';
 import { CombineChannelsDto } from './dto/combine-channels.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
+import { assertWriteAccess } from '../../common/auth/permissions';
 import { Dataset } from './entities/dataset.entity';
 
 /** 200 MB — generous for a CSV of weekly marketing spend, not unbounded. */
@@ -44,6 +45,7 @@ export class DatasetsController {
     @UploadedFile(new ParseFilePipe({ validators: [new MaxFileSizeValidator({ maxSize: MAX_UPLOAD_BYTES })] }))
     file: Express.Multer.File,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.create(projectId, user.userId!, user.tenantId!, dto, file);
   }
 
@@ -78,7 +80,12 @@ export class DatasetsController {
   }
 
   @Post('datasets/:id/combine-columns')
-  combineColumns(@Param('id', ParseUUIDPipe) id: string, @Body() dto: CombineColumnsDto) {
+  combineColumns(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: CombineColumnsDto,
+  ) {
+    assertWriteAccess(user);
     return this.datasets.combineColumns(id, dto);
   }
 
@@ -93,6 +100,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CombineChannelsDto,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.combineChannels(id, user.userId!, dto);
   }
 
@@ -103,6 +111,7 @@ export class DatasetsController {
    */
   @Post('datasets/:id/auto-combine-channels')
   autoCombineChannels(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    assertWriteAccess(user);
     return this.datasets.autoCombineChannels(id, user.userId!);
   }
 
@@ -112,6 +121,7 @@ export class DatasetsController {
     @Param('id', ParseUUIDPipe) id: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
+    assertWriteAccess(user);
     return this.datasets.remove(id, user.userId!);
   }
 
@@ -121,6 +131,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ConfigureDatasetDto,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.configure(id, user.userId!, dto);
   }
 
@@ -130,6 +141,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: OptimizeDatasetDto,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.optimize(id, user.userId!, dto);
   }
 
@@ -139,6 +151,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: CalibrateDatasetDto,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.calibrate(id, user.userId!, dto);
   }
 
@@ -148,6 +161,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: HyperparameterizeDatasetDto,
   ): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.hyperparameterize(id, user.userId!, dto);
   }
 
@@ -158,6 +172,7 @@ export class DatasetsController {
    */
   @Post('datasets/:id/assemble')
   assemble(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    assertWriteAccess(user);
     return this.datasets.assemble(id, user.userId!);
   }
 
@@ -168,6 +183,7 @@ export class DatasetsController {
    */
   @Post('datasets/:id/train')
   train(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {
+    assertWriteAccess(user);
     return this.datasets.train(id, user.userId!);
   }
 
