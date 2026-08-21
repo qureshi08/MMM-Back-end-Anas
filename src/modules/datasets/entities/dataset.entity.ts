@@ -193,6 +193,14 @@ export class Dataset extends BaseEntity {
   @Column({ type: 'text' })
   name: string;
 
+  /**
+   * Real "model owner" for display, 2026-08-20 — the person who actually uploaded this dataset,
+   * not the project's owner (a project commonly has more than one person uploading into it).
+   * Nullable only because existing rows predate this column; every new upload sets it.
+   */
+  @Column({ name: 'created_by_user_id', type: 'uuid', nullable: true })
+  createdByUserId: string | null;
+
   @Column({ name: 'model_type', type: 'text', enum: ModelType })
   modelType: ModelType;
 

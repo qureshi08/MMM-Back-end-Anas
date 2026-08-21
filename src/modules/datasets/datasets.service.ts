@@ -1,7 +1,6 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
-import { Project } from '../projects/entities/project.entity';
 import { ChannelCombination, Dataset, DatasetStatus, TrainingStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
@@ -15,6 +14,8 @@ import { nameForGroup, suggestChannelGroups } from './assembly/suggest-channel-c
 import { STORAGE_SERVICE } from './storage/storage.provider';
 import { NotificationService } from '../../common/mail/notification.service';
 import { UsersService } from '../users/users.service';
+import { ProjectsService } from '../projects/projects.service';
+import { GlobalRole } from '../users/entities/user.entity';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
 import {
@@ -61,6 +62,7 @@ export class DatasetsService {
     @Inject(STORAGE_SERVICE) private readonly storage: StorageService,
     private readonly notifications: NotificationService,
     private readonly users: UsersService,
+    private readonly projects: ProjectsService,
   ) {}
 
   /**
@@ -72,7 +74,9 @@ export class DatasetsService {
   private async notifyIfNeeded(id: string, status: TrainingStatus, errorMessage?: string | null): Promise<void> {
     if (status !== TrainingStatus.COMPLETED && status !== TrainingStatus.FAILED) return;
 
-    const dataset = await this.findOne(id);
+    // Raw fetch, not the access-checked findOne — this runs as a system side effect of a status
+    // poll, not on behalf of any particular requester with a role to check.
+    const dataset = await this.findEntity(id);
     if (dataset.notifiedAt || !dataset.trainedByUserId) return;
 
     await this.repo().update(id, { notifiedAt: new Date() });
@@ -91,38 +95,37 @@ export class DatasetsService {
     return getTenantContext().queryRunner.manager.getRepository(Dataset);
   }
 
-  private projectsRepo() {
-    return getTenantContext().queryRunner.manager.getRepository(Project);
-  }
-
-  private async findProjectOrThrow(projectId: string): Promise<Project> {
-    const project = await this.projectsRepo().findOne({ where: { id: projectId } });
-    if (!project) {
-      throw new NotFoundException(`Project ${projectId} not found.`);
+  /** Raw fetch, no access check — for internal use (notifyIfNeeded) and as the base for findOne. */
+  private async findEntity(id: string): Promise<Dataset> {
+    const dataset = await this.repo().findOne({ where: { id } });
+    if (!dataset) {
+      throw new NotFoundException(`Dataset ${id} not found.`);
     }
-    return project;
+    return dataset;
   }
 
   /**
-   * Same owner-only rule `ProjectsService` uses for the project itself — a
-   * dataset belongs to a project, so editing/removing it follows the
-   * project's own ownership, not a separate permission on the dataset row.
+   * Real access check, 2026-08-20: a dataset's privacy is only as real as its parent project's —
+   * delegates to `ProjectsService.assertAccess`, same Master/owner/project_members rule, so a
+   * private project's datasets can't be reached by guessing a dataset ID directly.
    */
-  private assertProjectOwner(project: Project, requesterId: string): void {
-    if (project.ownerId !== requesterId) {
-      throw new ForbiddenException('Only the project owner can do this.');
-    }
+  async findOne(id: string, requesterId: string, globalRole: GlobalRole): Promise<Dataset> {
+    const dataset = await this.findEntity(id);
+    await this.projects.assertAccessById(dataset.projectId, requesterId, globalRole);
+    return dataset;
   }
 
   async create(
     projectId: string,
     requesterId: string,
     tenantId: string,
+    globalRole: GlobalRole,
     dto: CreateDatasetDto,
     file: Express.Multer.File,
   ): Promise<Dataset> {
-    const project = await this.findProjectOrThrow(projectId);
-    this.assertProjectOwner(project, requesterId);
+    // Throws if the requester can't see this project at all — same Master/owner/project_members
+    // check every other dataset access goes through.
+    await this.projects.findOne(projectId, requesterId, globalRole);
     validateDatasetFile(file);
 
     const storageKey = `tenants/${tenantId}/projects/${projectId}/datasets/${randomUUID()}-${file.originalname}`;
@@ -139,25 +142,18 @@ export class DatasetsService {
         fileSizeBytes: file.size,
         mimeType: file.mimetype,
         status: DatasetStatus.VALIDATED,
+        createdByUserId: requesterId,
       }),
     );
   }
 
-  /** RLS already limits this to the caller's own tenant. */
-  findAllForProject(projectId: string): Promise<Dataset[]> {
+  async findAllForProject(projectId: string, requesterId: string, globalRole: GlobalRole): Promise<Dataset[]> {
+    await this.projects.assertAccessById(projectId, requesterId, globalRole);
     return this.repo().find({ where: { projectId }, order: { createdAt: 'DESC' } });
   }
 
-  async findOne(id: string): Promise<Dataset> {
-    const dataset = await this.repo().findOne({ where: { id } });
-    if (!dataset) {
-      throw new NotFoundException(`Dataset ${id} not found.`);
-    }
-    return dataset;
-  }
-
-  async getDownloadUrl(id: string): Promise<string> {
-    const dataset = await this.findOne(id);
+  async getDownloadUrl(id: string, requesterId: string, globalRole: GlobalRole): Promise<string> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     return this.storage.getDownloadUrl(dataset.storageKey);
   }
 
@@ -167,8 +163,12 @@ export class DatasetsService {
    * them from memory. CSV only for now — XLSX and Parquet need real binary
    * parsing this doesn't do yet, they get a clear error instead of a guess.
    */
-  async getColumns(id: string): Promise<{ columns: string[]; suggestions: ColumnRoleSuggestions }> {
-    const dataset = await this.findOne(id);
+  async getColumns(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+  ): Promise<{ columns: string[]; suggestions: ColumnRoleSuggestions }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
       throw new BadRequestException(
         'Reading column names is only supported for .csv files today. This dataset is ' +
@@ -185,8 +185,8 @@ export class DatasetsService {
    * to guess a date range blind — the exact gap Anas hit: he picked today's real calendar dates,
    * which don't exist anywhere in a real historical marketing dataset.
    */
-  async getDateRange(id: string): Promise<{ minDate: string; maxDate: string }> {
-    const dataset = await this.findOne(id);
+  async getDateRange(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ minDate: string; maxDate: string }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, the date column has to be known before its real range can be read.');
     }
@@ -201,8 +201,8 @@ export class DatasetsService {
    * "Example data" instead. CSV only, same limit as getColumns, this reads the whole file rather
    * than a header-only prefix.
    */
-  async getRows(id: string): Promise<{ rows: CsvRow[] }> {
-    const dataset = await this.findOne(id);
+  async getRows(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ rows: CsvRow[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
       throw new BadRequestException(
         'Reading row data is only supported for .csv files today. This dataset is ' +
@@ -218,8 +218,13 @@ export class DatasetsService {
    * client-side. Sums the named columns per real row, paired with the real date each row belongs
    * to. Requires Configure to already know which column is the date column.
    */
-  async combineColumns(id: string, dto: CombineColumnsDto): Promise<{ dateColumn: string; series: { date: string; value: number }[] }> {
-    const dataset = await this.findOne(id);
+  async combineColumns(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+    dto: CombineColumnsDto,
+  ): Promise<{ dateColumn: string; series: { date: string; value: number }[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, the date column has to be known before columns can be combined.');
     }
@@ -244,8 +249,8 @@ export class DatasetsService {
    * `channelHyperparameters`, since it no longer matches the new media column list — Hammad's
    * contract needs one carryover/saturation pair per real channel, that has to be redone.
    */
-  async combineChannels(id: string, requesterId: string, dto: CombineChannelsDto): Promise<Dataset> {
-    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+  async combineChannels(id: string, requesterId: string, globalRole: GlobalRole, dto: CombineChannelsDto): Promise<Dataset> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, channels can only be combined once media columns are known.');
     }
@@ -267,7 +272,7 @@ export class DatasetsService {
       channelCombinations: [...(dataset.channelCombinations ?? []), combination],
       channelHyperparameters: null,
     });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /**
@@ -279,8 +284,12 @@ export class DatasetsService {
    * this is the closest real, self-contained approximation, and would have caught the real
    * `paid_social_spend` rejection found 2026-08-18 before Train Model ever ran.
    */
-  async autoCombineChannels(id: string, requesterId: string): Promise<{ dataset: Dataset; combined: ChannelCombination[] }> {
-    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+  async autoCombineChannels(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+  ): Promise<{ dataset: Dataset; combined: ChannelCombination[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, channels can only be combined once media columns are known.');
     }
@@ -309,36 +318,29 @@ export class DatasetsService {
       channelHyperparameters: null,
     });
 
-    return { dataset: await this.findOne(id), combined: newCombinations };
+    return { dataset: await this.findOne(id, requesterId, globalRole), combined: newCombinations };
   }
 
   /**
    * Soft delete only, same audit-trail rationale as `ProjectsService`, the
    * row stays. The R2 object itself is left in place deliberately, not
    * removed on every dataset delete, matching that same "keep it for
-   * audit" reasoning rather than assuming delete always means gone.
+   * audit" reasoning rather than assuming delete always means gone. Access-checked the same as
+   * every other write — real project access plus a Read/Write (or Master) role, already enforced
+   * by `assertWriteAccess()` at the controller — not owner-exclusive the way it used to be, now
+   * that real project membership exists.
    */
-  async remove(id: string, requesterId: string): Promise<void> {
-    const dataset = await this.findOne(id);
-    const project = await this.findProjectOrThrow(dataset.projectId);
-    this.assertProjectOwner(project, requesterId);
+  async remove(id: string, requesterId: string, globalRole: GlobalRole): Promise<void> {
+    await this.findOne(id, requesterId, globalRole);
     await this.repo().softDelete(id);
-  }
-
-  /** Same ownership rule every other write on a dataset uses: the project owner, via the dataset's project. */
-  private async findOwnedDatasetOrThrow(id: string, requesterId: string): Promise<Dataset> {
-    const dataset = await this.findOne(id);
-    const project = await this.findProjectOrThrow(dataset.projectId);
-    this.assertProjectOwner(project, requesterId);
-    return dataset;
   }
 
   /**
    * The Configure step (CMP-79-adjacent). This is the piece Save
    * Configuration had nothing to call before today.
    */
-  async configure(id: string, requesterId: string, dto: ConfigureDatasetDto): Promise<Dataset> {
-    await this.findOwnedDatasetOrThrow(id, requesterId);
+  async configure(id: string, requesterId: string, globalRole: GlobalRole, dto: ConfigureDatasetDto): Promise<Dataset> {
+    await this.findOne(id, requesterId, globalRole);
 
     const organicColumns = dto.organicColumns ?? [];
     const geoColumns = dto.geoColumns ?? [];
@@ -364,21 +366,21 @@ export class DatasetsService {
       kpiType: dto.kpiType,
       revenuePerKpiValue: dto.revenuePerKpiValue ?? null,
     });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /** The Optimize step: the date range the training run actually uses. */
-  async optimize(id: string, requesterId: string, dto: OptimizeDatasetDto): Promise<Dataset> {
-    await this.findOwnedDatasetOrThrow(id, requesterId);
+  async optimize(id: string, requesterId: string, globalRole: GlobalRole, dto: OptimizeDatasetDto): Promise<Dataset> {
+    await this.findOne(id, requesterId, globalRole);
     assertValidDateRange(dto.startDate, dto.endDate);
 
     await this.repo().update(id, { dateRange: { startDate: dto.startDate, endDate: dto.endDate } });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /** The Calibrate step: model_configuration.calibration. */
-  async calibrate(id: string, requesterId: string, dto: CalibrateDatasetDto): Promise<Dataset> {
-    await this.findOwnedDatasetOrThrow(id, requesterId);
+  async calibrate(id: string, requesterId: string, globalRole: GlobalRole, dto: CalibrateDatasetDto): Promise<Dataset> {
+    await this.findOne(id, requesterId, globalRole);
 
     await this.repo().update(id, {
       calibration: {
@@ -386,7 +388,7 @@ export class DatasetsService {
         confidencePercent: dto.confidencePercent,
       },
     });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /**
@@ -396,8 +398,13 @@ export class DatasetsService {
    * Hammad's model needs one carryover/saturation pair per real media
    * channel, not an arbitrary list.
    */
-  async hyperparameterize(id: string, requesterId: string, dto: HyperparameterizeDatasetDto): Promise<Dataset> {
-    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+  async hyperparameterize(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+    dto: HyperparameterizeDatasetDto,
+  ): Promise<Dataset> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
 
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, hyperparameters are set per media column.');
@@ -414,7 +421,7 @@ export class DatasetsService {
         saturation: c.saturation,
       })),
     });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /**
@@ -425,8 +432,12 @@ export class DatasetsService {
    * doesn't actively manage. This stops at the real artifact so it can be inspected and confirmed
    * correct before the final "send it" step gets built, once there's a real address to send it to.
    */
-  async assemble(id: string, requesterId: string): Promise<{ jobId: string; datasetReference: string; payload: unknown }> {
-    const dataset = await this.findOwnedDatasetOrThrow(id, requesterId);
+  async assemble(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+  ): Promise<{ jobId: string; datasetReference: string; payload: unknown }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
 
     const missing: string[] = [];
     if (!dataset.columnMapping || !dataset.kpiType) missing.push('Configure');
@@ -475,10 +486,10 @@ export class DatasetsService {
    * concurrently on the same GPU process and crash each other — confirmed live, one job's log
    * started sampling before the previous job had finished. This is the guard against that.
    */
-  async train(id: string, requesterId: string): Promise<Dataset> {
-    const existing = await this.findOwnedDatasetOrThrow(id, requesterId);
+  async train(id: string, requesterId: string, globalRole: GlobalRole): Promise<Dataset> {
+    const existing = await this.findOne(id, requesterId, globalRole);
     if (existing.trainingStartedAt) {
-      const { status } = await this.getTrainingStatus(id);
+      const { status } = await this.getTrainingStatus(id, requesterId, globalRole);
       if (status === TrainingStatus.RUNNING) {
         throw new BadRequestException(
           'Training is already running for this dataset. Wait for it to finish before starting another run.',
@@ -486,7 +497,7 @@ export class DatasetsService {
       }
     }
 
-    const { jobId, datasetReference, payload } = await this.assemble(id, requesterId);
+    const { jobId, datasetReference, payload } = await this.assemble(id, requesterId, globalRole);
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
     let isLiveCallSuccess = false;
@@ -515,7 +526,7 @@ export class DatasetsService {
       notifiedAt: null,
       ...(isLiveCallSuccess ? {} : { results: generateMockResults(payload as Parameters<typeof generateMockResults>[0]) }),
     });
-    return this.findOne(id);
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /**
@@ -526,8 +537,10 @@ export class DatasetsService {
    */
   async getTrainingStatus(
     id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
   ): Promise<{ status: string; progress: number; jobId: string | null; errorMessage?: string | null }> {
-    const dataset = await this.findOne(id);
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.trainingStartedAt) {
       return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
     }
@@ -585,8 +598,8 @@ export class DatasetsService {
   /**
    * Fetches results of a completed model run. If `MODEL_ENGINE_URL` is configured, queries Colab's `/results/:jobId`.
    */
-  async getResults(id: string) {
-    const dataset = await this.findOne(id);
+  async getResults(id: string, requesterId: string, globalRole: GlobalRole) {
+    const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.trainingStartedAt) {
       throw new BadRequestException('Training has not started for this dataset yet.');
     }

@@ -46,37 +46,43 @@ export class DatasetsController {
     file: Express.Multer.File,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.create(projectId, user.userId!, user.tenantId!, dto, file);
+    return this.datasets.create(projectId, user.userId!, user.tenantId!, user.globalRole!, dto, file);
   }
 
   @Get('projects/:projectId/datasets')
-  findAllForProject(@Param('projectId', ParseUUIDPipe) projectId: string): Promise<Dataset[]> {
-    return this.datasets.findAllForProject(projectId);
+  findAllForProject(
+    @Param('projectId', ParseUUIDPipe) projectId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<Dataset[]> {
+    return this.datasets.findAllForProject(projectId, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<Dataset> {
-    return this.datasets.findOne(id);
+  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {
+    return this.datasets.findOne(id, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id/download-url')
-  async getDownloadUrl(@Param('id', ParseUUIDPipe) id: string): Promise<{ url: string }> {
-    return { url: await this.datasets.getDownloadUrl(id) };
+  async getDownloadUrl(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<{ url: string }> {
+    return { url: await this.datasets.getDownloadUrl(id, user.userId!, user.globalRole!) };
   }
 
   @Get('datasets/:id/columns')
-  getColumns(@Param('id', ParseUUIDPipe) id: string) {
-    return this.datasets.getColumns(id);
+  getColumns(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getColumns(id, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id/date-range')
-  getDateRange(@Param('id', ParseUUIDPipe) id: string) {
-    return this.datasets.getDateRange(id);
+  getDateRange(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getDateRange(id, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id/rows')
-  getRows(@Param('id', ParseUUIDPipe) id: string) {
-    return this.datasets.getRows(id);
+  getRows(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getRows(id, user.userId!, user.globalRole!);
   }
 
   @Post('datasets/:id/combine-columns')
@@ -86,7 +92,7 @@ export class DatasetsController {
     @Body() dto: CombineColumnsDto,
   ) {
     assertWriteAccess(user);
-    return this.datasets.combineColumns(id, dto);
+    return this.datasets.combineColumns(id, user.userId!, user.globalRole!, dto);
   }
 
   /**
@@ -101,7 +107,7 @@ export class DatasetsController {
     @Body() dto: CombineChannelsDto,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.combineChannels(id, user.userId!, dto);
+    return this.datasets.combineChannels(id, user.userId!, user.globalRole!, dto);
   }
 
   /**
@@ -112,7 +118,7 @@ export class DatasetsController {
   @Post('datasets/:id/auto-combine-channels')
   autoCombineChannels(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     assertWriteAccess(user);
-    return this.datasets.autoCombineChannels(id, user.userId!);
+    return this.datasets.autoCombineChannels(id, user.userId!, user.globalRole!);
   }
 
   @Delete('datasets/:id')
@@ -122,7 +128,7 @@ export class DatasetsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     assertWriteAccess(user);
-    return this.datasets.remove(id, user.userId!);
+    return this.datasets.remove(id, user.userId!, user.globalRole!);
   }
 
   @Patch('datasets/:id/configuration')
@@ -132,7 +138,7 @@ export class DatasetsController {
     @Body() dto: ConfigureDatasetDto,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.configure(id, user.userId!, dto);
+    return this.datasets.configure(id, user.userId!, user.globalRole!, dto);
   }
 
   @Patch('datasets/:id/optimize')
@@ -142,7 +148,7 @@ export class DatasetsController {
     @Body() dto: OptimizeDatasetDto,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.optimize(id, user.userId!, dto);
+    return this.datasets.optimize(id, user.userId!, user.globalRole!, dto);
   }
 
   @Patch('datasets/:id/calibration')
@@ -152,7 +158,7 @@ export class DatasetsController {
     @Body() dto: CalibrateDatasetDto,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.calibrate(id, user.userId!, dto);
+    return this.datasets.calibrate(id, user.userId!, user.globalRole!, dto);
   }
 
   @Patch('datasets/:id/hyperparameters')
@@ -162,7 +168,7 @@ export class DatasetsController {
     @Body() dto: HyperparameterizeDatasetDto,
   ): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.hyperparameterize(id, user.userId!, dto);
+    return this.datasets.hyperparameterize(id, user.userId!, user.globalRole!, dto);
   }
 
   /**
@@ -173,7 +179,7 @@ export class DatasetsController {
   @Post('datasets/:id/assemble')
   assemble(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     assertWriteAccess(user);
-    return this.datasets.assemble(id, user.userId!);
+    return this.datasets.assemble(id, user.userId!, user.globalRole!);
   }
 
   /**
@@ -184,16 +190,16 @@ export class DatasetsController {
   @Post('datasets/:id/train')
   train(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {
     assertWriteAccess(user);
-    return this.datasets.train(id, user.userId!);
+    return this.datasets.train(id, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id/status')
-  getTrainingStatus(@Param('id', ParseUUIDPipe) id: string) {
-    return this.datasets.getTrainingStatus(id);
+  getTrainingStatus(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getTrainingStatus(id, user.userId!, user.globalRole!);
   }
 
   @Get('datasets/:id/results')
-  getResults(@Param('id', ParseUUIDPipe) id: string) {
-    return this.datasets.getResults(id);
+  getResults(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getResults(id, user.userId!, user.globalRole!);
   }
 }

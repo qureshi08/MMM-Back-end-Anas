@@ -13,10 +13,12 @@ import {
 import { ProjectsService, ProjectWithCounts } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { AddProjectMemberDto } from './dto/add-project-member.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { assertWriteAccess } from '../../common/auth/permissions';
 import { Project } from './entities/project.entity';
+import { User } from '../users/entities/user.entity';
 
 @Controller('projects')
 export class ProjectsController {
@@ -29,13 +31,13 @@ export class ProjectsController {
   }
 
   @Get()
-  findAll(): Promise<ProjectWithCounts[]> {
-    return this.projects.findAll();
+  findAll(@CurrentUser() user: AuthenticatedUser): Promise<ProjectWithCounts[]> {
+    return this.projects.findAll(user.userId!, user.globalRole!);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string): Promise<ProjectWithCounts> {
-    return this.projects.findOne(id);
+  findOne(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<ProjectWithCounts> {
+    return this.projects.findOne(id, user.userId!, user.globalRole!);
   }
 
   @Patch(':id')
@@ -45,7 +47,7 @@ export class ProjectsController {
     @Body() dto: UpdateProjectDto,
   ): Promise<Project> {
     assertWriteAccess(user);
-    return this.projects.update(id, user.userId!, dto);
+    return this.projects.update(id, user.userId!, user.globalRole!, dto);
   }
 
   @Delete(':id')
@@ -55,6 +57,32 @@ export class ProjectsController {
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<void> {
     assertWriteAccess(user);
-    return this.projects.remove(id, user.userId!);
+    return this.projects.remove(id, user.userId!, user.globalRole!);
+  }
+
+  @Get(':id/members')
+  listMembers(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<User[]> {
+    return this.projects.listMembers(id, user.userId!, user.globalRole!);
+  }
+
+  /** Adds an existing tenant member to this project's visibility list — Master or the project owner only. */
+  @Post(':id/members')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  addMember(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: AddProjectMemberDto,
+  ): Promise<void> {
+    return this.projects.addMember(id, user.userId!, user.globalRole!, dto);
+  }
+
+  @Delete(':id/members/:userId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  removeMember(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('userId', ParseUUIDPipe) memberUserId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<void> {
+    return this.projects.removeMember(id, user.userId!, user.globalRole!, memberUserId);
   }
 }
