@@ -72,6 +72,12 @@ export function generateMockResults(payload: JobPayload): TrainingResults {
   }
   const totalIncremental = Object.values(incrementalByChannel).reduce((a, b) => a + b, 0) || 1;
 
+  const targetColumn = column_mapping.target_column;
+  const totalOutcome = df.reduce((sum, row) => sum + (Number(row[targetColumn]) || 0), 0) || totalIncremental;
+  const baselineOutcome = Math.max(0, totalOutcome - totalIncremental);
+
+  const avgErrorFraction = (8 + seededFraction('error') * 8) / 100;
+
   return {
     data_used: {
       date_column: column_mapping.date_column,
@@ -177,5 +183,29 @@ export function generateMockResults(payload: JobPayload): TrainingResults {
     }),
     status: 'completed',
     mock: true,
+    actual_vs_predicted: dates.map((date) => {
+      const row = df.find((r) => String(r[column_mapping.date_column]) === date);
+      const actual = row ? Number(row[targetColumn]) || 0 : 0;
+      const noise = (seededFraction(date + '_pred') - 0.5) * 2 * avgErrorFraction;
+      return { date, actual, predicted: actual * (1 + noise) };
+    }),
+    channel_confidence: mediaColumns.map((channel) => {
+      const spend = totalSpendByChannel[channel];
+      const incremental = incrementalByChannel[channel];
+      const roi = spend > 0 ? incremental / spend : 0;
+      const spread = 0.1 + seededFraction(channel + '_spread') * 0.2;
+      return {
+        channel: displayName(channel),
+        roi_low: roi * (1 - spread),
+        roi_high: roi * (1 + spread),
+        confidence_percent: 80 + seededFraction(channel + '_conf') * 15,
+      };
+    }),
+    baseline_vs_marketing: {
+      baseline_outcome: baselineOutcome,
+      marketing_outcome: totalIncremental,
+      baseline_percent: (baselineOutcome / (baselineOutcome + totalIncremental || 1)) * 100,
+      marketing_percent: (totalIncremental / (baselineOutcome + totalIncremental || 1)) * 100,
+    },
   };
 }

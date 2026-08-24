@@ -151,6 +151,31 @@ export interface TrainingResults {
   }>;
   status: 'completed';
   mock: true;
+
+  /**
+   * Three real fields the current contract doesn't have yet, flagged 2026-08-22 (Amna's Claude,
+   * relaying Hammad: "we can build a very good story around the results, right now nothing is
+   * happening"). All three are things a Bayesian model like Meridian plausibly already computes
+   * internally as part of its own methodology (a posterior gives a confidence range for free;
+   * separating baseline from marketing-driven outcome is the whole point of MMM) — not new
+   * modeling work, most likely just missing from what his engine currently writes into
+   * `results.json`. Optional here so the real contract can gain them with zero backend change the
+   * moment his engine does — populated in the mock generator now so the frontend "story" can be
+   * built and tested today, before his engine ships them for real.
+   */
+  actual_vs_predicted?: Array<{ date: string; actual: number; predicted: number }>;
+  channel_confidence?: Array<{
+    channel: string;
+    roi_low: number;
+    roi_high: number;
+    confidence_percent: number;
+  }>;
+  baseline_vs_marketing?: {
+    baseline_outcome: number;
+    marketing_outcome: number;
+    baseline_percent: number;
+    marketing_percent: number;
+  };
 }
 
 /**

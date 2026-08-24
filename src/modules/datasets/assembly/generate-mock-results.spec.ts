@@ -27,7 +27,7 @@ function realPayload() {
 }
 
 describe('generateMockResults', () => {
-  it('matches the real shape from Hammad\'s own sample output, one key per key', () => {
+  it('matches the real shape from Hammad\'s own sample output, plus the 3 real "story" fields added 2026-08-22', () => {
     const results = generateMockResults(realPayload());
     expect(Object.keys(results).sort()).toEqual(
       [
@@ -42,6 +42,9 @@ describe('generateMockResults', () => {
         'saturation_curves',
         'status',
         'mock',
+        'actual_vs_predicted',
+        'channel_confidence',
+        'baseline_vs_marketing',
       ].sort(),
     );
     expect(results.status).toBe('completed');
@@ -78,5 +81,28 @@ describe('generateMockResults', () => {
   it('always flags itself as mock in a real, checkable data quality warning', () => {
     const results = generateMockResults(realPayload());
     expect(results.data_quality_flags[0].message).toMatch(/simulated/i);
+  });
+
+  it('actual_vs_predicted has one real point per real date, using the real target column', () => {
+    const results = generateMockResults(realPayload());
+    expect(results.actual_vs_predicted).toHaveLength(results.data_used.row_count);
+    for (const point of results.actual_vs_predicted!) {
+      expect(point.actual).toBeGreaterThanOrEqual(0);
+      expect(point.predicted).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('channel_confidence brackets every channel\'s real roi between its low and high', () => {
+    const results = generateMockResults(realPayload());
+    for (const efficiency of results.channel_efficiency) {
+      const confidence = results.channel_confidence!.find((c) => c.channel === efficiency.channel)!;
+      expect(confidence.roi_low).toBeLessThanOrEqual(efficiency.roi);
+      expect(confidence.roi_high).toBeGreaterThanOrEqual(efficiency.roi);
+    }
+  });
+
+  it('baseline_vs_marketing percentages always add up to a real 100', () => {
+    const results = generateMockResults(realPayload());
+    expect(results.baseline_vs_marketing!.baseline_percent + results.baseline_vs_marketing!.marketing_percent).toBeCloseTo(100, 5);
   });
 });
