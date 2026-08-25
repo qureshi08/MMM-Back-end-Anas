@@ -29,8 +29,6 @@ import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-
 import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
-import { generateMockResults } from './assembly/generate-mock-results';
-import { computeTrainingProgress } from './assembly/compute-training-progress';
 import { findDateRange } from './assembly/find-date-range';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
@@ -471,15 +469,16 @@ export class DatasetsService {
   }
 
   /**
-   * Triggers Meridian model training. If `MODEL_ENGINE_URL` is set, calls the live Colab FastAPI
-   * endpoint over ngrok (`POST /train`), passing a real downloadable R2 link, not our internal
-   * storage key — his engine fetches over HTTP, it has no access to our bucket directly. Colab's
-   * `/train` returns immediately (`{"status": "accepted"}`, training runs in a background task on
-   * his side), so this call is fast either way, not a wait for training to finish.
+   * Triggers Meridian model training. Calls the live Colab FastAPI endpoint over ngrok
+   * (`POST /train`), passing a real downloadable R2 link, not our internal storage key — his
+   * engine fetches over HTTP, it has no access to our bucket directly. Colab's `/train` returns
+   * immediately (`{"status": "accepted"}`, training runs in a background task on his side), so
+   * this call is fast either way, not a wait for training to finish.
    *
-   * Only falls back to mock results when the live call was never attempted or didn't succeed —
-   * when it does succeed, `results` stays unset here so a real poll (`getTrainingStatus`/
-   * `getResults`) fills it in later, instead of a mock value briefly overwriting a real run.
+   * Real policy, Anas 2026-08-24: "we will never use mock numbers anywhere, always real now."
+   * The mock fallback that used to run here on a misconfigured or unreachable engine is gone —
+   * if the real engine can't be reached, this throws a real error instead of quietly starting a
+   * "run" that was never going to produce anything but fake numbers.
    *
    * Refuses to start a second run while one is already in progress. Real bug found in testing:
    * nothing on our side or Colab's queues jobs, so two real Meridian trainings could run
@@ -497,26 +496,26 @@ export class DatasetsService {
       }
     }
 
-    const { jobId, datasetReference, payload } = await this.assemble(id, requesterId, globalRole);
+    const { jobId, datasetReference } = await this.assemble(id, requesterId, globalRole);
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
-    let isLiveCallSuccess = false;
+    if (!modelEngineUrl) {
+      throw new BadRequestException('The model engine is not configured. Training cannot start.');
+    }
 
-    if (modelEngineUrl) {
-      try {
-        const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
-        const res = await fetch(`${modelEngineUrl}/train`, {
-          method: 'POST',
-          headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
-          body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
-        });
-        isLiveCallSuccess = res.ok;
-        if (!res.ok) {
-          console.error(`MODEL_ENGINE_URL /train responded ${res.status}, falling back to mock.`);
-        }
-      } catch (err) {
-        console.error('Failed to reach MODEL_ENGINE_URL:', err);
-      }
+    let res: Response;
+    try {
+      const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
+      res = await fetch(`${modelEngineUrl}/train`, {
+        method: 'POST',
+        headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
+      });
+    } catch (err) {
+      throw new BadRequestException(`Could not reach the model engine to start training: ${err}`);
+    }
+    if (!res.ok) {
+      throw new BadRequestException(`The model engine rejected the training request (status ${res.status}).`);
     }
 
     await this.repo().update(id, {
@@ -524,16 +523,21 @@ export class DatasetsService {
       trainingStartedAt: new Date(),
       trainedByUserId: requesterId,
       notifiedAt: null,
-      ...(isLiveCallSuccess ? {} : { results: generateMockResults(payload as Parameters<typeof generateMockResults>[0]) }),
     });
     return this.findOne(id, requesterId, globalRole);
   }
 
   /**
-   * Queries status of a training job. If `MODEL_ENGINE_URL` is configured, queries Colab's
-   * `/status/:jobId`, passing through a real "failed" status and error message — Colab's own
-   * `job_processor.py` writes exactly that when validation or training genuinely fails, real
-   * training can fail in ways the mock never does. Otherwise computes status fresh from elapsed time.
+   * Queries status of a real training job against Colab's `/status/:jobId`, passing through a
+   * real "failed" status and error message — Colab's own `job_processor.py` writes exactly that
+   * when validation or training genuinely fails.
+   *
+   * Real policy, Anas 2026-08-24: "we will never use mock numbers anywhere, always real now."
+   * The elapsed-time fake-progress fallback that used to run here on a transient network error is
+   * gone — a real hiccup reaching the engine now reports "still running, progress unknown" rather
+   * than inventing a percentage. The job's own real trainingStatus in the database (RUNNING) is
+   * still trustworthy even when this one poll couldn't reach the engine; only an explicit
+   * engine-reported failure or a confirmed-dead job (404) marks it FAILED.
    */
   async getTrainingStatus(
     id: string,
@@ -546,58 +550,64 @@ export class DatasetsService {
     }
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
-    if (modelEngineUrl && dataset.jobId) {
-      try {
-        const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`, {
-          headers: modelEngineHeaders(),
-        });
-        if (res.ok) {
-          const data = (await res.json()) as { status: string; progress: number; error_message?: string | null };
-          const status =
-            data.status === 'completed'
-              ? TrainingStatus.COMPLETED
-              : data.status === 'failed'
-                ? TrainingStatus.FAILED
-                : TrainingStatus.RUNNING;
-
-          if (status === TrainingStatus.FAILED) {
-            // Only place a real failure is first observed — getResults() never gets called for a
-            // job that failed before producing anything, so the completion email's persist-then-
-            // notify path can't cover this case, it needs its own.
-            await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
-            await this.notifyIfNeeded(id, TrainingStatus.FAILED, data.error_message);
-          }
-
-          return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
-        }
-
-        // Real gap found 2026-08-20: a 404 here means the engine has never heard of this
-        // job_id — always a dead job, never transient, because the only real cause is the
-        // Colab process having restarted since the job was submitted (its job registry lives
-        // only in that process's memory, nothing durable backs it). Previously this silently
-        // fell through to the elapsed-time mock fallback below, which just faked a progress
-        // bar for a job that was never coming back. Report it as a real, permanent failure
-        // instead — same path as an engine-reported failure, so notifyIfNeeded still fires.
-        if (res.status === 404) {
-          const errorMessage =
-            'This training run is no longer known to the model engine, most likely because the ' +
-            'Colab session restarted since it was submitted. Start training again.';
-          await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
-          await this.notifyIfNeeded(id, TrainingStatus.FAILED, errorMessage);
-          return { status: TrainingStatus.FAILED, progress: 0, jobId: dataset.jobId, errorMessage };
-        }
-      } catch (err) {
-        console.error('Failed to query MODEL_ENGINE_URL status:', err);
-      }
+    if (!modelEngineUrl || !dataset.jobId) {
+      throw new BadRequestException('The model engine is not configured. Cannot check real training status.');
     }
 
-    const { status, progress } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
-    return { status, progress, jobId: dataset.jobId };
+    try {
+      const res = await fetch(`${modelEngineUrl}/status/${dataset.jobId}`, {
+        headers: modelEngineHeaders(),
+      });
+      if (res.ok) {
+        const data = (await res.json()) as { status: string; progress: number; error_message?: string | null };
+        const status =
+          data.status === 'completed'
+            ? TrainingStatus.COMPLETED
+            : data.status === 'failed'
+              ? TrainingStatus.FAILED
+              : TrainingStatus.RUNNING;
+
+        if (status === TrainingStatus.FAILED) {
+          // Only place a real failure is first observed — getResults() never gets called for a
+          // job that failed before producing anything, so the completion email's persist-then-
+          // notify path can't cover this case, it needs its own.
+          await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
+          await this.notifyIfNeeded(id, TrainingStatus.FAILED, data.error_message);
+        }
+
+        return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
+      }
+
+      // A 404 here means the engine has never heard of this job_id — always a dead job, never
+      // transient, because the only real cause is the Colab process having restarted since the
+      // job was submitted (its job registry lives only in that process's memory, nothing durable
+      // backs it). Reported as a real, permanent failure, same path as an engine-reported
+      // failure, so notifyIfNeeded still fires.
+      if (res.status === 404) {
+        const errorMessage =
+          'This training run is no longer known to the model engine, most likely because the ' +
+          'Colab session restarted since it was submitted. Start training again.';
+        await this.repo().update(id, { trainingStatus: TrainingStatus.FAILED });
+        await this.notifyIfNeeded(id, TrainingStatus.FAILED, errorMessage);
+        return { status: TrainingStatus.FAILED, progress: 0, jobId: dataset.jobId, errorMessage };
+      }
+
+      throw new BadRequestException(`The model engine responded with status ${res.status}.`);
+    } catch (err) {
+      // A real network hiccup reaching the engine doesn't mean the job died — Colab's own
+      // background training keeps running regardless of whether this one poll landed. Report
+      // "still running, progress unknown" rather than failing the whole job or faking a number.
+      console.error('Failed to query MODEL_ENGINE_URL status:', err);
+      return {
+        status: TrainingStatus.RUNNING,
+        progress: 0,
+        jobId: dataset.jobId,
+        errorMessage: 'Could not reach the model engine just now — still checking, this is not a failure.',
+      };
+    }
   }
 
-  /**
-   * Fetches results of a completed model run. If `MODEL_ENGINE_URL` is configured, queries Colab's `/results/:jobId`.
-   */
+  /** Fetches real results of a completed model run from Colab's `/results/:jobId`. */
   async getResults(id: string, requesterId: string, globalRole: GlobalRole) {
     const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.trainingStartedAt) {
@@ -605,29 +615,37 @@ export class DatasetsService {
     }
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
-    if (modelEngineUrl && dataset.jobId) {
-      try {
-        const res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`, {
-          headers: modelEngineHeaders(),
-        });
-        if (res.ok) {
-          const liveResults = await res.json();
-          await this.repo().update(id, {
-            trainingStatus: TrainingStatus.COMPLETED,
-            results: liveResults,
-          });
-          await this.notifyIfNeeded(id, TrainingStatus.COMPLETED);
-          return liveResults;
-        }
-      } catch (err) {
-        console.error('Failed to fetch results from MODEL_ENGINE_URL:', err);
-      }
+    if (!modelEngineUrl || !dataset.jobId) {
+      throw new BadRequestException('The model engine is not configured. Cannot fetch real results.');
     }
 
-    const { status } = computeTrainingProgress(dataset.trainingStartedAt, new Date());
-    if (status !== 'completed') {
-      throw new BadRequestException('Training is still running, results are not ready yet.');
+    let res: Response;
+    try {
+      res = await fetch(`${modelEngineUrl}/results/${dataset.jobId}`, {
+        headers: modelEngineHeaders(),
+      });
+    } catch (err) {
+      throw new BadRequestException(`Could not reach the model engine to fetch real results: ${err}`);
     }
-    return dataset.results;
+
+    if (res.ok) {
+      const liveResults = await res.json();
+      await this.repo().update(id, {
+        trainingStatus: TrainingStatus.COMPLETED,
+        results: liveResults,
+      });
+      await this.notifyIfNeeded(id, TrainingStatus.COMPLETED);
+      return liveResults;
+    }
+
+    if (dataset.trainingStatus === TrainingStatus.COMPLETED && dataset.results) {
+      // Already confirmed completed and saved from a prior real poll — return the real stored
+      // results rather than failing just because this particular re-fetch didn't succeed.
+      return dataset.results;
+    }
+
+    throw new BadRequestException(
+      `Training is still running, or the model engine could not be reached (status ${res.status}). Results are not ready yet.`,
+    );
   }
 }
