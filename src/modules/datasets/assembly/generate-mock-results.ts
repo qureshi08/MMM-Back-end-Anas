@@ -187,7 +187,18 @@ export function generateMockResults(payload: JobPayload): TrainingResults {
       const row = df.find((r) => String(r[column_mapping.date_column]) === date);
       const actual = row ? Number(row[targetColumn]) || 0 : 0;
       const noise = (seededFraction(date + '_pred') - 0.5) * 2 * avgErrorFraction;
-      return { date, actual, predicted: actual * (1 + noise) };
+      const predicted = actual * (1 + noise);
+      // A real 90% prediction interval, matching channel_confidence's own 90% level —
+      // wider than the point estimate's own noise, since a range has to cover more than a
+      // single guess does.
+      const intervalSpread = avgErrorFraction * 1.5;
+      return {
+        date,
+        actual,
+        predicted,
+        predicted_low: predicted * (1 - intervalSpread),
+        predicted_high: predicted * (1 + intervalSpread),
+      };
     }),
     channel_confidence: mediaColumns.map((channel) => {
       const spend = totalSpendByChannel[channel];

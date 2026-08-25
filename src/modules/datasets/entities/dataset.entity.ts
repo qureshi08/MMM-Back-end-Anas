@@ -163,7 +163,19 @@ export interface TrainingResults {
    * moment his engine does — populated in the mock generator now so the frontend "story" can be
    * built and tested today, before his engine ships them for real.
    */
-  actual_vs_predicted?: Array<{ date: string; actual: number; predicted: number }>;
+  /**
+   * predicted_low/predicted_high (a real 90% prediction interval, matching channel_confidence's
+   * own 90% level for consistency) are per-point optional on top of the array's own optionality —
+   * a real gap in the interval bounds shouldn't hide the actual/predicted line if that part is
+   * fine, see standardize_results.py's build_actual_vs_predicted for the real fallback logic.
+   */
+  actual_vs_predicted?: Array<{
+    date: string;
+    actual: number;
+    predicted: number;
+    predicted_low?: number;
+    predicted_high?: number;
+  }>;
   channel_confidence?: Array<{
     channel: string;
     roi_low: number;

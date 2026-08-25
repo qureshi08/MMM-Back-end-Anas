@@ -92,6 +92,14 @@ describe('generateMockResults', () => {
     }
   });
 
+  it('actual_vs_predicted brackets every real predicted value between its own low and high', () => {
+    const results = generateMockResults(realPayload());
+    for (const point of results.actual_vs_predicted!) {
+      expect(point.predicted_low).toBeLessThanOrEqual(point.predicted);
+      expect(point.predicted_high).toBeGreaterThanOrEqual(point.predicted);
+    }
+  });
+
   it('channel_confidence brackets every channel\'s real roi between its low and high', () => {
     const results = generateMockResults(realPayload());
     for (const efficiency of results.channel_efficiency) {
