@@ -623,11 +623,30 @@ export class DatasetsService {
     }
   }
 
-  /** Fetches real results of a completed model run from Colab's `/results/:jobId`. */
+  /**
+   * Fetches real results of a model run.
+   *
+   * Real distinction, clarified 2026-08-27 after "always fetch live" (2026-08-24) turned out to
+   * be too broad: "never fake a result" and "never lose a real result" are two different rules.
+   * Once a run is genuinely confirmed COMPLETED and its real results are saved, that's a real,
+   * immutable fact — it gets served straight from the database from then on, with no dependency
+   * on Colab still being up. Colab's own job memory doesn't survive a restart anyway (see the 404
+   * handling in getTrainingStatus), so requiring a live round-trip for an already-finished run
+   * would make real, already-earned results disappear the moment the notebook closes — the exact
+   * regression Anas caught.
+   *
+   * The "always real, never mock" rule still applies to the part that was actually the problem:
+   * a run that ISN'T confirmed completed yet always gets checked live, never guessed at from a
+   * stale or absent local state.
+   */
   async getResults(id: string, requesterId: string, globalRole: GlobalRole) {
     const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.trainingStartedAt) {
       throw new BadRequestException('Training has not started for this dataset yet.');
+    }
+
+    if (dataset.trainingStatus === TrainingStatus.COMPLETED && dataset.results) {
+      return dataset.results;
     }
 
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
@@ -651,11 +670,6 @@ export class DatasetsService {
     }
 
     const liveResults = await res.json();
-    // Still saved for audit/history purposes — but never read back from here. Real gap found
-    // 2026-08-24: a saved copy going stale (or never actually landing) is invisible until
-    // someone's looking at old numbers without knowing it. Every real request for results now
-    // goes straight to the model engine, live, every time — the save above is a record, not a
-    // cache this method is ever allowed to trust.
     await this.repo().update(id, {
       trainingStatus: TrainingStatus.COMPLETED,
       results: liveResults,
