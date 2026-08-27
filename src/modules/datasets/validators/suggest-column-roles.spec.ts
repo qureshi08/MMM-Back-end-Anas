@@ -70,4 +70,23 @@ describe('suggestColumnRoles', () => {
     expect(result.targetColumn).toBe('TotalRevenue');
     expect(result.mediaColumns).toEqual(['TVSpend']);
   });
+
+  it('widened 2026-08-27: recognizes a B2B/app-style target column, not just revenue/subscriptions', () => {
+    expect(suggestColumnRoles(['Day', 'New Leads']).targetColumn).toBe('New Leads');
+    expect(suggestColumnRoles(['Day', 'App Installs']).targetColumn).toBe('App Installs');
+    expect(suggestColumnRoles(['Day', 'Signups']).targetColumn).toBe('Signups');
+    expect(suggestColumnRoles(['Day', 'Purchases']).targetColumn).toBe('Purchases');
+  });
+
+  it('widened 2026-08-27: recognizes real date columns beyond date/week/period ("Day", "Month", "Timestamp")', () => {
+    expect(suggestColumnRoles(['Day', 'Revenue']).dateColumn).toBe('Day');
+    expect(suggestColumnRoles(['Month', 'Revenue']).dateColumn).toBe('Month');
+    expect(suggestColumnRoles(['Timestamp', 'Revenue']).dateColumn).toBe('Timestamp');
+    expect(suggestColumnRoles(['Week End', 'Revenue']).dateColumn).toBe('Week End');
+  });
+
+  it('widened 2026-08-27: recognizes classic control variables beyond holiday/promo/discount/competitor', () => {
+    const result = suggestColumnRoles(['Date', 'Revenue', 'Weather Index', 'Seasonality', 'Temperature']);
+    expect(result.controlColumns).toEqual(['Weather Index', 'Seasonality', 'Temperature']);
+  });
 });

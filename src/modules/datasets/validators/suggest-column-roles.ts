@@ -39,14 +39,19 @@ function matches(pattern: RegExp, columnName: string): boolean {
   return pattern.test(normalize(columnName));
 }
 
-const DATE_PATTERN = /\b(date|week[\s_]?start|week|period)\b/;
-const TARGET_PATTERN = /\b(revenue|subscriptions?|conversions?|customers?|orders?|sales)\b/;
+// Widened 2026-08-27 (Anas: "fix everything") past the one real sample dataset's own vocabulary —
+// real MMM datasets vary a lot by business type (B2B leads vs. e-commerce revenue vs. app
+// installs), so each list now covers the common real spellings for that role, not just the ones
+// the one sample file happens to use.
+const DATE_PATTERN = /\b(date|day|month|timestamp|week ?start|week ?end|period ?start|period ?end|week|period)\b/;
+const TARGET_PATTERN =
+  /\b(revenue|subscriptions?|conversions?|customers?|orders?|sales|signups?|leads?|installs?|downloads?|purchases?|transactions?|kpi)\b/;
 const MEDIA_PATTERN = /\b(cost|spends?)\b/;
 // No trailing \b here, deliberately — these need to match a real plural or suffixed form too
-// ("holidays", "promotions", "competitor's") the same way the old substring-based version did,
-// unlike DATE_PATTERN/TARGET_PATTERN/MEDIA_PATTERN above, which need the trailing boundary to
-// correctly stay off "Dates_School_Holidays" (a real control column, not a date column).
-const CONTROL_PATTERN = /\b(holiday|promo(?:tion)?|discount|competitor)/;
+// ("holidays", "promotions", "seasonality", "competitor's") the same way the old substring-based
+// version did, unlike DATE_PATTERN/TARGET_PATTERN/MEDIA_PATTERN above, which need the trailing
+// boundary to correctly stay off "Dates_School_Holidays" (a real control column, not a date one).
+const CONTROL_PATTERN = /\b(holiday|promo(?:tion)?|discount|competitor|weather|season|temperature|recession|inflation)/;
 const ORGANIC_PATTERN = /\borganic/;
 
 export function suggestColumnRoles(columns: string[]): ColumnRoleSuggestions {
