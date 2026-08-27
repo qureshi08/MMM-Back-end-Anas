@@ -558,6 +558,17 @@ export class DatasetsService {
       return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
     }
 
+    // Same real regression as getResults() had, 2026-08-27: a run already confirmed COMPLETED
+    // with real saved results is a done, immutable fact — it must never be re-checked against a
+    // Colab session that may have since restarted. Without this, reloading the page on an
+    // already-finished dataset would poll /status, get a 404 because Colab's job memory doesn't
+    // survive a restart, and overwrite a real completed result with FAILED. Report the real,
+    // already-known outcome directly instead.
+    if (dataset.trainingStatus === TrainingStatus.COMPLETED && dataset.results) {
+      const step = trainingStepFor(1.0);
+      return { status: TrainingStatus.COMPLETED, progress: 1, jobId: dataset.jobId, ...(step ?? {}) };
+    }
+
     const modelEngineUrl = process.env.MODEL_ENGINE_URL;
     if (!modelEngineUrl || !dataset.jobId) {
       throw new BadRequestException('The model engine is not configured. Cannot check real training status.');
