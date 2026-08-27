@@ -30,6 +30,7 @@ import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { findDateRange } from './assembly/find-date-range';
+import { trainingStepFor } from './assembly/training-step-labels';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -543,7 +544,15 @@ export class DatasetsService {
     id: string,
     requesterId: string,
     globalRole: GlobalRole,
-  ): Promise<{ status: string; progress: number; jobId: string | null; errorMessage?: string | null }> {
+  ): Promise<{
+    status: string;
+    progress: number;
+    jobId: string | null;
+    errorMessage?: string | null;
+    stepNumber?: number;
+    totalSteps?: number;
+    stepLabel?: string;
+  }> {
     const dataset = await this.findOne(id, requesterId, globalRole);
     if (!dataset.trainingStartedAt) {
       return { status: TrainingStatus.NOT_STARTED, progress: 0, jobId: dataset.jobId };
@@ -575,7 +584,14 @@ export class DatasetsService {
           await this.notifyIfNeeded(id, TrainingStatus.FAILED, data.error_message);
         }
 
-        return { status, progress: data.progress ?? 0, jobId: dataset.jobId, errorMessage: data.error_message };
+        const step = trainingStepFor(data.progress ?? 0);
+        return {
+          status,
+          progress: data.progress ?? 0,
+          jobId: dataset.jobId,
+          errorMessage: data.error_message,
+          ...(step ?? {}),
+        };
       }
 
       // A 404 here means the engine has never heard of this job_id — always a dead job, never
@@ -628,24 +644,23 @@ export class DatasetsService {
       throw new BadRequestException(`Could not reach the model engine to fetch real results: ${err}`);
     }
 
-    if (res.ok) {
-      const liveResults = await res.json();
-      await this.repo().update(id, {
-        trainingStatus: TrainingStatus.COMPLETED,
-        results: liveResults,
-      });
-      await this.notifyIfNeeded(id, TrainingStatus.COMPLETED);
-      return liveResults;
+    if (!res.ok) {
+      throw new BadRequestException(
+        `Training is still running, or the model engine could not be reached (status ${res.status}). Results are not ready yet.`,
+      );
     }
 
-    if (dataset.trainingStatus === TrainingStatus.COMPLETED && dataset.results) {
-      // Already confirmed completed and saved from a prior real poll — return the real stored
-      // results rather than failing just because this particular re-fetch didn't succeed.
-      return dataset.results;
-    }
-
-    throw new BadRequestException(
-      `Training is still running, or the model engine could not be reached (status ${res.status}). Results are not ready yet.`,
-    );
+    const liveResults = await res.json();
+    // Still saved for audit/history purposes — but never read back from here. Real gap found
+    // 2026-08-24: a saved copy going stale (or never actually landing) is invisible until
+    // someone's looking at old numbers without knowing it. Every real request for results now
+    // goes straight to the model engine, live, every time — the save above is a record, not a
+    // cache this method is ever allowed to trust.
+    await this.repo().update(id, {
+      trainingStatus: TrainingStatus.COMPLETED,
+      results: liveResults,
+    });
+    await this.notifyIfNeeded(id, TrainingStatus.COMPLETED);
+    return liveResults;
   }
 }

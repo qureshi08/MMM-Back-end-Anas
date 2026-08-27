@@ -58,4 +58,16 @@ describe('suggestColumnRoles', () => {
     expect(result.dateColumn).toBeNull();
     expect(result.targetColumn).toBeNull();
   });
+
+  it('real regex fix: matches "week_start" as a real date column, which the old token-splitting version could never do', () => {
+    const result = suggestColumnRoles(['week_start', 'Revenue']);
+    expect(result.dateColumn).toBe('week_start');
+  });
+
+  it('real regex fix: matches camelCase column names with no separators at all ("TVSpend", "WeekStart")', () => {
+    const result = suggestColumnRoles(['WeekStart', 'TotalRevenue', 'TVSpend']);
+    expect(result.dateColumn).toBe('WeekStart');
+    expect(result.targetColumn).toBe('TotalRevenue');
+    expect(result.mediaColumns).toEqual(['TVSpend']);
+  });
 });
