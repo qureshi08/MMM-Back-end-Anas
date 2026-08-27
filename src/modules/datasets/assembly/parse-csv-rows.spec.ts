@@ -20,20 +20,22 @@ describe('parseCsvRows', () => {
   it('parses the real sample dataset, matching Hammad\'s exact contract example shape', () => {
     const buffer = readFileSync(join(__dirname, '../../../../samples/sample-dataset.csv'));
     const rows = parseCsvRows(buffer);
-    expect(rows.length).toBe(16);
+    // Real dataset swapped 2026-08-27 (Anas: use Resources/Handover MMM - Hammad/clean_test_data.csv
+    // as the real sample, not the old 16-row placeholder) — 157 real weeks, 2022-01-03 to 2024-12-30.
+    expect(rows.length).toBe(157);
     expect(rows[0]).toEqual({
-      Date: '2025-01-06',
-      'Accounts Subscriptions': 3251,
-      'Google Display Cost': 680.32,
-      'Google Branded Paid Search Cost': 2387.74,
+      Date: '2022-01-03',
+      'Accounts Subscriptions': 4182,
+      'Google Display Cost': 5.2935,
+      'Google Branded Paid Search Cost': 3580.52,
       'TV Cost': 0,
-      'Google Generic Paid Search Cost': 3446.52,
+      'Google Generic Paid Search Cost': 5322.2,
       'Influencers Cost': 0,
-      'Meta Cost': 11075.25,
-      'YouTube Cost': 6336.37,
-      Dates_School_Holidays: 1,
-      'Competitors Promotion': 2,
-      Promotion: 18,
+      'Meta Cost': 11637.193,
+      'YouTube Cost': 5572.056,
+      Dates_School_Holidays: 0,
+      'Competitors Promotion': 14,
+      Promotion: 14,
     });
   });
 });
