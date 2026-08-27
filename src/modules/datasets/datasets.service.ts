@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { getTenantContext } from '../../common/tenant/tenant-context';
-import { ChannelCombination, Dataset, DatasetStatus, TrainingStatus } from './entities/dataset.entity';
+import { ChannelCombination, Dataset, DatasetStatus, ModelType, TrainingStatus } from './entities/dataset.entity';
 import { CreateDatasetDto } from './dto/create-dataset.dto';
 import { ConfigureDatasetDto } from './dto/configure-dataset.dto';
 import { OptimizeDatasetDto } from './dto/optimize-dataset.dto';
@@ -48,6 +48,16 @@ function modelEngineHeaders(extra?: Record<string, string>): Record<string, stri
     ...(secret ? { 'X-Internal-Secret': secret } : {}),
     ...extra,
   };
+}
+
+/**
+ * Real second engine, 2026-08-27 — Hammad's PyMC-Marketing handover. A separate Colab notebook
+ * means a separate ngrok tunnel, so a separate URL — same /train, /status, /results contract as
+ * Meridian, same shared secret, just a different host. `MODEL_ENGINE_URL` stays Meridian's own
+ * variable name unchanged, so nothing about the already-working engine needs touching.
+ */
+function modelEngineUrlFor(modelType: ModelType): string | undefined {
+  return modelType === ModelType.PYMC ? process.env.MODEL_ENGINE_URL_PYMC : process.env.MODEL_ENGINE_URL;
 }
 
 /**
@@ -470,11 +480,22 @@ export class DatasetsService {
   }
 
   /**
-   * Triggers Meridian model training. Calls the live Colab FastAPI endpoint over ngrok
-   * (`POST /train`), passing a real downloadable R2 link, not our internal storage key — his
-   * engine fetches over HTTP, it has no access to our bucket directly. Colab's `/train` returns
-   * immediately (`{"status": "accepted"}`, training runs in a background task on his side), so
-   * this call is fast either way, not a wait for training to finish.
+   * Triggers real model training on the dataset's own chosen engine (Meridian or PyMC-Marketing —
+   * see `modelEngineUrlFor`). Calls the live Colab FastAPI endpoint over ngrok (`POST /train`),
+   * passing a real downloadable R2 link, not our internal storage key — the engine fetches over
+   * HTTP, it has no access to our bucket directly.
+   *
+   * Meridian's `/train` returns immediately (`{"status": "accepted"}`, training runs in a
+   * background task on his side) — this call just awaits that quick response normally.
+   *
+   * PyMC's `/train` is a genuinely different, real design: it's synchronous — the HTTP request
+   * doesn't return until the *entire* training run finishes, several minutes later. Awaiting that
+   * directly would hold this whole request (and the frontend's own request to us) open for
+   * minutes, well past any real proxy's timeout. Instead, this fires the request with a short
+   * client-side abort and treats the abort as success: FastAPI runs a sync `def` route handler in
+   * a thread pool with no client-disconnect check, so the real training keeps running server-side
+   * to completion regardless of whether we're still listening — `getTrainingStatus`/`getResults`
+   * poll it separately from here on, exactly like Meridian's async design already works.
    *
    * Real policy, Anas 2026-08-24: "we will never use mock numbers anywhere, always real now."
    * The mock fallback that used to run here on a misconfigured or unreachable engine is gone —
@@ -499,24 +520,49 @@ export class DatasetsService {
 
     const { jobId, datasetReference } = await this.assemble(id, requesterId, globalRole);
 
-    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    const modelEngineUrl = modelEngineUrlFor(existing.modelType);
     if (!modelEngineUrl) {
-      throw new BadRequestException('The model engine is not configured. Training cannot start.');
+      throw new BadRequestException(
+        `No model engine is configured for ${existing.modelType}. Training cannot start.`,
+      );
     }
 
-    let res: Response;
-    try {
-      const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
-      res = await fetch(`${modelEngineUrl}/train`, {
-        method: 'POST',
-        headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
-        body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
-      });
-    } catch (err) {
-      throw new BadRequestException(`Could not reach the model engine to start training: ${err}`);
-    }
-    if (!res.ok) {
-      throw new BadRequestException(`The model engine rejected the training request (status ${res.status}).`);
+    const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
+
+    if (existing.modelType === ModelType.PYMC) {
+      // Fire-and-abort, deliberately not awaited to completion — see this method's own comment.
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      try {
+        await fetch(`${modelEngineUrl}/train`, {
+          method: 'POST',
+          headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
+          signal: controller.signal,
+        });
+        // If it somehow returns within 8s, that's fine too — nothing else to check, the request
+        // reached the engine either way.
+      } catch (err) {
+        if (!(err instanceof Error) || err.name !== 'AbortError') {
+          throw new BadRequestException(`Could not reach the model engine to start training: ${err}`);
+        }
+      } finally {
+        clearTimeout(timeout);
+      }
+    } else {
+      let res: Response;
+      try {
+        res = await fetch(`${modelEngineUrl}/train`, {
+          method: 'POST',
+          headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
+        });
+      } catch (err) {
+        throw new BadRequestException(`Could not reach the model engine to start training: ${err}`);
+      }
+      if (!res.ok) {
+        throw new BadRequestException(`The model engine rejected the training request (status ${res.status}).`);
+      }
     }
 
     await this.repo().update(id, {
@@ -565,11 +611,11 @@ export class DatasetsService {
     // survive a restart, and overwrite a real completed result with FAILED. Report the real,
     // already-known outcome directly instead.
     if (dataset.trainingStatus === TrainingStatus.COMPLETED && dataset.results) {
-      const step = trainingStepFor(1.0);
+      const step = trainingStepFor(1.0, dataset.modelType);
       return { status: TrainingStatus.COMPLETED, progress: 1, jobId: dataset.jobId, ...(step ?? {}) };
     }
 
-    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    const modelEngineUrl = modelEngineUrlFor(dataset.modelType);
     if (!modelEngineUrl || !dataset.jobId) {
       throw new BadRequestException('The model engine is not configured. Cannot check real training status.');
     }
@@ -595,7 +641,7 @@ export class DatasetsService {
           await this.notifyIfNeeded(id, TrainingStatus.FAILED, data.error_message);
         }
 
-        const step = trainingStepFor(data.progress ?? 0);
+        const step = trainingStepFor(data.progress ?? 0, dataset.modelType);
         return {
           status,
           progress: data.progress ?? 0,
@@ -660,7 +706,7 @@ export class DatasetsService {
       return dataset.results;
     }
 
-    const modelEngineUrl = process.env.MODEL_ENGINE_URL;
+    const modelEngineUrl = modelEngineUrlFor(dataset.modelType);
     if (!modelEngineUrl || !dataset.jobId) {
       throw new BadRequestException('The model engine is not configured. Cannot fetch real results.');
     }

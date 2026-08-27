@@ -13,9 +13,16 @@ import { Project } from '../../projects/entities/project.entity';
  * and flow as Cassandra's own model-type picker, deliberately built to
  * scale to more models later. Today it only has one real value, that's a
  * fact about the roadmap, not a reason to remove the choice from the API.
+ *
+ * PYMC added 2026-08-27 — Hammad's second real handover
+ * (`Resources/Handover MMM - Hammad/PyMC Testing Published/`), this is
+ * exactly the moment the comment above was written for. Routed to a
+ * separate real engine (`MODEL_ENGINE_URL_PYMC`), same job payload shape,
+ * same /train, /status, /results contract — see DatasetsService.engineFor.
  */
 export enum ModelType {
   MERIDIAN = 'meridian',
+  PYMC = 'pymc',
 }
 
 export enum DatasetStatus {
