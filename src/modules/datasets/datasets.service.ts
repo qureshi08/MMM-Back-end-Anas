@@ -491,11 +491,13 @@ export class DatasetsService {
    * PyMC's `/train` is a genuinely different, real design: it's synchronous — the HTTP request
    * doesn't return until the *entire* training run finishes, several minutes later. Awaiting that
    * directly would hold this whole request (and the frontend's own request to us) open for
-   * minutes, well past any real proxy's timeout. Instead, this fires the request with a short
-   * client-side abort and treats the abort as success: FastAPI runs a sync `def` route handler in
-   * a thread pool with no client-disconnect check, so the real training keeps running server-side
-   * to completion regardless of whether we're still listening — `getTrainingStatus`/`getResults`
-   * poll it separately from here on, exactly like Meridian's async design already works.
+   * minutes, well past any real proxy's timeout. This fires the request and deliberately never
+   * awaits or aborts it — just lets it run in the background on our own server, still connected,
+   * until it finishes naturally. (A short client-side abort was tried first and confirmed live
+   * *not* to be safe here — killing the connection through ngrok's tunnel kills the request
+   * server-side too, so the job never even reached "running" in Redis.) `getTrainingStatus`/
+   * `getResults` poll the real job separately from here on, exactly like Meridian's async design
+   * already works.
    *
    * Real policy, Anas 2026-08-24: "we will never use mock numbers anywhere, always real now."
    * The mock fallback that used to run here on a misconfigured or unreachable engine is gone —
@@ -530,25 +532,23 @@ export class DatasetsService {
     const downloadUrl = await this.storage.getDownloadUrl(datasetReference);
 
     if (existing.modelType === ModelType.PYMC) {
-      // Fire-and-abort, deliberately not awaited to completion — see this method's own comment.
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      try {
-        await fetch(`${modelEngineUrl}/train`, {
-          method: 'POST',
-          headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
-          body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
-          signal: controller.signal,
-        });
-        // If it somehow returns within 8s, that's fine too — nothing else to check, the request
-        // reached the engine either way.
-      } catch (err) {
-        if (!(err instanceof Error) || err.name !== 'AbortError') {
-          throw new BadRequestException(`Could not reach the model engine to start training: ${err}`);
-        }
-      } finally {
-        clearTimeout(timeout);
-      }
+      // Fire-and-forget, deliberately not awaited — see this method's own comment. Real incident
+      // 2026-08-27: an earlier version of this used a short client-side AbortController timeout,
+      // assuming the server-side thread would keep running regardless of the client disconnecting
+      // (true for a plain direct connection to a sync FastAPI route). It wasn't true here —
+      // confirmed live, every real attempt 404'd on the very first status poll, meaning the job
+      // never even reached "running" in Redis. Aborting the client connection through ngrok's
+      // tunnel evidently kills the request server-side too, not just our own end of it. The real
+      // fix: never abort the connection at all, just don't block this method's return on it —
+      // the fetch keeps running, still connected, on our own server in the background, until the
+      // real training genuinely finishes.
+      fetch(`${modelEngineUrl}/train`, {
+        method: 'POST',
+        headers: modelEngineHeaders({ 'Content-Type': 'application/json' }),
+        body: JSON.stringify({ job_id: jobId, dataset_reference: downloadUrl }),
+      }).catch((err) => {
+        console.error(`Background PyMC /train call failed for job ${jobId}:`, err);
+      });
     } else {
       let res: Response;
       try {
