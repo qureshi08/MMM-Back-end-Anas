@@ -276,8 +276,25 @@ export class Dataset extends BaseEntity {
    * Hammad's contract: "required only if kpi_type is non_revenue; otherwise null." Real dollar
    * value of one unit of the KPI (subscriptions, signups, ...), needed to convert a non-revenue
    * outcome into a real dollar figure the model can optimize against.
+   *
+   * Real bug found 2026-08-27, in production, mid-integration-test: Postgres `numeric` columns
+   * come back from node-postgres/TypeORM as *strings*, not numbers — a real precision-safety
+   * default, not a bug in the driver. Without a transformer, `dataset.revenuePerKpiValue` was
+   * silently a string everywhere it got read after a DB round-trip, and `buildJobPayload()` sent
+   * that string straight through as JSON — which Python correctly parses as a `str`, not a
+   * `float`. PyMC's real pipeline then crashed on `float * revenue_per_kpi_value` with `can't
+   * multiply sequence by non-int of type 'float'`. The transformer below is the real, permanent
+   * fix — coerces to a real number on every read, not just at this one call site.
    */
-  @Column({ name: 'revenue_per_kpi_value', type: 'numeric', nullable: true })
+  @Column({
+    name: 'revenue_per_kpi_value',
+    type: 'numeric',
+    nullable: true,
+    transformer: {
+      to: (value: number | null) => value,
+      from: (value: string | null) => (value === null ? null : Number(value)),
+    },
+  })
   revenuePerKpiValue: number | null;
 
   @Column({ name: 'date_range', type: 'jsonb', nullable: true })
