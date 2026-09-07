@@ -46,6 +46,19 @@ export function transposeTimesSelf(x: number[][]): number[][] {
   return result;
 }
 
+/**
+ * Adds a small real ridge (Tikhonov) penalty to XᵀX's diagonal, skipping the intercept term
+ * (index 0) by convention — regularizing the intercept would bias the baseline itself for no
+ * real reason. Used only as a real fallback when the plain normal equations are exactly singular
+ * (two *other* real channels are themselves exact linear copies of each other), which otherwise
+ * makes VIF undefined for every channel regressed against them, not just the collinear pair.
+ * `lambda` is chosen relative to the matrix's own scale (see compute-channel-health.ts), so this
+ * works the same way regardless of whether real spend is in the hundreds or the millions.
+ */
+export function addRidgePenalty(xtx: number[][], lambda: number): number[][] {
+  return xtx.map((row, i) => row.map((value, j) => (i === j && i !== 0 ? value + lambda : value)));
+}
+
 /** Xᵀ · y — a real n-length vector. */
 export function transposeTimesVector(x: number[][], y: number[]): number[] {
   const cols = x[0]?.length ?? 0;

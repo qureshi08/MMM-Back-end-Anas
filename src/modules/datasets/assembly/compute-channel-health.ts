@@ -1,14 +1,19 @@
 import { CsvRow } from './parse-csv-rows';
 import { correlation } from './suggest-channel-combinations';
-import { solveLinearSystem, transposeTimesSelf, transposeTimesVector } from './linear-algebra';
+import { addRidgePenalty, solveLinearSystem, transposeTimesSelf, transposeTimesVector } from './linear-algebra';
 
 export interface ChannelHealth {
   channel: string;
   shareOfSpendPercent: number;
   /** Real Variance Inflation Factor — how much this channel's own spend can be predicted from every
-   * other real channel's spend. Null when there's only one real media channel (nothing to regress
-   * against) or fewer real rows than channels (not enough real data for a stable regression). */
+   * other real channel's spend. Null only when there's genuinely nothing to compute it from: one
+   * real media channel total, or fewer real rows than channels. */
   vif: number | null;
+  /** True when `vif` came from the real ridge-regularized fallback below, not the plain textbook
+   * VIF formula — real, exact collinearity among the *other* channels made the plain version
+   * mathematically undefined. Still a real, computed number, just worth a softer real caveat in
+   * the UI ("approximate") rather than presenting it with the same confidence as the plain case. */
+  vifIsApproximate: boolean;
   /** The single other real channel this one correlates with most strongly, for the "combine with
    * X" suggestion — null if there's no other real channel or every correlation is exactly zero. */
   mostCorrelatedWith: string | null;
@@ -65,42 +70,66 @@ export function computeChannelHealth(rows: CsvRow[], mediaColumns: string[]): Ch
       }
     }
 
+    const { vif, vifIsApproximate } = computeVif(rows, channel, mediaColumns);
     return {
       channel,
       shareOfSpendPercent,
-      vif: computeVif(rows, channel, mediaColumns),
+      vif,
+      vifIsApproximate,
       mostCorrelatedWith,
       mostCorrelatedValue,
     };
   });
 }
 
-function computeVif(rows: CsvRow[], channel: string, mediaColumns: string[]): number | null {
+/**
+ * Real fallback, added 2026-09-07 after Amna asked directly: the plain textbook VIF is undefined
+ * (not just "hard to compute") when two *other* real channels are themselves exactly collinear —
+ * the regression genuinely has no unique answer. A small real ridge penalty on the normal
+ * equations' diagonal breaks that tie with a minimal, principled nudge, rather than picking an
+ * arbitrary one of the infinitely many equally-valid answers. Only used when the plain version
+ * fails — a well-defined case is never regularized, so it never gets a different number than
+ * before this fallback existed.
+ */
+function computeVif(
+  rows: CsvRow[],
+  channel: string,
+  mediaColumns: string[],
+): { vif: number | null; vifIsApproximate: boolean } {
   const others = mediaColumns.filter((c) => c !== channel);
-  if (others.length === 0) return null;
+  if (others.length === 0) return { vif: null, vifIsApproximate: false }; // nothing real to regress against — a structural fact, not a fixable gap
 
   const numericRows = rows.filter(
     (row) => typeof row[channel] === 'number' && others.every((c) => typeof row[c] === 'number'),
   );
-  if (numericRows.length <= others.length + 1) return null; // not enough real rows for a stable fit
+  if (numericRows.length <= others.length + 1) return { vif: null, vifIsApproximate: false }; // not enough real rows for a stable fit, regularizing this wouldn't make it a real answer
 
   const y = numericRows.map((row) => row[channel] as number);
   const x = numericRows.map((row) => [1, ...others.map((c) => row[c] as number)]); // 1 = intercept column
+  const xtx = transposeTimesSelf(x);
+  const xty = transposeTimesVector(x, y);
 
-  const beta = solveLinearSystem(transposeTimesSelf(x), transposeTimesVector(x, y));
-  if (!beta) return null; // real, exact multicollinearity among the *other* channels — treat as "can't tell", not a crash
+  let beta = solveLinearSystem(xtx, xty);
+  let vifIsApproximate = false;
+  if (!beta) {
+    const avgDiagonal = xtx.reduce((sum, row, i) => sum + row[i], 0) / xtx.length;
+    const lambda = (avgDiagonal || 1) * 1e-6;
+    beta = solveLinearSystem(addRidgePenalty(xtx, lambda), xty);
+    vifIsApproximate = true;
+  }
+  if (!beta) return { vif: null, vifIsApproximate: false }; // real edge case even ridge can't rescue — genuinely nothing to say
 
   const meanY = y.reduce((sum, v) => sum + v, 0) / y.length;
   let ssRes = 0;
   let ssTot = 0;
   for (let i = 0; i < y.length; i++) {
-    const predicted = x[i].reduce((sum, xij, j) => sum + xij * beta[j], 0);
+    const predicted = x[i].reduce((sum, xij, j) => sum + xij * beta![j], 0);
     ssRes += (y[i] - predicted) ** 2;
     ssTot += (y[i] - meanY) ** 2;
   }
 
-  if (ssTot === 0) return null; // this channel never varies — VIF is meaningless, not infinite
-  const rSquared = 1 - ssRes / ssTot;
-  if (rSquared >= 0.999) return 999; // real, near-exact collinearity — cap rather than return Infinity (not valid JSON)
-  return 1 / (1 - rSquared);
+  if (ssTot === 0) return { vif: null, vifIsApproximate: false }; // this channel never varies — VIF is meaningless, not infinite
+  const rSquared = Math.min(1 - ssRes / ssTot, 0.999); // clamp — a regularized fit can nudge R^2 fractionally past 1 in a near-perfect real case
+  if (rSquared >= 0.999) return { vif: 999, vifIsApproximate }; // real, near-exact collinearity — cap rather than return Infinity (not valid JSON)
+  return { vif: 1 / (1 - rSquared), vifIsApproximate };
 }

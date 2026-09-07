@@ -13,6 +13,7 @@ describe('computeChannelHealth', () => {
     const tv = health.find((h) => h.channel === 'tv_spend')!;
     expect(tv.vif).not.toBeNull();
     expect(tv.vif!).toBeGreaterThan(50); // real near-perfect collinearity
+    expect(tv.vifIsApproximate).toBe(false); // this one's a real, exact, well-defined answer
     expect(tv.mostCorrelatedWith).toBe('google_spend');
     expect(tv.mostCorrelatedValue!).toBeCloseTo(1, 2);
   });
@@ -29,16 +30,31 @@ describe('computeChannelHealth', () => {
     expect(display.vif!).toBeLessThan(5); // real independent channel, low redundancy
   });
 
-  it('returns null VIF for every channel when two OTHER real channels are exactly collinear (the regression genuinely has no unique answer)', () => {
+  it('falls back to a real, ridge-regularized VIF (flagged approximate) when two OTHER real channels are exactly collinear, instead of giving up', () => {
     const rows = Array.from({ length: 20 }, (_, i) => ({
       google_spend: 100 + i * 7,
       tv_spend: (100 + i * 7) * 2, // exact copy of google_spend
-      display_spend: (i % 5) * 33 + 10,
+      display_spend: (i % 5) * 33 + 10, // real, independent noise
     }));
     const health = computeChannelHealth(rows, ['google_spend', 'tv_spend', 'display_spend']);
     // display_spend is regressed against {google_spend, tv_spend}, which are themselves an exact
-    // linear pair — that design matrix is singular, so this real answer is "can't tell", not a guess.
-    expect(health.find((h) => h.channel === 'display_spend')!.vif).toBeNull();
+    // linear pair — the plain regression is singular, so this real answer comes from the real
+    // ridge fallback instead, added 2026-09-07 after Amna asked whether one was feasible.
+    const display = health.find((h) => h.channel === 'display_spend')!;
+    expect(display.vif).not.toBeNull();
+    expect(display.vifIsApproximate).toBe(true);
+    expect(display.vif!).toBeLessThan(10); // still correctly reads as low redundancy, real independent channel
+  });
+
+  it('does not regularize a channel that already has a real, well-defined VIF', () => {
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      google_spend: 100 + i * 7,
+      tv_spend: (100 + i * 7) * 2,
+      display_spend: (i % 5) * 33 + 10,
+    }));
+    const health = computeChannelHealth(rows, ['google_spend', 'tv_spend', 'display_spend']);
+    expect(health.find((h) => h.channel === 'google_spend')!.vifIsApproximate).toBe(false);
+    expect(health.find((h) => h.channel === 'tv_spend')!.vifIsApproximate).toBe(false);
   });
 
   it('computes a real share of spend across all real channels', () => {
