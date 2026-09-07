@@ -76,20 +76,30 @@ export function suggestColumnRoles(columns: string[]): ColumnRoleSuggestions {
     }
   }
 
-  const mediaColumns: string[] = [];
-  for (const col of columns) {
-    if (claimed.has(col)) continue;
-    if (matches(MEDIA_PATTERN, col)) {
-      mediaColumns.push(col);
-      claimed.add(col);
-    }
-  }
-
+  /**
+   * Real bug, found live 2026-09-07: control checked *after* media meant any column matching both
+   * ("competitor_spend" — a real, common MMM column name — matches MEDIA_PATTERN on "spend" just as
+   * much as CONTROL_PATTERN on "competitor") always lost to media, since media claimed it first.
+   * That's not just a cosmetic Configure mistake: a real training run would then treat a
+   * competitor's own spend as one of *your* channels, corrupting the real result, not just this
+   * suggestion. Control now runs first — a control keyword is a more specific, more confident real
+   * signal ("competitor," "promo," "holiday") than the generic "cost/spend" media pattern, so it
+   * should win the tie, not lose it by coincidence of loop order.
+   */
   const controlColumns: string[] = [];
   for (const col of columns) {
     if (claimed.has(col)) continue;
     if (matches(CONTROL_PATTERN, col)) {
       controlColumns.push(col);
+      claimed.add(col);
+    }
+  }
+
+  const mediaColumns: string[] = [];
+  for (const col of columns) {
+    if (claimed.has(col)) continue;
+    if (matches(MEDIA_PATTERN, col)) {
+      mediaColumns.push(col);
       claimed.add(col);
     }
   }

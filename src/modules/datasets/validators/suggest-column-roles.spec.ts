@@ -89,4 +89,11 @@ describe('suggestColumnRoles', () => {
     const result = suggestColumnRoles(['Date', 'Revenue', 'Weather Index', 'Seasonality', 'Temperature']);
     expect(result.controlColumns).toEqual(['Weather Index', 'Seasonality', 'Temperature']);
   });
+
+  it('real bug, found live 2026-09-07: "competitor_spend" must be suggested as control, not media, even though it also matches the media "spend" pattern', () => {
+    const result = suggestColumnRoles(['date', 'sales', 'google_ads_spend', 'competitor_spend']);
+    expect(result.controlColumns).toContain('competitor_spend');
+    expect(result.mediaColumns).not.toContain('competitor_spend');
+    expect(result.mediaColumns).toEqual(['google_ads_spend']);
+  });
 });
