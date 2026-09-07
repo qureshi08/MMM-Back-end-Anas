@@ -1,4 +1,5 @@
 import { computeChannelHealth } from './compute-channel-health';
+import { applyChannelCombinations } from './apply-channel-combinations';
 
 describe('computeChannelHealth', () => {
   it('gives a real, large VIF to a channel that is an exact linear copy of another', () => {
@@ -55,5 +56,26 @@ describe('computeChannelHealth', () => {
     const health = computeChannelHealth(rows, ['a']);
     expect(health[0].vif).toBeNull();
     expect(health[0].mostCorrelatedWith).toBeNull();
+  });
+
+  it('uses the real combined channel\'s actual summed spend, not zero, after a combine (the real bug found live 2026-09-07)', () => {
+    const rawRows = [
+      { google_spend: 1000, tv_spend: 500, radio_spend: 200 },
+      { google_spend: 1200, tv_spend: 550, radio_spend: 220 },
+      { google_spend: 900, tv_spend: 480, radio_spend: 190 },
+    ];
+    const combinations = [{ sourceColumns: ['tv_spend', 'radio_spend'], newColumnName: 'tv_radio_combined' }];
+
+    // The real, correct flow: apply the saved combination before computing health, exactly like
+    // getChannelHealth() now does — not read the raw file's own tv_spend/radio_spend columns
+    // directly, which no longer count as real media columns after a combine.
+    const combinedRows = applyChannelCombinations(rawRows, combinations);
+    const health = computeChannelHealth(combinedRows, ['google_spend', 'tv_radio_combined']);
+
+    const combined = health.find((h) => h.channel === 'tv_radio_combined')!;
+    const realTotalTvRadio = 700 + 770 + 670; // real per-row sums of tv_spend + radio_spend
+    const realGrandTotal = 1000 + 1200 + 900 + realTotalTvRadio;
+    expect(combined.shareOfSpendPercent).toBeCloseTo((realTotalTvRadio / realGrandTotal) * 100, 5);
+    expect(combined.shareOfSpendPercent).toBeGreaterThan(0); // the real bug made this silently zero
   });
 });

@@ -195,6 +195,15 @@ export class DatasetsService {
    * Real backend for the Channel Health screen, built 2026-09-07 — see compute-channel-health.ts
    * for the real math (VIF for redundancy, share of spend for "too small to trust"). Requires
    * Configure to already be saved, since it needs to know which columns are real media channels.
+   *
+   * Real bug, found the same day, live: a combined channel (say, `tv_radio_combined`) only ever
+   * gets its real summed values at `assemble()` time — the raw uploaded file on disk still has the
+   * original separate `tv_spend`/`radio_spend` columns, nothing named `tv_radio_combined` at all.
+   * Calling this straight after a combine, without applying that same real combination first, meant
+   * the combined channel's own numbers came from a column that doesn't exist yet (silently read as
+   * zero on every row), and — worse — every *other* channel's share of spend was computed against a
+   * total that had quietly lost the combined channels' real spend entirely. Fixed by running the
+   * exact same `applyChannelCombinations()` used at real training time before computing anything.
    */
   async getChannelHealth(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ channels: ChannelHealth[] }> {
     const dataset = await this.findOne(id, requesterId, globalRole);
@@ -203,7 +212,8 @@ export class DatasetsService {
     }
 
     const fileBuffer = await this.storage.download(dataset.storageKey);
-    const rows = parseCsvRows(fileBuffer);
+    const rawRows = parseCsvRows(fileBuffer);
+    const rows = applyChannelCombinations(rawRows, dataset.channelCombinations);
     return { channels: computeChannelHealth(rows, dataset.columnMapping.mediaColumns) };
   }
 
