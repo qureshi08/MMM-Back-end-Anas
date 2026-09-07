@@ -89,6 +89,12 @@ export class DatasetsController {
     return this.datasets.getDataQuality(id, user.userId!, user.globalRole!);
   }
 
+  /** Real VIF + share-of-spend per media column, for the Optimize screen's Channel Health chart. */
+  @Get('datasets/:id/channel-health')
+  getChannelHealth(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getChannelHealth(id, user.userId!, user.globalRole!);
+  }
+
   @Get('datasets/:id/rows')
   getRows(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.datasets.getRows(id, user.userId!, user.globalRole!);

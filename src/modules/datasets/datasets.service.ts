@@ -28,6 +28,7 @@ import { extractCsvHeaders } from './validators/extract-csv-headers';
 import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-column-roles';
 import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
 import { checkDataQuality, DataQualityFlag } from './assembly/check-data-quality';
+import { computeChannelHealth, ChannelHealth } from './assembly/compute-channel-health';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { findDateRange } from './assembly/find-date-range';
@@ -188,6 +189,22 @@ export class DatasetsService {
     const prefix = await this.storage.downloadPrefix(dataset.storageKey, HEADER_PREVIEW_BYTES);
     const columns = extractCsvHeaders(prefix);
     return { columns, suggestions: suggestColumnRoles(columns) };
+  }
+
+  /**
+   * Real backend for the Channel Health screen, built 2026-09-07 — see compute-channel-health.ts
+   * for the real math (VIF for redundancy, share of spend for "too small to trust"). Requires
+   * Configure to already be saved, since it needs to know which columns are real media channels.
+   */
+  async getChannelHealth(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ channels: ChannelHealth[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, channel health is computed per real media column.');
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+    return { channels: computeChannelHealth(rows, dataset.columnMapping.mediaColumns) };
   }
 
   /**

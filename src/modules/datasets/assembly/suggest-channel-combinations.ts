@@ -1,7 +1,11 @@
 import { CsvRow } from './parse-csv-rows';
 
-/** Real Pearson correlation between two real numeric columns, pairwise-deleting any row where either side isn't a number. */
-function correlation(rows: CsvRow[], colA: string, colB: string): number {
+/**
+ * Real Pearson correlation between two real numeric columns, pairwise-deleting any row where
+ * either side isn't a number. Exported 2026-09-07 for reuse by Channel Health's "combine with"
+ * suggestion — same real math, no reason for a second copy of it.
+ */
+export function correlation(rows: CsvRow[], colA: string, colB: string): number {
   const pairs = rows
     .map((row) => [row[colA], row[colB]])
     .filter((pair): pair is [number, number] => typeof pair[0] === 'number' && typeof pair[1] === 'number');
