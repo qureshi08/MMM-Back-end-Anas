@@ -80,6 +80,15 @@ export class DatasetsController {
     return this.datasets.getDateRange(id, user.userId!, user.globalRole!);
   }
 
+  /**
+   * Called right after Upload Data, before Configure is even saved — real data quality problems
+   * (bad date format, blank cells, negative spend) surface here instead of only at Train Model.
+   */
+  @Get('datasets/:id/data-quality')
+  getDataQuality(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getDataQuality(id, user.userId!, user.globalRole!);
+  }
+
   @Get('datasets/:id/rows')
   getRows(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.datasets.getRows(id, user.userId!, user.globalRole!);

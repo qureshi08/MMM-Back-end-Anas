@@ -27,6 +27,7 @@ import {
 import { extractCsvHeaders } from './validators/extract-csv-headers';
 import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-column-roles';
 import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
+import { checkDataQuality, DataQualityFlag } from './assembly/check-data-quality';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { findDateRange } from './assembly/find-date-range';
@@ -187,6 +188,41 @@ export class DatasetsService {
     const prefix = await this.storage.downloadPrefix(dataset.storageKey, HEADER_PREVIEW_BYTES);
     const columns = extractCsvHeaders(prefix);
     return { columns, suggestions: suggestColumnRoles(columns) };
+  }
+
+  /**
+   * Real gap found 2026-09-07, end-to-end test: a bad date format (DD-MM-YYYY instead of the
+   * required YYYY-MM-DD), blank cells, and negative spend all went completely undetected until
+   * Train Model — after every other step had already been filled in, and only because Hammad's
+   * engine rejected the file with "193 data error(s) found." Anas: "all the data quality issues
+   * must be diagnosed upfront (when the dataset is initially uploaded)."
+   *
+   * Callable the moment a file is uploaded, before Configure is ever saved — uses the same real
+   * `suggestColumnRoles()` guess Configure itself shows, so a bad date column gets caught even if
+   * the user hasn't confirmed anything yet. Once Configure is saved, checks the real confirmed
+   * `columnMapping` instead, since that's more trustworthy than a guess.
+   */
+  async getDataQuality(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ flags: DataQualityFlag[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
+    if (!dataset.fileName.toLowerCase().endsWith('.csv')) {
+      throw new BadRequestException(
+        'Checking data quality upfront is only supported for .csv files today. This dataset is ' +
+          `"${dataset.fileName}" — real issues will still surface at Train Model.`,
+      );
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+
+    const columns = dataset.columnMapping
+      ? {
+          dateColumn: dataset.columnMapping.dateColumn,
+          targetColumn: dataset.columnMapping.targetColumn,
+          mediaColumns: dataset.columnMapping.mediaColumns,
+        }
+      : suggestColumnRoles(extractCsvHeaders(fileBuffer.subarray(0, HEADER_PREVIEW_BYTES)));
+
+    return { flags: checkDataQuality(rows, columns) };
   }
 
   /**
