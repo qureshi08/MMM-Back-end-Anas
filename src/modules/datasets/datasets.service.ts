@@ -20,6 +20,7 @@ import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
 import {
   assertChannelsMatchMediaColumns,
+  assertColumnsMatchExposureColumns,
   assertNoDuplicateColumns,
   assertRevenuePerKpiValueMatchesKpiType,
   assertValidDateRange,
@@ -29,6 +30,8 @@ import { ColumnRoleSuggestions, suggestColumnRoles } from './validators/suggest-
 import { CsvRow, parseCsvRows } from './assembly/parse-csv-rows';
 import { checkDataQuality, DataQualityFlag } from './assembly/check-data-quality';
 import { computeChannelHealth, ChannelHealth } from './assembly/compute-channel-health';
+import { computeExposureMetrics, ExposureMetric } from './assembly/compute-exposure-metrics';
+import { SetExposureDirectionsDto } from './dto/set-exposure-directions.dto';
 import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { findDateRange } from './assembly/find-date-range';
@@ -215,6 +218,51 @@ export class DatasetsService {
     const rawRows = parseCsvRows(fileBuffer);
     const rows = applyChannelCombinations(rawRows, dataset.channelCombinations);
     return { channels: computeChannelHealth(rows, dataset.columnMapping.mediaColumns) };
+  }
+
+  /**
+   * Real backend for the Exposure Metrics screen, built 2026-09-07 — same real gap Channel Health
+   * had: "does this column help or hurt" was showing a real UI with nothing behind it. Covers both
+   * control and organic columns, since both are real non-media inputs whose direction matters.
+   */
+  async getExposureMetrics(id: string, requesterId: string, globalRole: GlobalRole): Promise<{ metrics: ExposureMetric[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, exposure metrics need to know the real target and control/organic columns.');
+    }
+
+    const exposureColumns = [...dataset.columnMapping.controlColumns, ...dataset.columnMapping.organicColumns];
+    if (exposureColumns.length === 0) {
+      return { metrics: [] };
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rows = parseCsvRows(fileBuffer);
+    return { metrics: computeExposureMetrics(rows, dataset.columnMapping.targetColumn, exposureColumns) };
+  }
+
+  /** The Exposure Metrics screen's real "Save and continue" — the user's chosen direction per real control/organic column. */
+  async setExposureDirections(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+    dto: SetExposureDirectionsDto,
+  ): Promise<Dataset> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, exposure directions are set per real control/organic column.');
+    }
+
+    const exposureColumns = [...dataset.columnMapping.controlColumns, ...dataset.columnMapping.organicColumns];
+    assertColumnsMatchExposureColumns(
+      exposureColumns,
+      dto.directions.map((d) => d.column),
+    );
+
+    await this.repo().update(id, {
+      exposureDirections: dto.directions.map((d) => ({ column: d.column, direction: d.direction })),
+    });
+    return this.findOne(id, requesterId, globalRole);
   }
 
   /**

@@ -24,6 +24,7 @@ import { CalibrateDatasetDto } from './dto/calibrate-dataset.dto';
 import { HyperparameterizeDatasetDto } from './dto/hyperparameterize-dataset.dto';
 import { CombineColumnsDto } from './dto/combine-columns.dto';
 import { CombineChannelsDto } from './dto/combine-channels.dto';
+import { SetExposureDirectionsDto } from './dto/set-exposure-directions.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthenticatedUser } from '../auth/interfaces/authenticated-user.interface';
 import { assertWriteAccess } from '../../common/auth/permissions';
@@ -93,6 +94,22 @@ export class DatasetsController {
   @Get('datasets/:id/channel-health')
   getChannelHealth(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.datasets.getChannelHealth(id, user.userId!, user.globalRole!);
+  }
+
+  /** Real Helps/Hurts/Not sure suggestion per control/organic column, from real correlation with the target. */
+  @Get('datasets/:id/exposure-metrics')
+  getExposureMetrics(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getExposureMetrics(id, user.userId!, user.globalRole!);
+  }
+
+  @Patch('datasets/:id/exposure-directions')
+  setExposureDirections(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: SetExposureDirectionsDto,
+  ) {
+    assertWriteAccess(user);
+    return this.datasets.setExposureDirections(id, user.userId!, user.globalRole!, dto);
   }
 
   @Get('datasets/:id/rows')

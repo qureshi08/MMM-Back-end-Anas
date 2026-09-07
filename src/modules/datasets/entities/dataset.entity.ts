@@ -83,6 +83,19 @@ export interface ChannelCombination {
 }
 
 /**
+ * The real, saved answer to Exposure Metrics' "does this column help or hurt your outcome" —
+ * distinct from the real-time `suggestedDirection` computed fresh from the data every time
+ * (see compute-exposure-metrics.ts). This is what the user actually chose, defaulting to the
+ * suggestion but overridable, exactly like calibration's own "your real belief" nudge.
+ */
+export type ExposureDirection = 'helps' | 'hurts' | 'not_sure';
+
+export interface ExposureDirectionChoice {
+  column: string;
+  direction: ExposureDirection;
+}
+
+/**
  * 2026-08-12: real training against Hammad's worker is on hold, blocked on decisions still with
  * Farhan (see `dev-log/raw/2026-08-11.md`). Decided with Anas: build a mock training run instead,
  * using this exact real shape — copied field for field from Hammad's own real sample output,
@@ -308,6 +321,10 @@ export class Dataset extends BaseEntity {
 
   @Column({ name: 'channel_combinations', type: 'jsonb', nullable: true })
   channelCombinations: ChannelCombination[] | null;
+
+  /** The user's real, saved choice per control/organic column — see ExposureDirectionChoice's own comment. */
+  @Column({ name: 'exposure_directions', type: 'jsonb', nullable: true })
+  exposureDirections: ExposureDirectionChoice[] | null;
 
   /** Set by POST /datasets/:id/assemble. The real job_id and pointer, kept even though nothing is sent anywhere yet. */
   @Column({ name: 'job_id', type: 'text', nullable: true })

@@ -40,6 +40,26 @@ export function assertValidDateRange(startDate: string, endDate: string): void {
 }
 
 /**
+ * Exposure Metrics: the same real "exactly these columns, no more, no fewer" shape as
+ * hyperparameters below, just against the real control + organic columns instead of media ones.
+ */
+export function assertColumnsMatchExposureColumns(exposureColumns: string[], submitted: string[]): void {
+  const uniqueSubmitted = new Set(submitted);
+  if (uniqueSubmitted.size !== submitted.length) {
+    throw new BadRequestException('The same column is listed more than once.');
+  }
+
+  const expected = new Set(exposureColumns);
+  const missing = [...expected].filter((c) => !uniqueSubmitted.has(c));
+  const unexpected = submitted.filter((c) => !expected.has(c));
+  if (missing.length > 0 || unexpected.length > 0) {
+    throw new BadRequestException(
+      `Directions must exactly match the real control and organic columns from Configure. Missing: [${missing.join(', ') || 'none'}]. Not a real control/organic column: [${unexpected.join(', ') || 'none'}].`,
+    );
+  }
+}
+
+/**
  * Hyperparameterization: Hammad's model needs exactly one carryover/saturation
  * pair per real media channel, no more, no fewer, so the channel list has to
  * match Configure's media columns exactly.
