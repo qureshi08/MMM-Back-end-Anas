@@ -102,6 +102,12 @@ export class DatasetsController {
     return this.datasets.getExposureMetrics(id, user.userId!, user.globalRole!);
   }
 
+  /** Real carryover/saturation suggestion per real media column, for "Automatic Optimization." */
+  @Get('datasets/:id/suggested-hyperparameters')
+  getSuggestedHyperparameters(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.datasets.getSuggestedHyperparameters(id, user.userId!, user.globalRole!);
+  }
+
   @Patch('datasets/:id/exposure-directions')
   setExposureDirections(
     @Param('id', ParseUUIDPipe) id: string,

@@ -38,6 +38,7 @@ import { filterRowsByDateRange } from './assembly/filter-rows-by-date-range';
 import { buildJobPayload } from './assembly/build-job-payload';
 import { findDateRange } from './assembly/find-date-range';
 import { trainingStepFor } from './assembly/training-step-labels';
+import { suggestHyperparameters, SuggestedHyperparameter } from './assembly/suggest-hyperparameters';
 
 /** Enough to guarantee a full header row even for a very wide real file, without downloading the whole thing. */
 const HEADER_PREVIEW_BYTES = 65536;
@@ -265,6 +266,40 @@ export class DatasetsService {
       exposureDirections: dto.directions.map((d) => ({ column: d.column, direction: d.direction })),
     });
     return this.findOne(id, requesterId, globalRole);
+  }
+
+  /**
+   * Real backend for Hyperparameterization's "Automatic Optimization" button, built 2026-09-08.
+   * Replaces the old client-side random draw (`current ± variance%`, no real data behind it) — a
+   * genuine gap once real training was connected: an honestly-labeled random guess for a *starting*
+   * value stopped being good enough. This computes one real, deterministic estimate per real media
+   * column from that channel's own real spend history, filtered to Optimize's real training window
+   * when one's been saved (same real weeks that will actually train), and sorted into real
+   * chronological order first since the lag-based math depends on real time order, not upload order.
+   * Still a heuristic, not the real trained answer — Meridian's own training finds that — but a real
+   * number derived from this dataset, not a coin flip.
+   */
+  async getSuggestedHyperparameters(
+    id: string,
+    requesterId: string,
+    globalRole: GlobalRole,
+  ): Promise<{ suggestions: SuggestedHyperparameter[] }> {
+    const dataset = await this.findOne(id, requesterId, globalRole);
+    if (!dataset.columnMapping) {
+      throw new BadRequestException('Save Configure first, suggestions are computed per real media column.');
+    }
+
+    const fileBuffer = await this.storage.download(dataset.storageKey);
+    const rawRows = parseCsvRows(fileBuffer);
+    const combined = applyChannelCombinations(rawRows, dataset.channelCombinations);
+    const windowed = dataset.dateRange
+      ? filterRowsByDateRange(combined, dataset.columnMapping.dateColumn, dataset.dateRange.startDate, dataset.dateRange.endDate)
+      : combined;
+    const sorted = [...windowed].sort((a, b) =>
+      String(a[dataset.columnMapping!.dateColumn]).localeCompare(String(b[dataset.columnMapping!.dateColumn])),
+    );
+
+    return { suggestions: suggestHyperparameters(sorted, dataset.columnMapping.mediaColumns) };
   }
 
   /**
