@@ -88,4 +88,18 @@ describe('buildJobPayload', () => {
       'Meta Cost': { saturation: 1.1 },
     });
   });
+
+  it('never sends carryoverEstimated/saturationEstimated to the real engine — internal metadata only', () => {
+    const payload = buildJobPayload(
+      fakeDataset({
+        channelHyperparameters: [
+          { channel: 'TV Cost', carryover: 0.85, saturation: 1.5, carryoverEstimated: true, saturationEstimated: false },
+        ],
+      }),
+      [],
+    );
+    expect(payload.model_configuration.channels).toEqual({
+      'TV Cost': { carryover: 0.85, saturation: 1.5 },
+    });
+  });
 });

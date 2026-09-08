@@ -571,6 +571,8 @@ export class DatasetsService {
         channel: c.channel,
         carryover: c.carryover ?? null,
         saturation: c.saturation ?? null,
+        carryoverEstimated: c.carryoverEstimated ?? null,
+        saturationEstimated: c.saturationEstimated ?? null,
       })),
     });
     return this.findOne(id, requesterId, globalRole);

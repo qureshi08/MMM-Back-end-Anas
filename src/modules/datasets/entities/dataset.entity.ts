@@ -72,6 +72,16 @@ export interface ChannelHyperparameter {
   channel: string;
   carryover: number | null;
   saturation: number | null;
+  /**
+   * True when the value was picked by Automatic Optimization's in-browser random draw, not chosen
+   * deliberately by the user. Amna's Claude confirmed 2026-09-08 this only lived as transient
+   * frontend state before, unconditionally cleared on every reload — so a randomly-drawn value
+   * looked identical to a deliberate one the moment a user left Setup and came back. Stored here so
+   * it's a durable fact about the dataset instead. Never sent to Hammad's real engine — only
+   * carryover/saturation themselves are, see build-job-payload.ts.
+   */
+  carryoverEstimated?: boolean | null;
+  saturationEstimated?: boolean | null;
 }
 
 /**

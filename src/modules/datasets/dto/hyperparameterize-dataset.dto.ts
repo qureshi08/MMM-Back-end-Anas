@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNumber, Max, Min, MinLength, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, Max, Min, MinLength, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 /**
  * One channel's real settings, matching an entry in `model_configuration.channels`. Both real
@@ -26,6 +26,19 @@ export class ChannelHyperparameterDto {
   @IsNumber()
   @Min(0.0001)
   saturation?: number;
+
+  /**
+   * True when Automatic Optimization's in-browser random draw picked this value, not the user
+   * directly. Real, durable metadata now (Amna's Claude, 2026-09-08) instead of frontend-only
+   * state that used to vanish on reload. Never reaches Hammad's engine — see build-job-payload.ts.
+   */
+  @IsOptional()
+  @IsBoolean()
+  carryoverEstimated?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  saturationEstimated?: boolean;
 }
 
 /**
