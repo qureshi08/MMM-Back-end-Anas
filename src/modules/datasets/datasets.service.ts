@@ -458,6 +458,23 @@ export class DatasetsService {
   /**
    * The Configure step (CMP-79-adjacent). This is the piece Save
    * Configuration had nothing to call before today.
+   *
+   * Real bug, found live 2026-09-08 on a real "brand compaign" training failure: this used to
+   * overwrite `columnMapping.mediaColumns` with whatever the Configure form submitted (always the
+   * real, raw file headers — Configure has no idea a combine ever happened) while leaving any
+   * already-saved `channelCombinations` completely untouched. Re-saving Configure after combining
+   * channels on Optimize silently undid the combine's effect on `mediaColumns` — "Google Display
+   * Cost" came right back onto the media list — while `channelCombinations` still remembered the
+   * old combination and kept deleting that same column from the real rows at train time. The job
+   * payload's `column_mapping.media_columns` then named a column that genuinely didn't exist in
+   * the data anymore, which is exactly the real error Meridian's own validation caught: "Column
+   * 'Google Display Cost' mapped as 'spend' does not exist in the file."
+   *
+   * Configure is the real upstream source of which columns exist at all — same reasoning
+   * `combineChannels`/`autoCombineChannels` already use to clear `channelHyperparameters` when
+   * *they* change the media list. Re-saving Configure now clears both `channelCombinations` and
+   * `channelHyperparameters` in the other direction, so nothing downstream can ever reference a
+   * media column Configure no longer actually has an opinion on.
    */
   async configure(id: string, requesterId: string, globalRole: GlobalRole, dto: ConfigureDatasetDto): Promise<Dataset> {
     await this.findOne(id, requesterId, globalRole);
@@ -485,6 +502,8 @@ export class DatasetsService {
       },
       kpiType: dto.kpiType,
       revenuePerKpiValue: dto.revenuePerKpiValue ?? null,
+      channelCombinations: null,
+      channelHyperparameters: null,
     });
     return this.findOne(id, requesterId, globalRole);
   }
