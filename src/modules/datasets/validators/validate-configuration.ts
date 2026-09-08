@@ -60,22 +60,58 @@ export function assertColumnsMatchExposureColumns(exposureColumns: string[], sub
 }
 
 /**
- * Hyperparameterization: Hammad's model needs exactly one carryover/saturation
- * pair per real media channel, no more, no fewer, so the channel list has to
- * match Configure's media columns exactly.
+ * Hyperparameterization: real contract confirmed by Hammad 2026-09-08 — a channel only needs to
+ * appear here if the user actually set something real for it; "no input to any channel" (an empty
+ * list) is a real, valid choice, and Hammad's own engine computes real defaults for every media
+ * column not mentioned. This is now a real *subset* check, not an exact-match one: every channel
+ * named here must be a real media column from Configure, and none may repeat, but not every real
+ * media column needs an entry.
  */
-export function assertChannelsMatchMediaColumns(mediaColumns: string[], channels: string[]): void {
+export function assertChannelsAreRealMediaColumns(mediaColumns: string[], channels: string[]): void {
   const uniqueChannels = new Set(channels);
   if (uniqueChannels.size !== channels.length) {
     throw new BadRequestException('The same channel is listed more than once.');
   }
 
   const expected = new Set(mediaColumns);
-  const missing = [...expected].filter((c) => !uniqueChannels.has(c));
   const unexpected = channels.filter((c) => !expected.has(c));
-  if (missing.length > 0 || unexpected.length > 0) {
+  if (unexpected.length > 0) {
+    throw new BadRequestException(`Not a real media column from Configure: [${unexpected.join(', ')}].`);
+  }
+}
+
+/**
+ * Hyperparameterization: a channel entry with neither carryover nor saturation set is
+ * meaningless — real contract confirmed 2026-09-08, "no input to a channel" means the channel
+ * doesn't appear in the list at all, not that it appears with both fields empty.
+ */
+export function assertChannelHyperparameterHasAtLeastOneField(
+  channel: string,
+  carryover: number | null | undefined,
+  saturation: number | null | undefined,
+): void {
+  if ((carryover === undefined || carryover === null) && (saturation === undefined || saturation === null)) {
     throw new BadRequestException(
-      `Channels must exactly match the media columns from Configure. Missing: [${missing.join(', ') || 'none'}]. Not a real media column: [${unexpected.join(', ') || 'none'}].`,
+      `"${channel}" has neither carryover nor saturation set — leave it out of the list entirely instead.`,
+    );
+  }
+}
+
+/**
+ * Calibration: Hammad's real contract, word for word: "The user must either provide both or
+ * None. He cannot provide one of the above only." A real belief without a real confidence (or the
+ * reverse) isn't a usable calibration input, so both-or-neither is enforced as one real rule here,
+ * not left to two independent optional fields that could each be set alone.
+ */
+export function assertCalibrationBothOrNeither(
+  contributionBeliefPercent: number | null | undefined,
+  confidencePercent: number | null | undefined,
+): void {
+  const hasBelief = contributionBeliefPercent !== undefined && contributionBeliefPercent !== null;
+  const hasConfidence = confidencePercent !== undefined && confidencePercent !== null;
+  if (hasBelief !== hasConfidence) {
+    throw new BadRequestException(
+      'Provide both contributionBeliefPercent and confidencePercent together, or leave both out — not just one.',
     );
   }
 }

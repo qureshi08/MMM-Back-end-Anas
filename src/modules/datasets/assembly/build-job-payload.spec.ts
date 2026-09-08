@@ -46,11 +46,46 @@ describe('buildJobPayload', () => {
         },
         calibration: { contribution_belief_percent: 30, confidence_percent: 80 },
       },
+      target_budget: null,
     });
   });
 
   it('sends revenue_per_kpi_value as null when the KPI is already revenue', () => {
     const payload = buildJobPayload(fakeDataset({ kpiType: KpiType.REVENUE, revenuePerKpiValue: null }), []);
     expect(payload.revenue_per_kpi_value).toBeNull();
+  });
+
+  it('sends target_budget as null always, since it is never collected from the user', () => {
+    const payload = buildJobPayload(fakeDataset(), []);
+    expect(payload.target_budget).toBeNull();
+  });
+
+  it('sends real calibration nulls when calibration was never set', () => {
+    const payload = buildJobPayload(fakeDataset({ calibration: null }), []);
+    expect(payload.model_configuration.calibration).toEqual({
+      contribution_belief_percent: null,
+      confidence_percent: null,
+    });
+  });
+
+  it('sends an empty channels object when hyperparameterization was never set', () => {
+    const payload = buildJobPayload(fakeDataset({ channelHyperparameters: null }), []);
+    expect(payload.model_configuration.channels).toEqual({});
+  });
+
+  it('omits whichever field a channel did not set, instead of sending it as null', () => {
+    const payload = buildJobPayload(
+      fakeDataset({
+        channelHyperparameters: [
+          { channel: 'TV Cost', carryover: 0.85, saturation: null },
+          { channel: 'Meta Cost', carryover: null, saturation: 1.1 },
+        ],
+      }),
+      [],
+    );
+    expect(payload.model_configuration.channels).toEqual({
+      'TV Cost': { carryover: 0.85 },
+      'Meta Cost': { saturation: 1.1 },
+    });
   });
 });

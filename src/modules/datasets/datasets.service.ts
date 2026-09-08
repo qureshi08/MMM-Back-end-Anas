@@ -19,7 +19,9 @@ import { GlobalRole } from '../users/entities/user.entity';
 import { StorageService } from './storage/storage.service';
 import { validateDatasetFile } from './validators/validate-dataset-file';
 import {
-  assertChannelsMatchMediaColumns,
+  assertChannelsAreRealMediaColumns,
+  assertChannelHyperparameterHasAtLeastOneField,
+  assertCalibrationBothOrNeither,
   assertColumnsMatchExposureColumns,
   assertNoDuplicateColumns,
   assertRevenuePerKpiValueMatchesKpiType,
@@ -518,24 +520,32 @@ export class DatasetsService {
   }
 
   /** The Calibrate step: model_configuration.calibration. */
+  /**
+   * The Calibrate step: model_configuration.calibration. Real contract confirmed by Hammad
+   * 2026-09-08: a real belief is either both `contributionBeliefPercent` and `confidencePercent`
+   * together, or neither — never just one. Saving with neither is genuinely valid and means "no
+   * real belief," stored as `calibration: null`, not an empty/zero belief.
+   */
   async calibrate(id: string, requesterId: string, globalRole: GlobalRole, dto: CalibrateDatasetDto): Promise<Dataset> {
     await this.findOne(id, requesterId, globalRole);
+    assertCalibrationBothOrNeither(dto.contributionBeliefPercent, dto.confidencePercent);
 
+    const hasRealBelief = dto.contributionBeliefPercent !== undefined && dto.confidencePercent !== undefined;
     await this.repo().update(id, {
-      calibration: {
-        contributionBeliefPercent: dto.contributionBeliefPercent,
-        confidencePercent: dto.confidencePercent,
-      },
+      calibration: hasRealBelief
+        ? { contributionBeliefPercent: dto.contributionBeliefPercent!, confidencePercent: dto.confidencePercent! }
+        : null,
     });
     return this.findOne(id, requesterId, globalRole);
   }
 
   /**
-   * The Hyperparameterization step: model_configuration.channels. Requires
-   * Configure to already be saved, and requires the channel names to be
-   * exactly the media columns Configure named, no more, no fewer, since
-   * Hammad's model needs one carryover/saturation pair per real media
-   * channel, not an arbitrary list.
+   * The Hyperparameterization step: model_configuration.channels. Real contract confirmed by
+   * Hammad 2026-09-08: a channel only needs an entry here if the user actually set something for
+   * it — "no input to any channel" (an empty list) is valid, as is a real partial subset, and each
+   * entry can carry just carryover, just saturation, or both. Hammad's own engine computes a real
+   * default for anything left out; this step no longer requires the full media column list to be
+   * covered.
    */
   async hyperparameterize(
     id: string,
@@ -548,16 +558,19 @@ export class DatasetsService {
     if (!dataset.columnMapping) {
       throw new BadRequestException('Save Configure first, hyperparameters are set per media column.');
     }
-    assertChannelsMatchMediaColumns(
+    assertChannelsAreRealMediaColumns(
       dataset.columnMapping.mediaColumns,
       dto.channels.map((c) => c.channel),
     );
+    for (const c of dto.channels) {
+      assertChannelHyperparameterHasAtLeastOneField(c.channel, c.carryover, c.saturation);
+    }
 
     await this.repo().update(id, {
       channelHyperparameters: dto.channels.map((c) => ({
         channel: c.channel,
-        carryover: c.carryover,
-        saturation: c.saturation,
+        carryover: c.carryover ?? null,
+        saturation: c.saturation ?? null,
       })),
     });
     return this.findOne(id, requesterId, globalRole);
@@ -581,8 +594,8 @@ export class DatasetsService {
     const missing: string[] = [];
     if (!dataset.columnMapping || !dataset.kpiType) missing.push('Configure');
     if (!dataset.dateRange) missing.push('Optimize');
-    if (!dataset.calibration) missing.push('Calibrate');
-    if (!dataset.channelHyperparameters) missing.push('Hyperparameterization');
+    // Calibrate and Hyperparameterization are genuinely optional per Hammad's contract
+    // (2026-09-08) — omitting them means "use the model's own real defaults," not "not ready."
     if (missing.length > 0) {
       throw new BadRequestException(`Save these steps first: ${missing.join(', ')}.`);
     }

@@ -62,11 +62,16 @@ export interface Calibration {
   confidencePercent: number;
 }
 
-/** One row per channel from the Hyperparameterization screen, matching `model_configuration.channels`. */
+/**
+ * One row per channel from the Hyperparameterization screen, matching `model_configuration.channels`.
+ * `carryover`/`saturation` are genuinely optional per real channel, confirmed by Hammad's contract
+ * 2026-09-08 — a channel can have just one of the two set, or (if this row exists at all) both.
+ * Hammad's own engine computes a real default for whichever one isn't given.
+ */
 export interface ChannelHyperparameter {
   channel: string;
-  carryover: number;
-  saturation: number;
+  carryover: number | null;
+  saturation: number | null;
 }
 
 /**
