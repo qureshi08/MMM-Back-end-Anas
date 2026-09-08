@@ -175,7 +175,13 @@ export interface TrainingResults {
     }>;
   }>;
   status: 'completed';
-  mock: true;
+  /**
+   * Stale as of 2026-08-24 (Anas: "we will never use mock numbers anywhere, always real now") —
+   * this shape was copied from the mock generator's own output and no real engine result has ever
+   * needed to set it since. Left optional, not removed, only because an already-saved dataset from
+   * before that date could still have `mock: true` sitting in its stored `results` column.
+   */
+  mock?: boolean;
 
   /**
    * Three real fields the current contract doesn't have yet, flagged 2026-08-22 (Amna's Claude,
@@ -341,11 +347,11 @@ export class Dataset extends BaseEntity {
   @Column({ name: 'training_status', type: 'text', enum: TrainingStatus, default: TrainingStatus.NOT_STARTED })
   trainingStatus: TrainingStatus;
 
-  /** When POST /datasets/:id/train was called. GET /status computes a fake "running" window from this, purely for a real-feeling UI, no background job involved. */
+  /** When POST /datasets/:id/train was called. Stamped for real, used to refuse starting a second run while one is already in progress — see train()'s own comment. */
   @Column({ name: 'training_started_at', type: 'timestamptz', nullable: true })
   trainingStartedAt: Date | null;
 
-  /** Real shape, mock content, see TrainingResults' own comment. */
+  /** Real shape, real content — see TrainingResults' own comment for why `mock` is still in the type. */
   @Column({ type: 'jsonb', nullable: true })
   results: TrainingResults | null;
 

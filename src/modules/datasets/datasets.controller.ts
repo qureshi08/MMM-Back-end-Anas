@@ -215,9 +215,9 @@ export class DatasetsController {
   }
 
   /**
-   * "Train Model." Calls the real Meridian engine over ngrok when `MODEL_ENGINE_URL` is configured,
-   * falls back to a mock in the exact real result shape otherwise — see DatasetsService.train's own
-   * comment. Mock results are always flagged (results.mock === true), never presented as real.
+   * "Train Model." Calls the real Meridian/PyMC engine — see DatasetsService.train's own comment.
+   * Real policy, Anas 2026-08-24: no mock fallback anywhere. If the engine can't be reached or
+   * isn't configured, this throws a real error instead of returning fake results.
    */
   @Post('datasets/:id/train')
   train(@Param('id', ParseUUIDPipe) id: string, @CurrentUser() user: AuthenticatedUser): Promise<Dataset> {
