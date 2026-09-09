@@ -17,15 +17,13 @@ in Calibration on a PyMC-selected dataset with no indication it's pointless.
 
 ## What's needed
 
-When a dataset's model type is PyMC, either:
-- Hide the Calibrate step entirely, or
-- Keep it visible but show a real, honest note explaining it has no effect for this engine (something
-  like: "Calibration isn't used by PyMC-Marketing — this dataset will train without it, whatever you
-  enter here won't reach the model.")
+When a dataset's model type is PyMC, **hide the Calibrate step entirely.** Not a disabled state, not
+a note explaining it does nothing — remove it from the flow for that dataset, the same way a step
+that genuinely doesn't apply wouldn't show up at all. Anas's call, explicit: if it isn't usable, it
+isn't an option. A visible-but-pointless field with a caveat is worse than not showing it.
 
-Same honesty rule as the "Estimated" badge on Hyperparameterization — never let a user spend real
-time on an input that silently does nothing. Your call on hide vs. explain; either is fine as long as
-it's not silent.
+Hyperparameterization stays exactly as-is for PyMC — that part is genuinely aligned and usable,
+confirmed in PyMC's own code. This is only about Calibrate.
 
 ## One more thing worth flagging, not urgent
 
