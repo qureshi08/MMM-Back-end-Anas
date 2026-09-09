@@ -1,4 +1,4 @@
-import { Dataset, KpiType } from '../entities/dataset.entity';
+import { Dataset, KpiType, ModelType } from '../entities/dataset.entity';
 import { buildJobPayload } from './build-job-payload';
 
 function fakeDataset(overrides: Partial<Dataset> = {}): Dataset {
@@ -100,6 +100,23 @@ describe('buildJobPayload', () => {
     );
     expect(payload.model_configuration.channels).toEqual({
       'TV Cost': { carryover: 0.85, saturation: 1.5 },
+    });
+  });
+
+  it('omits calibration entirely for PyMC — its real code never reads that key', () => {
+    const payload = buildJobPayload(fakeDataset({ modelType: ModelType.PYMC }), []);
+    expect(payload.model_configuration).not.toHaveProperty('calibration');
+    expect(payload.model_configuration.channels).toEqual({
+      'TV Cost': { carryover: 0.85, saturation: 1.5 },
+      'Meta Cost': { carryover: 0.4, saturation: 1.1 },
+    });
+  });
+
+  it('still sends calibration for Meridian, real values included', () => {
+    const payload = buildJobPayload(fakeDataset({ modelType: ModelType.MERIDIAN }), []);
+    expect(payload.model_configuration.calibration).toEqual({
+      contribution_belief_percent: 30,
+      confidence_percent: 80,
     });
   });
 });
