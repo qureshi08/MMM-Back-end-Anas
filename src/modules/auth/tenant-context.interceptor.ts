@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, HttpException, Injectable, NestInterceptor } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Observable } from 'rxjs';
@@ -15,8 +15,24 @@ import { AuthenticatedUser } from './interfaces/authenticated-user.interface';
  *
  * One QueryRunner per request, in one transaction: opened here, provisioning
  * runs on it, the route handler runs on it (via AsyncLocalStorage), then
- * it's committed and released. A request that throws rolls back instead of
- * partially committing a half-provisioned tenant.
+ * it's committed and released.
+ *
+ * Real bug, found live 2026-09-11: this used to roll back on *any* thrown
+ * error, no exceptions. OtpService.verifyCode does a real, intentional write
+ * — incrementing the attempt count — specifically so a wrong guess counts
+ * against the real 5-try limit, then throws a normal UnauthorizedException to
+ * tell the client "incorrect code." That throw rolled back the whole
+ * transaction, undoing the increment right along with it — so `attempts`
+ * silently reset to its pre-request value on every single wrong guess, and
+ * the real limit could never be reached. Confirmed live: attemptsRemaining
+ * stuck at the same number across separate requests, seconds apart.
+ *
+ * A normal `HttpException` (4xx) is the route handler correctly rejecting a
+ * request it fully understood — real writes made before that point were
+ * deliberate, and now commit instead of vanishing. Only a genuinely
+ * unexpected failure (a non-HttpException, or a real 5xx) still rolls back,
+ * since that's the actual "half-provisioned tenant" case this comment used
+ * to describe — an error nobody planned for, not an intentional 401.
  */
 @Injectable()
 export class TenantContextInterceptor implements NestInterceptor {
@@ -63,7 +79,12 @@ export class TenantContextInterceptor implements NestInterceptor {
           await queryRunner.commitTransaction();
           subscriber.complete();
         } catch (error) {
-          await queryRunner.rollbackTransaction().catch(() => undefined);
+          const isExpectedRejection = error instanceof HttpException && error.getStatus() < 500;
+          if (isExpectedRejection) {
+            await queryRunner.commitTransaction().catch(() => undefined);
+          } else {
+            await queryRunner.rollbackTransaction().catch(() => undefined);
+          }
           subscriber.error(error);
         } finally {
           await queryRunner.release();
