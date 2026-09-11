@@ -70,14 +70,15 @@ export class OtpService {
       throw new UnauthorizedException('That code expired. Request a new one.');
     }
     if (active.attempts >= MAX_ATTEMPTS) {
-      throw new UnauthorizedException('Too many incorrect attempts. Request a new one.');
+      throw new UnauthorizedException({ message: 'Too many incorrect attempts. Request a new one.', attemptsRemaining: 0 });
     }
 
     active.attempts += 1;
     await this.repo().save(active);
 
     if (hashCode(code) !== active.codeHash) {
-      throw new UnauthorizedException('Incorrect code.');
+      const attemptsRemaining = Math.max(0, MAX_ATTEMPTS - active.attempts);
+      throw new UnauthorizedException({ message: 'Incorrect code.', attemptsRemaining });
     }
 
     active.consumedAt = new Date();
