@@ -27,9 +27,20 @@ re-render, remount, or reload while already on this screen.
 Right now nothing on the "Check your email" screen tells the user a limit exists, how many tries
 are left, or when the code expires. A wrong guess just says "Incorrect code." with no context.
 
-**What's needed**: show the real state, not just the error.
-- After a wrong attempt, show something like "Incorrect code. 3 attempts left." The real attempts
-  count isn't currently returned by `POST /otp/verify` &mdash; say if you want that added to the
-  response so this is a real number, not a frontend guess.
-- Consider a visible countdown or "expires in Xm" note, since a real 10-minute window with no visual
-  cue just means the user finds out it expired the hard way.
+**Done on our side**: `POST /otp/verify` now returns a real `attemptsRemaining` number in its error
+body on every failed attempt (`401`), both for a wrong code and for hitting the 5-try limit:
+
+```json
+{ "message": "Incorrect code.", "attemptsRemaining": 3 }
+```
+
+```json
+{ "message": "Too many incorrect attempts. Request a new one.", "attemptsRemaining": 0 }
+```
+
+**What's needed on your side**: read that real field and show it &mdash; "Incorrect code. 3 attempts
+left." instead of just "Incorrect code." When `attemptsRemaining` is `0`, disable Verify and point
+the user at Resend code instead of letting them keep guessing against a code that's already dead.
+
+Consider a visible countdown or "expires in Xm" note too, since a real 10-minute window with no
+visual cue just means the user finds out it expired the hard way.
