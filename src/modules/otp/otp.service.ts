@@ -9,6 +9,7 @@ import { GraphMailService } from '../../common/mail/graph-mail.service';
 
 const CODE_TTL_MINUTES = 10;
 const MAX_ATTEMPTS = 5;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 function hashCode(code: string): string {
   return createHash('sha256').update(code).digest('hex');
@@ -31,9 +32,31 @@ export class OtpService {
     return getTenantContext().queryRunner.manager.getRepository(OtpCode);
   }
 
+  /**
+   * Real gap found live 2026-09-11: nothing here stopped a real user (or a script) from spamming
+   * this endpoint — unlimited fresh codes, unlimited emails to the same real address, and each
+   * resend also handed out a fresh real 5-try budget with no limit on how many times that budget
+   * itself could be refilled. This cooldown checks the most recent code ever sent to this account,
+   * consumed or not, so a real resend still can't be requested more than once every 30 seconds.
+   */
   async requestCode(user: AuthenticatedUser): Promise<void> {
     if (!user.email) {
       throw new BadRequestException('This account has no email on file, cannot send a code.');
+    }
+
+    const mostRecent = await this.repo().findOne({
+      where: { userId: user.userId! },
+      order: { createdAt: 'DESC' },
+    });
+    if (mostRecent) {
+      const secondsSinceLast = (Date.now() - mostRecent.createdAt.getTime()) / 1000;
+      if (secondsSinceLast < RESEND_COOLDOWN_SECONDS) {
+        const retryAfterSeconds = Math.ceil(RESEND_COOLDOWN_SECONDS - secondsSinceLast);
+        throw new BadRequestException({
+          message: `Please wait ${retryAfterSeconds}s before requesting another code.`,
+          retryAfterSeconds,
+        });
+      }
     }
 
     const code = generateCode();

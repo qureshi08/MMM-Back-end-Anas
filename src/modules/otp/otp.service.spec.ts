@@ -20,9 +20,12 @@ function fakeRepo() {
       else rows[i] = row;
       return row;
     },
-    findOne: async ({ where }: { where: { userId: string; consumedAt: null } }) => {
+    findOne: async ({ where }: { where: Partial<Record<'userId' | 'consumedAt', unknown>> }) => {
+      // Every real call in this service that filters by consumedAt uses IsNull() — this fake only
+      // ever needs to tell "filter to unconsumed" apart from "no filter at all," not model IsNull().
       const matches = rows
-        .filter((r) => r.userId === where.userId && r.consumedAt === null)
+        .filter((r) => r.userId === where.userId)
+        .filter((r) => !('consumedAt' in where) || r.consumedAt === null)
         .sort((a, b) => (b as any).createdAt - (a as any).createdAt);
       return matches[0] ?? null;
     },
@@ -85,5 +88,56 @@ describe('OtpService.verifyCode', () => {
 
   it('throws NotFoundException when there is no active code at all', async () => {
     await expect(service.verifyCode(user, '123456')).rejects.toBeInstanceOf(NotFoundException);
+  });
+});
+
+describe('OtpService.requestCode', () => {
+  const user: AuthenticatedUser = { userId: randomUUID(), tenantId: randomUUID(), email: 'a@b.com' } as AuthenticatedUser;
+  let repo: ReturnType<typeof fakeRepo>;
+  let service: OtpService;
+
+  beforeEach(() => {
+    repo = fakeRepo();
+    service = new OtpService({ sendMail: jest.fn() } as any);
+    jest.spyOn(service as any, 'repo').mockReturnValue(repo);
+  });
+
+  function seedRecentCode(secondsAgo: number, consumed = false): void {
+    repo.rows.push({
+      id: randomUUID(),
+      userId: user.userId,
+      tenantId: user.tenantId,
+      codeHash: 'irrelevant',
+      expiresAt: new Date(Date.now() + 10 * 60_000),
+      attempts: 0,
+      consumedAt: consumed ? new Date() : null,
+      createdAt: new Date(Date.now() - secondsAgo * 1000),
+    } as any);
+  }
+
+  it('sends a real first code with no prior history', async () => {
+    await expect(service.requestCode(user)).resolves.toBeUndefined();
+    expect(repo.rows).toHaveLength(1);
+  });
+
+  it('real gap found live 2026-09-11: blocks a resend requested less than 30s after the last one', async () => {
+    seedRecentCode(5);
+    await expect(service.requestCode(user)).rejects.toMatchObject({
+      response: { message: expect.stringContaining('Please wait'), retryAfterSeconds: 25 },
+    });
+    expect(repo.rows).toHaveLength(1); // no second row got created
+  });
+
+  it('allows a resend once the real 30s cooldown has passed', async () => {
+    seedRecentCode(31);
+    await expect(service.requestCode(user)).resolves.toBeUndefined();
+    expect(repo.rows).toHaveLength(2);
+  });
+
+  it('the cooldown applies even against an already-consumed code, not just an active one', async () => {
+    seedRecentCode(5, true);
+    await expect(service.requestCode(user)).rejects.toMatchObject({
+      response: { retryAfterSeconds: 25 },
+    });
   });
 });
